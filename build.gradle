@@ -1,0 +1,15 @@
+plugins {
+     id 'java'
+}
+apply plugin: 'jacoco'
+apply plugin: 'application'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+     testImplementation('junit:junit:4.13') {
+     }
+}
