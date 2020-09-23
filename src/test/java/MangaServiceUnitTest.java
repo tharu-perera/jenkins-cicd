@@ -8,7 +8,8 @@ public class MangaServiceUnitTest {
     @Test
     public void testGetMangasByTitle() throws IOException {
         User user = new User("tharindu");
-        assertEquals(user.getName() ,"tharindu");
+        assertEquals("tharindu" ,user.getName());
+        assertEquals("tharindu" ,user.getName());
 
     }
 
