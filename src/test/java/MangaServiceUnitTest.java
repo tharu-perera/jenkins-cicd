@@ -12,6 +12,7 @@ public class MangaServiceUnitTest {
         user.setCount(1);
         assertEquals(1, user.getCount());
 
+
     }
 
 }
