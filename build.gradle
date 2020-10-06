@@ -7,7 +7,7 @@ apply plugin: 'application'
 
 sonarqube {
     properties {
-        property 'sonar.projectName', 'Example of SonarQube Scanner for Gradle Usage'
+        property 'sonar.projectName', 'Jenkind Gradle Usage'
         property 'sonar.host.url', 'http://localhost:9000'
     }
 }
@@ -20,18 +20,16 @@ dependencies {
      }
 }
 
-test {
-    finalizedBy jacocoTestReport
-}
+
 jacocoTestReport {
     reports {
         xml.enabled true
     }
 }
-test.finalizedBy jacocoTestReport
+
 
 jacocoTestCoverageVerification {
-    dependsOn test
+//    dependsOn test
     violationRules {
         rule {
             limit {
