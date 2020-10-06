@@ -1,10 +1,16 @@
 plugins {
      id 'java'
+    id "org.sonarqube" version "3.0"
 }
 apply plugin: 'jacoco'
 apply plugin: 'application'
 
-
+sonarqube {
+    properties {
+        property 'sonar.projectName', 'Example of SonarQube Scanner for Gradle Usage'
+        property 'sonar.host.url', 'http://localhost:9000'
+    }
+}
 repositories {
     mavenCentral()
 }
@@ -18,8 +24,11 @@ test {
     finalizedBy jacocoTestReport
 }
 jacocoTestReport {
-    dependsOn test
+    reports {
+        xml.enabled true
+    }
 }
+test.finalizedBy jacocoTestReport
 
 jacocoTestCoverageVerification {
     dependsOn test

@@ -55,6 +55,7 @@ pipeline {
 
         junit '**/build/test-results/test/*.xml'
 
+
 //         jacoco deltaLineCoverage: '50', exclusionPattern: '**/*Test*.class' , inclusionPattern: '**/*.class',   maximumLineCoverage: '90', changeBuildStatus: true
         slackSend(channel: "#general", color: COLOR_MAP[currentBuild.currentResult], message: "*${currentBuild.currentResult} * Deploy Approval: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.JOB_DISPLAY_URL})", attachments: attachments, blocks: blocks)
         // script {
