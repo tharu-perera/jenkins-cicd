@@ -1,25 +1,11 @@
 public class User {
-    private String name;
-    private String xxxx;
+     private int count;
 
-    public String getXxxx() {
-        return xxxx;
+    public int getCount() {
+        return count;
     }
 
-
-    public void setXxxx(String xxxx) {
-        this.xxxx = xxxx;
-    }
-
-    public User(String name) {
-        this.name=name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setCount(int count) {
+        this.count = count;
     }
 }
