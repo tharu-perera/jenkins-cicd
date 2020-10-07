@@ -27,11 +27,12 @@ pipeline {
 
     stage('Cleanup Workspace') {
       steps {
-        cleanWs()
-        sh """
-                echo "
-        Cleaned Up Workspace For Project "
-                """
+//         cleanWs()
+        sh 'echo Cleaned Up Workspace For Project '
+        sh 'pwd '
+        sh 'ls -ltr '
+        sh 'cat src/test/java/MangaServiceUnitTest.java'
+
       }
     }
     stage('Checkout') {
