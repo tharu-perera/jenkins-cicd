@@ -27,23 +27,17 @@ pipeline {
 
     stage('Cleanup Workspace') {
       steps {
-        cleanWs()
-        sh """
-                echo "
-        Cleaned Up Workspace For Project "
-                """
+//         cleanWs()
+        sh 'echo Cleaned Up Workspace For Project '
       }
     }
     stage('Checkout') {
       steps { //Checking out the repo
-        checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '3f16424e-a2b9-4bd4-b787-5a3987dfc84c', url: 'https://github.com/tharindu-perera/jenkins-cicd.git']]])
+        checkout([$class: 'GitSCM', branches: [[name: '*/develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '3f16424e-a2b9-4bd4-b787-5a3987dfc84c', url: 'https://github.com/tharindu-perera/jenkins-cicd.git']]])
 
         script {
           try {
             sh 'chmod +x gradlew'
-
-            sh './gradlew build -x test --no-daemon'
-                        sh './gradlew test jacocoTestReport  jacocoTestCoverageVerification --no-daemon'
             sh './gradlew test jacocoTestReport    --no-daemon'
           } finally {
             print('xxxxxxxxxxxxxx')
@@ -53,7 +47,7 @@ pipeline {
           }
         }
 
-        junit '**/build/test-results/test/*.xml'
+//         junit '**/build/test-results/test/*.xml'
         // step( [ $class: 'JacocoPublisher' ] )
 
          script {
@@ -65,6 +59,7 @@ pipeline {
                    sh "${tool("sonarqube")}/bin/sonar-scanner  -Dsonar.projectKey=test-node-js  -Dsonar.sources=. -Dsonar.css.node=.  -Dsonar.host.url=http://localhost:9000   -Dsonar.login=your-generated-token-from-sonarqube-container"
 
                        }
+//                     sh './gradlew  jacocoTestCoverageVerification   --no-daemon'
 
                    }
 
