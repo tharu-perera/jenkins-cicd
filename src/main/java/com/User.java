@@ -1,5 +1,7 @@
+package com;
+
 public class User {
-     private int count;
+     private int count;   //dwed
 
     public int getCount() {
         return count;

@@ -1,0 +1,165 @@
+#!groovy
+
+import groovy.json.JsonOutput
+import java.util.Optional
+import hudson.tasks.test.AbstractTestResultAction
+import hudson.model.Actionable
+import hudson.tasks.junit.CaseResult
+
+def speedUp = '--configure-on-demand --daemon --parallel'
+def nebulaReleaseScope = (env.GIT_BRANCH == 'origin/master') ? '' : "-Prelease.scope=patch"
+def nebulaRelease = "-x prepare -x develop snapshot ${nebulaReleaseScope}"
+def gradleDefaultSwitches = "${speedUp} ${nebulaRelease}"
+def gradleAdditionalTestTargets = "integrationTest"
+def gradleAdditionalSwitches = "shadowJar"
+def slackNotificationChannel = "general"
+def author = ""
+def message = ""
+def testSummary = ""
+def total = 0
+def failed = 0
+def skipped = 0
+
+def isPublishingBranch = { ->
+    return env.GIT_BRANCH == 'origin/master' || env.GIT_BRANCH =~ /develop.+/
+}
+
+def isResultGoodForPublishing = { ->
+    return currentBuild.result == null
+}
+
+def notifySlack(text, channel, attachments) {
+//    def slackURL = 'https://hooks.slack.com/services/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'
+//    def jenkinsIcon = 'https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png'
+//
+//    def payload = JsonOutput.toJson([text       : text,
+//                                     channel    : channel,
+//                                     username   : "Jenkins",
+//                                     icon_url   : jenkinsIcon,
+//                                     attachments: attachments
+//    ])
+
+    sh "curl --location --request POST 'https://hooks.slack.com/services/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' \\\n" +
+            "--header 'Content-Type: application/json' \\\n" +
+            "--data-raw '{\n" +
+            "  \"channel\": \"general\",\n" +
+            "  \"blocks\": [\n" +
+            "    {\n" +
+            "      \"type\": \"section\",\n" +
+            "      \"text\": {\n" +
+            "        \"type\": \"mrkdwn\",\n" +
+            "        \"text\": \"Danny Torrence left the following review for your property:\"\n" +
+            "      }\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"type\": \"section\",\n" +
+            "      \"block_id\": \"section567\",\n" +
+            "      \"text\": {\n" +
+            "        \"type\": \"mrkdwn\",\n" +
+            "        \"text\": \"<https://google.com|Overlook Hotel> \\n :star: \\n Doors had too many axe holes, guest in room 237 was far too rowdy, whole place felt stuck in the 1920s.\"\n" +
+            "      },\n" +
+            "      \"accessory\": {\n" +
+            "        \"type\": \"image\",\n" +
+            "        \"image_url\": \"https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/d3/72/5c/d3725c8f-c642-5d69-1904-aa36e4297885/source/256x256bb.jpg\",\n" +
+            "        \"alt_text\": \"Haunted hotel image\"\n" +
+            "      }\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"type\": \"section\",\n" +
+            "      \"block_id\": \"section789\",\n" +
+            "      \"fields\": [\n" +
+            "        {\n" +
+            "          \"type\": \"mrkdwn\",\n" +
+            "          \"text\": \"*Average Rating*\\n1.0\"\n" +
+            "        }\n" +
+            "      ]\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}'"
+}
+
+def getGitAuthor = {
+    def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
+    author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
+}
+
+
+
+
+@NonCPS
+def getFailedTests = { ->
+    def testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
+    def failedTestsString = "```"
+
+    if (testResultAction != null) {
+        def failedTests = testResultAction.getFailedTests()
+
+        if (failedTests.size() > 9) {
+            failedTests = failedTests.subList(0, 8)
+        }
+
+        for (CaseResult cr : failedTests) {
+            failedTestsString = failedTestsString + "${cr.getFullDisplayName()}:\n${cr.getErrorDetails()}\n\n"
+        }
+        failedTestsString = failedTestsString + "```"
+    }
+    return failedTestsString
+}
+
+
+
+pipeline {
+    try {
+        stage('Checkout') {
+            checkout scm
+        }
+
+        stage('Build') {
+            sh "./gradlew clean build "
+            step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+
+//            populateGlobalVariables()
+
+            def buildColor = currentBuild.result == null ? "good" : "warning"
+            def buildStatus = currentBuild.result == null ? "Success" : currentBuild.result
+            def jobName = "${env.JOB_NAME}"
+
+            // Strip the branch name out of the job name (ex: "Job Name/branch1" -> "Job Name")
+            jobName = jobName.getAt(0..(jobName.indexOf('/') - 1))
+
+//            sh "title: ${jobName}, build #${env.BUILD_NUMBER} ,title_link: ${env.BUILD_URL}, color: ${buildColor}, text: ${buildStatus} ${author}"
+//            sh " test sumary ${testSummary}"
+
+
+                notifySlack("", slackNotificationChannel, [
+                        [
+                                title      : "${jobName}, build #${env.BUILD_NUMBER}",
+                                title_link : "${env.BUILD_URL}",
+                                color      : "${buildColor}",
+                                author_name: "${author}",
+                                text       : "${buildStatus}\n${author}",
+                                fields     : [
+                                        [
+                                                title: "Branch",
+                                                value: "${env.GIT_BRANCH}",
+                                                short: true
+                                        ],
+                                        [
+                                                title: "Test Results",
+                                                value: "${testSummary}",
+                                                short: true
+                                        ],
+                                        [
+                                                title: "Last Commit",
+                                                value: "${message}",
+                                                short: false
+                                        ]
+                                ]
+                        ]
+                ])
+            }
+    } catch (e) {
+        println(">>>>ERROR")
+        throw e
+    }
+}
