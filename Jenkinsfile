@@ -41,6 +41,20 @@ pipeline {
         stage("send slack ") {
 
             steps {
+                script{
+                    def slackURL = 'https://hooks.slack.com/services/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'
+                    def jenkinsIcon = 'https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png'
+
+                    def payload = JsonOutput.toJson([text: text,
+                                                     channel: "general",
+                                                     username: "Jenkins",
+                                                     icon_url: jenkinsIcon,
+                                                     attachments: attachments
+                    ])
+
+                    sh "curl -X POST --data-urlencode \'payload=${payload}\' ${slackURL}"
+
+                }
 
             }
         }
