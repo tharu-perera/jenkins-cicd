@@ -38,7 +38,25 @@ pipeline {
     // =============== stages====================
     stages {
 
-        stage("env varible checking"){
+        stage("send slack ") {
+            environment {
+                // Using returnStdout
+                CC = sh(
+                        returnStdout: true,
+                        script: 'echo "clang"'
+                )
+                // Using returnStatus
+                EXIT_STATUS = """${sh(
+                        returnStatus: true,
+                        script: 'exit 1'
+                )}"""
+            }
+            steps {
+                sh 'printenv'
+            }
+        }
+
+        stage("env varible checking") {
             environment {
                 // Using returnStdout
                 CC = sh(
@@ -157,12 +175,12 @@ pipeline {
         }
         stage('   changeset    ') {
             when {
-                changeset pattern: "*/*TEST.java", comparator: "REGEXP"
+//                changeset pattern: "*/*TEST.java", comparator: "REGEXP"
 //                anyOf {
 //                    changeset "src/**"
 //                    changeset "test/**"
 //                }
-//                changeset "**/*.java"
+                changeset "**/*.java"
 
             }
             steps {
@@ -171,7 +189,8 @@ pipeline {
         }
         stage('   changelog    ') {
             when {
-                changelog 'TEST'}
+                changelog 'TEST'
+            }
             steps {
                 echo "when condition checking - changelog"
             }
@@ -287,7 +306,7 @@ pipeline {
                 echo "Choice: ${params.CHOICE}"
 
                 echo "Password: ${params.PASSWORD}"
-             }
+            }
         }
 
 //        stage('Input paramter checking') {
