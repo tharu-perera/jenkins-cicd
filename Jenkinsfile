@@ -39,20 +39,9 @@ pipeline {
     stages {
 
         stage("send slack ") {
-            environment {
-                // Using returnStdout
-                CC = sh(
-                        returnStdout: true,
-                        script: 'echo "clang"'
-                )
-                // Using returnStatus
-                EXIT_STATUS = """${sh(
-                        returnStatus: true,
-                        script: 'exit 1'
-                )}"""
-            }
+
             steps {
-                sh 'printenv'
+
             }
         }
 
