@@ -1,4 +1,5 @@
 #!groovy
+import groovy.json.JsonOutput
 def author = ""
 def DEPLOY_QA = 'qa'
 def deployto = {
