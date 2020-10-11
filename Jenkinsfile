@@ -157,12 +157,12 @@ pipeline {
         }
         stage('   changeset    ') {
             when {
-//                changeset pattern: "**/*TEST.java", comparator: "REGEXP"
-                anyOf {
-                    changeset "src/**"
-                    changeset "test/**"
-                }
-                changeset "**/*.java"
+                changeset pattern: "**/*TEST.java", comparator: "REGEXP"
+//                anyOf {
+//                    changeset "src/**"
+//                    changeset "test/**"
+//                }
+//                changeset "**/*.java"
 
             }
             steps {
