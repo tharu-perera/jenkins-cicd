@@ -1,100 +1,318 @@
-def COLOR_MAP = ['SUCCESS': 'good', 'FAILURE': 'danger', ]
-blocks = [["type": "section", "text": ["type": "mrkdwn", "text": "Hello, Assistant to the Regional Manager Dwight! *Michael Scott* wants to know where you'd like to take the Paper Company investors to dinner tonight.\n\n *Please select a restaurant:*"]], ["type": "divider"], ["type": "section", "text": ["type": "mrkdwn", "text": "*Farmhouse Thai Cuisine*\n:star::star::star::star: 1528 reviews\n They do have some vegan options, like the roti and curry, plus they have a ton of salad stuff and noodles can be ordered without meat!! They have something for everyone here"], "accessory": ["type": "image", "image_url": "https://s3-media3.fl.yelpcdn.com/bphoto/c7ed05m9lC2EmA3Aruue7A/o.jpg", "alt_text": "alt text for image"]]]
-def attachments = [[
-text: 'I find your lack of faith disturbing!', fallback: 'Hey, Vader seems to be mad at you.', color: 'green']]
-
-def getBuildUser() {
-  return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
+#!groovy
+def author = ""
+def DEPLOY_QA = 'qa'
+def deployto = {
+    'qa'
+}
+def getGitAuthor = {
+    def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
+    author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
 }
 
+//to do chnageset  ,  changelog
 pipeline {
-
-  agent {
-    node {
-      label 'master'
+    agent any
+    environment {
+        CC = 'globvar'
+        DEPLOY_TO = deployto()
     }
-  }
-
-  options {
-    buildDiscarder logRotator(
-    daysToKeepStr: '16', numToKeepStr: '10')
-  }
-  environment {
-    APP_NAME = "DCUBE_APP"
-    APP_ENV = "DEV"
-  }
-  stages {
-
-    stage('Cleanup Workspace') {
-      steps {
-//         cleanWs()
-        sh 'echo Cleaned Up Workspace For Project '
-        sh 'pwd '
-        sh 'ls -ltr '
-        sh 'cat src/test/java/MangaServiceUnitTest.java'
-
-      }
+    options {
+//        skipDefaultCheckout()
+        buildDiscarder(logRotator(numToKeepStr: '1'))
     }
-    stage('Checkout') {
-      steps { //Checking out the repo
-        checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '3f16424e-a2b9-4bd4-b787-5a3987dfc84c', url: 'https://github.com/tharindu-perera/jenkins-cicd.git']]])
+    parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
 
-        script {
-          try {
-            sh 'chmod +x gradlew'
+        text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
 
-            sh './gradlew build -x test --no-daemon'
-                        sh './gradlew test jacocoTestReport  jacocoTestCoverageVerification --no-daemon'
-            sh './gradlew test jacocoTestReport    --no-daemon'
-          } finally {
-            print('xxxxxxxxxxxxxx')
-            //                         junit '**/build/test-results/test/*.xml' //make
-            //                         the junit test results available in any case
-            //                         (success & failure)
-          }
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+
+        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+
+        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+
+        file(name: 'name', description: 'file to upload')
+
+    }
+
+    // =============== stages====================
+    stages {
+
+        stage("env varible checking"){
+            environment {
+                // Using returnStdout
+                CC = sh(
+                        returnStdout: true,
+                        script: 'echo "clang"'
+                )
+                // Using returnStatus
+                EXIT_STATUS = """${sh(
+                        returnStatus: true,
+                        script: 'exit 1'
+                )}"""
+            }
+            steps {
+                sh 'printenv'
+            }
         }
 
-        junit '**/build/test-results/test/*.xml'
-        // step( [ $class: 'JacocoPublisher' ] )
+        stage('git n env info') {
+            // getGitAuthor() -- we cnnot call method outside steps
+            environment {
+                DEBUG_FLAGS = '-g'
+            }
+            steps {
+                script {
+                    getGitAuthor() // getGitAuthor() -- we should call method outside steps
+                }
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL} cc ${env.CC} DEBUG_FLAGS ${env.DEBUG_FLAGS}  "
+                echo " git branch  ${env.GIT_BRANCH}  "
+                echo " git author  ${author}  "
+                echo " JOB_NAME  ${env.JOB_NAME}  "
+            }
+            post {
+                always {
+                    echo ' post inside stage (first stage) section .... always'
+                }
+            }
+        }
 
-         script {
+        stage('currentBuild  ') {
+            steps {
+                echo " >>>> currentBuild ${currentBuild.changeSets} "
+                echo " >>>> currentBuild ${currentBuild.result} "
+                echo " >>>> gettign change logs "
+                script {
+                    def changeLogSets = currentBuild.changeSets
+                    for (int i = 0; i < changeLogSets.size(); i++) {
+                        def entries = changeLogSets[i].items
+                        for (int j = 0; j < entries.length; j++) {
+                            def entry = entries[j]
+                            echo "${entry.commitId} by ${entry.author} on ${new Date(entry.timestamp)}: ${entry.msg}"
+                            def files = new ArrayList(entry.affectedFiles)
+                            for (int k = 0; k < files.size(); k++) {
+                                def file = files[k]
+                                echo "  ${file.editType.name} ${file.path}"
+                            }
+                        }
+                    }
+                }
 
-               def scannerHome = tool 'sonarqube';
-
-                   withSonarQubeEnv("sonarqube-container") {
-
-                   sh "${tool("sonarqube")}/bin/sonar-scanner  -Dsonar.projectKey=test-node-js  -Dsonar.sources=. -Dsonar.css.node=.  -Dsonar.host.url=http://localhost:9000   -Dsonar.login=your-generated-token-from-sonarqube-container"
-
-                       }
-
-                   }
+            }
+        }
 
 
+        stage('checking env of other stage') {
+            steps {
+                echo " first stage specific env var DEBUG_FLAGS = ${env.DEBUG_FLAGS}  "
+                echo " globale env var [env.CC] = ${env.CC} "
+                echo " globale env var [CC] = $CC"
+
+            }
+        }
+
+        stage('checking shell status with script try catch') {
+            steps {
+                script {
+                    try {
+                        sh 'exit 1'
+                    } catch (Exception e) {
+
+                        sh 'echo   exception! '
+                    }
+                }
+            }
+        }
+
+        stage('checking shell status 0') {
+            steps {
+                sh 'exit 0'
+            }
+        }
+        // this will stop whole build and global level post blocks will get executed.
+        //stages after this will not get executed
+//        stage('checking shell status 1') {
+//            steps {
+//                sh 'exit 1'
+//            }
+//        }
+
+        stage('when   -is master') {
+            when { branch 'master' }
+            steps {
+                echo " when condition branch master"
+            }
+        }
+        stage('when   -is develop') {
+            when { branch 'develop' }
+            steps {
+                echo " when condition branch develop"
+            }
+        }
+        stage('when    - patter release') {
+            when { branch pattern: "release-\\d+", comparator: "REGEXP" }
+            steps {
+                echo "when condition checking - patter release"
+            }
+        }
+        stage('   changeset    ') {
+            when {
+//                changeset pattern: "**/*TEST.java", comparator: "REGEXP"
+                changeset "**/*.java"
+
+            }
+            steps {
+                echo "when condition checking - changeset test classes"
+            }
+        }
+        stage('when  changeRequest - for all requests') {
+            when { changeRequest() }
+            steps {
+                echo "when   - changeRequest¬ for all requests"
+            }
+        }
+        stage('when  - changeRequest target master') {
+            when {
+                changeRequest target: 'master'
+                expression {
+                    currentBuild.result == null || currentBuild.result == 'SUCCESS'
+                }
+            }
+            steps {
+                echo "when condition checking - changeRequest¬ target master"
+            }
+        }
+        stage('when  - changeRequest target develop') {
+            when { changeRequest target: 'develop' }
+            steps {
+                echo "when condition checking - changeRequest¬ target develop"
+            }
+        }
+        stage('when  - SCMTrigger') {
+            when { triggeredBy 'SCMTrigger' }
+            steps {
+                echo "when condition checking - SCMTrigger"
+            }
+        }
+        stage('when  - UpstreamCause') {
+            when { triggeredBy 'UpstreamCause' }
+            steps {
+                echo "when condition checking - UpstreamCause"
+            }
+        }
+        stage('when   - TimerTrigger') {
+            when { triggeredBy 'TimerTrigger' }
+            steps {
+                echo "when condition checking - TimerTrigger"
+            }
+        }
+        stage('when   - UserIdCause') {
+            when { triggeredBy cause: "UserIdCause", detail: "vlinde" }
+            steps {
+                echo "when condition checking - UserIdCause"
+            }
+        }
+        stage(' checking production deloy wit env ') {
+            when {
+                environment name: 'DEPLOY_TO', value: 'production'
+            }
+            steps {
+                echo 'Deploying to prod'
+            }
+        }
+        stage(' checking qa deloy wit env ') {
+            when {
+                environment name: 'DEPLOY_TO', value: 'qa'
+            }
+            steps {
+                echo 'Deploying to qa '
+            }
+        }
 
 
-//         jacoco deltaLineCoverage: '50', exclusionPattern: '**/*Test*.class' , inclusionPattern: '**/*.class',   maximumLineCoverage: '90', changeBuildStatus: true
+        stage('when condition checking succes scenario ') {
+            when {
+                expression {
+                    currentBuild.result == 'SUCCESS'
+                }
+            }
+            steps {
+                echo " when conditio is SUCCESS"
+            }
+        }
 
-        slackSend(channel: "#general", color: COLOR_MAP[currentBuild.currentResult], message: "*${currentBuild.currentResult} * Deploy Approval: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.JOB_DISPLAY_URL})", attachments: attachments, blocks: blocks)
-        // script {
-        //   try {
-        //     timeout(time: 30, unit: 'MINUTES') {
-        //       env.APPROVE_PROD = input message: 'Deploy to Production',
-        //       ok: 'Continue',
-        //       parameters: [choice(name: 'APPROVE_PROD', choices: 'YES\nNO', description: 'Deploy from STAGING to PRODUCTION?')]
-        //       if (env.APPROVE_PROD == 'YES') {
-        //         env.DPROD = true
-        //       } else {
-        //         env.DPROD = false
-        //       }
-        //     }
-        //   } catch(error) {
-        //     env.DPROD = true
-        //     echo 'Timeout has been reached! Deploy to PRODUCTION automatically activated'
-        //   }
-        // }
-      }
+        stage('when condition checking ERROR scenario ') {
+            when {
+                expression {
+                    currentBuild.result == 'FAILED'
+                }
+            }
+            steps {
+                echo " when conditio is FAILED"
+            }
+        }
+
+        stage('printing environment variables') {
+            environment {
+                AN_ACCESS_KEY = credentials('jen')
+            }
+            steps {
+                echo 'printing jen pass from jenkins config == ${AN_ACCESS_KEY}'
+                sh 'printenv'
+                sh 'echo  ${AN_ACCESS_KEY}'
+                sh 'echo  $AN_ACCESS_KEY'
+            }
+        }
+
+        stage('printing all global parameters') {
+            steps {
+                echo "Hello ${params.PERSON}"
+
+                echo "Biography: ${params.BIOGRAPHY}"
+
+                echo "Toggle: ${params.TOGGLE}"
+
+                echo "Choice: ${params.CHOICE}"
+
+                echo "Password: ${params.PASSWORD}"
+             }
+        }
+
+//        stage('Input paramter checking') {
+//            input {
+//                message "Should we continue?"
+//                ok "Yes, we should."
+//                submitter "alice,bob"
+//                parameters {
+//                    choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+//                    string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+//                }
+//            }
+//            steps {
+//                echo "Hello, ${PERSON}, nice to meet you."
+//            }
+//        }
+
+        stage('final  stage to test last step') {
+            steps {
+                echo 'final test'
+            }
+        }
     }
 
-  }
-
+    post { // these post steps will get executed at the end of build
+        always {
+            echo ' post outside stages always '
+//            sh '${currentBuild.result}'
+        }
+        failure {
+            echo ' post outside stages failure'
+        }
+        unstable {
+            echo ' post outside stages unstable'
+        }
+        aborted {
+            echo ' post outside stages aborted'
+        }
+    }
 }
