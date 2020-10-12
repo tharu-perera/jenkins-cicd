@@ -43,7 +43,7 @@ pipeline {
 
             steps {
                 script{
-                    def slackURL = 'https://hooks.slack.com/services/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'
+                    def slackURL = 'https://hooks.slack.com/services/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'
                     def jenkinsIcon = 'https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png'
 
                     def payload = JsonOutput.toJson([text: "xxxxxxx",
