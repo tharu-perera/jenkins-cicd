@@ -1,10 +1,10 @@
 #!groovy
 def author = ""
-def DEPLOY_QA = 'qa'
+def     DEPLOY_QA = 'qa'
 def buildCause = ""
 def BUILD_USER = ""
 
-//to do chnageset  ,  changelog
+//TODO chnageset  ,  changelog,try catch bloc
 pipeline {
 //    try{
         agent any
@@ -18,6 +18,19 @@ pipeline {
             stage('preparation') {
                 steps {
                     script {
+                        echo ">>getBuildUser>>>>>"
+                        echo "${currentBuild.getBuildCauses()}"
+                        echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
+                        echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserCause')}"
+                        echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
+
+                        // started by commit
+                        echo "${currentBuild.getBuildCauses('jenkins.branch.BranchEventCause')}"
+// started by timer
+                        echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
+// started by user
+                        echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')}"
+                        echo ">>getBuildUser> ENd >>>>"
                         // get build cause (time triggered vs. SCM change)
                         BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
                         echo "Current build was caused by: ${BUILD_USER}\n"
@@ -52,8 +65,6 @@ pipeline {
                             message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
 
                 }
-
-
             }
 
             stage('inform  build status to slack ') {
