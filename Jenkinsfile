@@ -10,10 +10,16 @@ def getGitAuthor = {
     author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
 }
 
+def getBuildUser() {
+    return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
+}
+
 //to do chnageset  ,  changelog
 pipeline {
     agent any
     environment {
+        doError = '0'
+        BUILD_USER = ''
         CC = 'globvar'
         DEPLOY_TO = deployto()
     }
@@ -42,19 +48,27 @@ pipeline {
         stage("send slack ") {
 
             steps {
-                script{
-                    def slackURL = 'https://hooks.slack.com/services/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'
-                    def jenkinsIcon = 'https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png'
+//                script{
+//                    def slackURL = 'https://hooks.slack.com/services/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'
+//                    def jenkinsIcon = 'https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png'
+//
+//                    def payload = JsonOutput.toJson([text: "xxxxxxx",
+//                                                     channel: "general",
+//                                                     username: "Jenkins",
+//                                                     icon_url: jenkinsIcon
+//                    ])
+//
+//                    sh "curl -X POST --data-urlencode \'payload=${payload}\' ${slackURL}"
+//
+//                }
 
-                    def payload = JsonOutput.toJson([text: "xxxxxxx",
-                                                     channel: "general",
-                                                     username: "Jenkins",
-                                                     icon_url: jenkinsIcon
-                    ])
-
-                    sh "curl -X POST --data-urlencode \'payload=${payload}\' ${slackURL}"
-
+                script {
+                    BUILD_USER = getBuildUser()
                 }
+                echo 'I will always say hello in the console.'
+                slackSend channel: 'general',
+                        color: COLOR_MAP[currentBuild.currentResult],
+                        message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
 
             }
         }
