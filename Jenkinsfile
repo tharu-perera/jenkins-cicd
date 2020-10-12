@@ -77,6 +77,13 @@ pipeline {
             }
         }
 
+        stage ('build & test'){
+            sh "./gradlew clean build"
+            step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+            echo ' getTestSummary()'
+
+        }
+
         stage("env varible checking") {
             environment {
                 // Using returnStdout
@@ -367,4 +374,23 @@ pipeline {
             echo ' post outside stages aborted'
         }
     }
+}
+
+@NonCPS
+def getTestSummary = { ->
+    def testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
+    def summary = ""
+
+    if (testResultAction != null) {
+        total = testResultAction.getTotalCount()
+        failed = testResultAction.getFailCount()
+        skipped = testResultAction.getSkipCount()
+
+        summary = "Passed: " + (total - failed - skipped)
+        summary = summary + (", Failed: " + failed)
+        summary = summary + (", Skipped: " + skipped)
+    } else {
+        summary = "No tests found"
+    }
+    return summary
 }
