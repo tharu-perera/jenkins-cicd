@@ -4,7 +4,7 @@ def DEPLOY_QA = 'qa'
 def buildCause = ""
 def BUILD_USER = ""
 
-//to do chnageset  ,  changelog
+//TODO chnageset  ,  changelog,try catch bloc
 pipeline {
 //    try{
         agent any
