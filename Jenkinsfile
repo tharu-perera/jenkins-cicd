@@ -20,7 +20,7 @@ pipeline {
                 script {
                     // get build cause (time triggered vs. SCM change)
                     BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
-                    echo "Current build was caused by: ${buildCause}\n"
+                    echo "Current build was caused by: ${BUILD_USER}\n"
 
                 }
             }
@@ -58,11 +58,11 @@ pipeline {
     post { // these post steps will get executed at the end of build
         always {
             echo ' post outside stages always '
-            sh "${currentBuild.result}"
+            sh "echo ${currentBuild.result}"
         }
         failure {
             echo ' post outside stages failure '
-            sh "${currentBuild.result}"
+            sh "echo ${currentBuild.result}"
         }
 
     }
