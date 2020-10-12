@@ -19,6 +19,7 @@ pipeline {
                 steps {
                     script {
                         echo ">>getBuildUser>>>>>"
+                        echo " git branch  ${env.GIT_BRANCH}  "
                         echo "${currentBuild.getBuildCauses()}"
                         echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
                         echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserCause')}"
