@@ -1,7 +1,7 @@
 #!groovy
 def author = ""
 def DEPLOY_QA = 'qa'
-
+def buildCause = ""
 
 //to do chnageset  ,  changelog
 pipeline {
@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // get build cause (time triggered vs. SCM change)
-                    def buildCause = currentBuild.getBuildCauses()[0].shortDescription
+                    buildCause = currentBuild.getBuildCauses()[0].shortDescription
                     echo "Current build was caused by: ${buildCause}\n"
 
                 }
@@ -29,41 +29,36 @@ pipeline {
         stage('build & test') {
             steps {
                 sh "./gradlew clean build test"
-
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-                echo " ${reportOnTestsForBuild()}"
-            }
-        }
-
-        stage("send slack ") {
-            steps {
-                script {
-                    BUILD_USER = getBuildUser()
-//                    BUILD_USER = "wde"
-                }
-                echo 'I will always say hello in the console.'
-                slackSend channel: 'general',
-                        color: 'good',
-                        message: "" +
-                                "result >>*${currentBuild.result} >>" +
-                                "changeSets >>*${currentBuild.changeSets} >>" +
-                                "rawBuild >>*${currentBuild.rawBuild} >>" +
-                                "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
 
             }
-        }
-        stage('checking shell status with script try catch') {
-            steps {
-                script {
-                    try {
-                        sh 'exit 1'
-                    } catch (Exception e) {
 
-                        sh 'echo   exception! '
-                    }
+            post {
+                failure {
+                    echo 'build & test error'
+                    slackSend channel: 'error',
+                            color: 'good',
+                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+
                 }
             }
         }
+
+        stage('inform  build status to slack ') {
+            echo 'inform  build status to slack'
+            slackSend channel: 'general',
+                    color: 'good',
+                    message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+
+        }
+
+
+
+
+
+
+
+
 
 
     }
@@ -71,7 +66,11 @@ pipeline {
     post { // these post steps will get executed at the end of build
         always {
             echo ' post outside stages always '
-//            sh '${currentBuild.result}'
+            sh '${currentBuild.result}'
+        }
+        failure {
+            echo ' post outside stages failure '
+            sh '${currentBuild.result}'
         }
 
     }
