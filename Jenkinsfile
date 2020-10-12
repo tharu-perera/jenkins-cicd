@@ -2,6 +2,57 @@
 def author = ""
 def DEPLOY_QA = 'qa'
 
+@NonCPS
+def getTestSummary = { ->
+    def testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
+    def summary = ""
+
+    if (testResultAction != null) {
+        total = testResultAction.getTotalCount()
+        failed = testResultAction.getFailCount()
+        skipped = testResultAction.getSkipCount()
+
+        summary = "Passed: " + (total - failed - skipped)
+        summary = summary + (", Failed: " + failed)
+        summary = summary + (", Skipped: " + skipped)
+    } else {
+        summary = "No tests found"
+    }
+    return summary
+}
+
+def deployto = {
+    'qa'
+}
+
+def getGitAuthor = {
+    def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
+    author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
+}
+
+@NonCPS
+def getBuildUser() {
+    echo ">>getBuildUser>>>>>"
+    echo "${currentBuild.getBuildCauses()}"
+    echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
+    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserCause')}"
+    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
+
+    // started by commit
+    echo "${currentBuild.getBuildCauses('jenkins.branch.BranchEventCause')}"
+// started by timer
+    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
+// started by user
+    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')}"
+    echo ">>getBuildUser> ENd >>>>"
+    if (currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')['userId']) {
+        return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
+    } else {
+        currentBuild.getBuildCauses()[0].shortDescription
+        return  currentBuild.getBuildCauses()[0].shortDescription
+    }
+}
+
 //to do chnageset  ,  changelog
 pipeline {
     agent any
@@ -32,6 +83,23 @@ pipeline {
 
     // =============== stages====================
     stages {
+        stage('preparation') {
+
+            steps {
+
+                script {
+
+                    // get build cause (time triggered vs. SCM change)
+                    def buildCause = currentBuild.getBuildCauses()[0].shortDescription
+                    echo "Current build was caused by: ${buildCause}\n"
+
+                    // e.g. "Current build was caused by: Started by GitHub push by mirekphd"
+                    // vs. "Started by timer"
+
+                }
+            }
+        }
+
 
         stage("send slack ") {
 
@@ -364,56 +432,5 @@ pipeline {
         aborted {
             echo ' post outside stages aborted'
         }
-    }
-}
-
-@NonCPS
-def getTestSummary = { ->
-    def testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
-    def summary = ""
-
-    if (testResultAction != null) {
-        total = testResultAction.getTotalCount()
-        failed = testResultAction.getFailCount()
-        skipped = testResultAction.getSkipCount()
-
-        summary = "Passed: " + (total - failed - skipped)
-        summary = summary + (", Failed: " + failed)
-        summary = summary + (", Skipped: " + skipped)
-    } else {
-        summary = "No tests found"
-    }
-    return summary
-}
-
-def deployto = {
-    'qa'
-}
-
-def getGitAuthor = {
-    def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
-    author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
-}
-
-@NonCPS
-def getBuildUser() {
-    echo ">>getBuildUser>>>>>"
-    echo "${currentBuild.getBuildCauses()}"
-    echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
-    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserCause')}"
-    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
-
-    // started by commit
-    echo "${currentBuild.getBuildCauses('jenkins.branch.BranchEventCause')}"
-// started by timer
-    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
-// started by user
-    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')}"
-    echo ">>getBuildUser> ENd >>>>"
-    if (currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')['userId']) {
-        return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
-    } else {
-        println(currentBuild.rawBuild.getCause(Cause.UserIdCause))
-        return "PR OR MERGE"
     }
 }
