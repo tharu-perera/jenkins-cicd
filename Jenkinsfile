@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // get build cause (time triggered vs. SCM change)
-                    buildCause = currentBuild.getBuildCauses()[0].shortDescription
+                    BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
                     echo "Current build was caused by: ${buildCause}\n"
 
                 }
@@ -38,7 +38,7 @@ pipeline {
                     echo 'build & test error'
                     slackSend channel: 'error',
                             color: 'good',
-                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${env.BUILD_USER}\n More info at: ${env.BUILD_URL}"
 
                 }
             }
@@ -58,11 +58,11 @@ pipeline {
     post { // these post steps will get executed at the end of build
         always {
             echo ' post outside stages always '
-            sh '${currentBuild.result}'
+            sh "${currentBuild.result}"
         }
         failure {
             echo ' post outside stages failure '
-            sh '${currentBuild.result}'
+            sh "${currentBuild.result}"
         }
 
     }
