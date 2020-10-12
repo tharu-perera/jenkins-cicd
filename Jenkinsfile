@@ -1,5 +1,9 @@
 #!groovy
 import groovy.json.JsonOutput
+import java.util.Optional
+import hudson.tasks.test.AbstractTestResultAction
+import hudson.model.Actionable
+import hudson.tasks.junit.CaseResult
 def author = ""
 def DEPLOY_QA = 'qa'
 def deployto = {
