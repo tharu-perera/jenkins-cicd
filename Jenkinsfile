@@ -1,36 +1,6 @@
 #!groovy
 def author = ""
 def DEPLOY_QA = 'qa'
-def deployto = {
-    'qa'
-}
-
-def getGitAuthor = {
-    def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
-    author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
-}
-
-@NonCPS
-def getBuildUser() {
-    echo ">>getBuildUser>>>>>"
-    echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
-    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserCause')}"
-    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
-
-    // started by commit
-    echo "${currentBuild.getBuildCauses('jenkins.branch.BranchEventCause')}"
-// started by timer
-    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
-// started by user
-    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')}"
-    echo ">>getBuildUser> ENd >>>>"
-    if (currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')['userId']) {
-        return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
-    } else {
-        println(currentBuild.rawBuild.getCause(Cause.UserIdCause))
-        return "PR OR MERGE"
-    }
-}
 
 //to do chnageset  ,  changelog
 pipeline {
@@ -414,4 +384,36 @@ def getTestSummary = { ->
         summary = "No tests found"
     }
     return summary
+}
+
+def deployto = {
+    'qa'
+}
+
+def getGitAuthor = {
+    def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
+    author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
+}
+
+@NonCPS
+def getBuildUser() {
+    echo ">>getBuildUser>>>>>"
+    echo "${currentBuild.getBuildCauses()}"
+    echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
+    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserCause')}"
+    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
+
+    // started by commit
+    echo "${currentBuild.getBuildCauses('jenkins.branch.BranchEventCause')}"
+// started by timer
+    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
+// started by user
+    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')}"
+    echo ">>getBuildUser> ENd >>>>"
+    if (currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')['userId']) {
+        return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
+    } else {
+        println(currentBuild.rawBuild.getCause(Cause.UserIdCause))
+        return "PR OR MERGE"
+    }
 }
