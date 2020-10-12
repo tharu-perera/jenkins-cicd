@@ -13,6 +13,11 @@ pipeline {
     }
     // =============== stages====================
     stages {
+        if(true){
+
+        }else{
+
+        }
         stage('preparation') {
             steps {
                 script {
@@ -39,6 +44,19 @@ pipeline {
 
                 }
             }
+        }
+
+        stage('getting approval for qa release') {
+            when { branch 'develop' }
+            steps {
+                echo 'getting approval for qa release'
+                slackSend channel: 'qa-release-approval',
+                        color: 'good',
+                        message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+
+            }
+
+
         }
 
         stage('inform  build status to slack ') {
