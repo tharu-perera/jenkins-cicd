@@ -61,7 +61,6 @@ pipeline {
 //                    sh "curl -X POST --data-urlencode \'payload=${payload}\' ${slackURL}"
 //
 //                }
-
                 script {
 //                    BUILD_USER = getBuildUser()
                     BUILD_USER = "wde"
@@ -69,7 +68,11 @@ pipeline {
                 echo 'I will always say hello in the console.'
                 slackSend channel: 'general',
                         color: 'good',
-                        message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+                        message: "" +
+                                "result >>*${currentBuild.result} >>" +
+                                "changeSets >>*${currentBuild.changeSets} >>" +
+                                "rawBuild >>*${currentBuild.rawBuild} >>" +
+                                "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
 
             }
         }
