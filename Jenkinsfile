@@ -1,5 +1,4 @@
 #!groovy
-import groovy.json.JsonOutput
 def author = ""
 def DEPLOY_QA = 'qa'
 def deployto = {
@@ -10,15 +9,28 @@ def getGitAuthor = {
     def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
     author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
 }
+
 @NonCPS
 def getBuildUser() {
-    if (currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')['userId']){
+    echo ">>getBuildUser>>>>>"
+    echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
+    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserCause')}"
+    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
+
+    // started by commit
+    echo "${currentBuild.getBuildCauses('jenkins.branch.BranchEventCause')}"
+// started by timer
+    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
+// started by user
+    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')}"
+    echo ">>getBuildUser> ENd >>>>"
+    if (currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')['userId']) {
         return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
-    }else{
+    } else {
         println(currentBuild.rawBuild.getCause(Cause.UserIdCause))
         return "PR OR MERGE"
     }
- }
+}
 
 //to do chnageset  ,  changelog
 pipeline {
@@ -83,11 +95,11 @@ pipeline {
             }
         }
 
-        stage ('build & test'){
-            steps{
+        stage('build & test') {
+            steps {
                 sh "./gradlew clean build"
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-                echo '${getTestSummary()}'
+                echo " ${getTestSummary()}"
             }
 
 
