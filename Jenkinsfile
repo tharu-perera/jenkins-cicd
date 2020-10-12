@@ -87,7 +87,7 @@ pipeline {
             steps{
                 sh "./gradlew clean build"
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-                echo getTestSummary()
+                echo '${getTestSummary()}'
             }
 
 
