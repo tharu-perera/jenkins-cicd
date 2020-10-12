@@ -146,7 +146,7 @@ pipeline {
 
         stage('build & test') {
             steps {
-                sh "./gradlew clean build"
+                sh "./gradlew clean build test"
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
                 echo " ${reportOnTestsForBuild()}"
             }
