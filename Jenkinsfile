@@ -7,9 +7,6 @@ def BUILD_USER = ""
 //to do chnageset  ,  changelog
 pipeline {
     agent any
-    environment {
-
-    }
     options {
 //        skipDefaultCheckout()
         buildDiscarder(logRotator(numToKeepStr: '1'))
