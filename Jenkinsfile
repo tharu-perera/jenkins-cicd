@@ -1,9 +1,5 @@
 #!groovy
 import groovy.json.JsonOutput
-import java.util.Optional
-import hudson.tasks.test.AbstractTestResultAction
-import hudson.model.Actionable
-import hudson.tasks.junit.CaseResult
 def author = ""
 def DEPLOY_QA = 'qa'
 def deployto = {
@@ -50,11 +46,10 @@ pipeline {
                     def slackURL = 'https://hooks.slack.com/services/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'
                     def jenkinsIcon = 'https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png'
 
-                    def payload = JsonOutput.toJson([text: text,
+                    def payload = JsonOutput.toJson([text: "xxxxxxx",
                                                      channel: "general",
                                                      username: "Jenkins",
-                                                     icon_url: jenkinsIcon,
-                                                     attachments: attachments
+                                                     icon_url: jenkinsIcon
                     ])
 
                     sh "curl -X POST --data-urlencode \'payload=${payload}\' ${slackURL}"
