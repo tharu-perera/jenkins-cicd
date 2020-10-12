@@ -6,13 +6,12 @@ def BUILD_USER = ""
 
 //to do chnageset  ,  changelog
 pipeline {
-    try {
+//    try{
         agent any
         options {
 //        skipDefaultCheckout()
             buildDiscarder(logRotator(numToKeepStr: '1'))
         }
-        if(true){}
         // =============== stages====================
         stages {
 
@@ -79,12 +78,12 @@ pipeline {
             }
 
         }
-    } catch (e) {
-       echo 'Error in pipeline'
-        slackSend channel: 'general',
-                color: 'good',
-                message: "Error in pipelin [${e.toString()}]"
-
-    }
+//    } catch (e) {
+//       echo 'Error in pipeline'
+//        slackSend channel: 'general',
+//                color: 'good',
+//                message: "Error in pipelin [${e.toString()}]"
+//
+//    }
 
 }
