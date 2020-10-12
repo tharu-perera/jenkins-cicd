@@ -63,11 +63,12 @@ pipeline {
 //                }
 
                 script {
-                    BUILD_USER = getBuildUser()
+//                    BUILD_USER = getBuildUser()
+                    BUILD_USER = "wde"
                 }
                 echo 'I will always say hello in the console.'
                 slackSend channel: 'general',
-                        color: COLOR_MAP[currentBuild.currentResult],
+                        color: 'good',
                         message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
 
             }
