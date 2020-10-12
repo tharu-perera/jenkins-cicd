@@ -62,8 +62,8 @@ pipeline {
 //
 //                }
                 script {
-//                    BUILD_USER = getBuildUser()
-                    BUILD_USER = "wde"
+                    BUILD_USER = getBuildUser()
+//                    BUILD_USER = "wde"
                 }
                 echo 'I will always say hello in the console.'
                 slackSend channel: 'general',
