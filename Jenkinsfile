@@ -5,11 +5,12 @@ def DEPLOY_QA = 'qa'
 def deployto = {
     'qa'
 }
+
 def getGitAuthor = {
     def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
     author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
 }
-
+@NonCPS
 def getBuildUser() {
     return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
 }
