@@ -45,22 +45,14 @@ pipeline {
         }
 
         stage('inform  build status to slack ') {
-            echo 'inform  build status to slack'
-            slackSend channel: 'general',
-                    color: 'good',
-                    message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+            steps {
+                echo 'inform  build status to slack'
+                slackSend channel: 'general',
+                        color: 'good',
+                        message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
 
+            }
         }
-
-
-
-
-
-
-
-
-
-
     }
 
     post { // these post steps will get executed at the end of build
