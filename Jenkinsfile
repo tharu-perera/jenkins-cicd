@@ -2,12 +2,13 @@
 def author = ""
 def DEPLOY_QA = 'qa'
 def buildCause = ""
+def BUILD_USER = ""
 
 //to do chnageset  ,  changelog
 pipeline {
     agent any
     environment {
-        BUILD_USER = ''
+
     }
     options {
 //        skipDefaultCheckout()
@@ -37,7 +38,7 @@ pipeline {
                     echo 'build & test error'
                     slackSend channel: 'error',
                             color: 'good',
-                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${env.BUILD_USER}\n More info at: ${env.BUILD_URL}"
+                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
 
                 }
             }
