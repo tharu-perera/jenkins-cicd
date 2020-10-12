@@ -78,9 +78,12 @@ pipeline {
         }
 
         stage ('build & test'){
-            sh "./gradlew clean build"
-            step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-            echo ' getTestSummary()'
+            steps{
+                sh "./gradlew clean build"
+                step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+                echo ' getTestSummary()'
+            }
+
 
         }
 
