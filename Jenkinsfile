@@ -12,8 +12,13 @@ def getGitAuthor = {
 }
 @NonCPS
 def getBuildUser() {
-    return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
-}
+    if (currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')['userId']){
+        return currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
+    }else{
+        println(currentBuild.rawBuild.getCause(Cause.UserIdCause))
+        return "PR OR MERGE"
+    }
+ }
 
 //to do chnageset  ,  changelog
 pipeline {
@@ -63,8 +68,8 @@ pipeline {
 //
 //                }
                 script {
-//                    BUILD_USER = getBuildUser()
-                    BUILD_USER = "wde"
+                    BUILD_USER = getBuildUser()
+//                    BUILD_USER = "wde"
                 }
                 echo 'I will always say hello in the console.'
                 slackSend channel: 'general',
