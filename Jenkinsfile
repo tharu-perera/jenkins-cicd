@@ -64,6 +64,9 @@ pipeline {
                         echo " env.par1  =  ${env.par1 }"
                         if(env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop"){
                             echo "true"
+                            echo "$type"
+                            type=Type.DEV_PR
+                            echo "$type"
                         }else{
                             echo "flasesss"
                         }
