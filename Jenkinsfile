@@ -26,8 +26,7 @@ pipeline {
 //        withCredentials([string(credentialsId: 'jen', variable: 'jen1')]) {
 //            echo "My password is '${jen1}'!"
 //        }
-        jen = credentials('jen')
-    }
+     }
     // =============== stages====================
     stages {
 
@@ -41,15 +40,15 @@ pipeline {
                          script {
                              echo ">>jen >>>>>${jenn}"
                              jen=jenn
+                             SLACK_ACCESS_KEY=st
                              echo ">>jen >>>>>${jen}"
-
                          }
 
                 }
                 script {
                     echo ">>getBuildUser>>>>>"
-                    echo ">>SLACK_ACCESS_KEY >>>>>${st}"
-                    echo ">>jen >>>>>${jenn}"
+                    echo ">>SLACK_ACCESS_KEY >>>>>${SLACK_ACCESS_KEY}"
+                    echo ">>jen >>>>>${jen}"
                     echo " git branch  ${env.GIT_BRANCH}  "
                     echo "${currentBuild.getBuildCauses()}"
                     echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
