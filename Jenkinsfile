@@ -1,10 +1,10 @@
 #!groovy
 def author = ""
-def     DEPLOY_QA = 'qa'
+def DEPLOY_QA = 'qa'
 def buildCause = ""
 def BUILD_USER = ""
 
-//TODO chnageset  ,  changelog,try catch bloc
+//TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
 //    try{
         agent any
@@ -43,6 +43,7 @@ pipeline {
             stage('build & test') {
                 steps {
                     sh "./gradlew clean build test"
+                    junit allowEmptyResults: true, testResults: ''
                     step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
                 }
 
