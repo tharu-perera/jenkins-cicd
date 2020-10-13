@@ -103,7 +103,79 @@ pipeline {
 def notifySlack() {
      withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
          script {
-            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{\"channel\": \"general\",\n  \"text\": \"Hello, world\"}'"
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{\n" +
+                    "\"blocks\": [\n" +
+                    "{\n" +
+                    "\"type\": \"section\",\n" +
+                    "\"text\": {\n" +
+                    "\"type\": \"mrkdwn\",\n" +
+                    "\"text\": \"Danny Torrence left the following review for your property:\"\n" +
+                    "}\n" +
+                    "},\n" +
+                    "{\n" +
+                    "\"type\": \"section\",\n" +
+                    "\"block_id\": \"section567\",\n" +
+                    "\"text\": {\n" +
+                    "\"type\": \"mrkdwn\",\n" +
+                    "\"text\": \"<https://example.com|Overlook Hotel> \\n :star: \\n Doors had too many axe holes, guest in room 237 was far too rowdy, whole place felt stuck in the 1920s.\"\n" +
+                    "},\n" +
+                    "\"accessory\": {\n" +
+                    "\"type\": \"image\",\n" +
+                    "\"image_url\": \"https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/d3/72/5c/d3725c8f-c642-5d69-1904-aa36e4297885/source/256x256bb.jpg\",\n" +
+                    "\"alt_text\": \"Haunted hotel image\"\n" +
+                    "}\n" +
+                    "},\n" +
+                    "{\n" +
+                    "\"type\": \"section\",\n" +
+                    "\"block_id\": \"section789\",\n" +
+                    "\"fields\": [\n" +
+                    "{\n" +
+                    "\"type\": \"mrkdwn\",\n" +
+                    "\"text\": \"*Average Rating*\\n1.0\"\n" +
+                    "}\n" +
+                    "]\n" +
+                    "},\n" +
+                    "{\n" +
+                    "\"type\": \"actions\",\n" +
+                    "\"elements\": [\n" +
+                    "{\n" +
+                    "\"type\": \"button\",\n" +
+                    "\"text\": {\n" +
+                    "\"type\": \"plain_text\",\n" +
+                    "\"text\": \"Reply to review\",\n" +
+                    "\"emoji\": false\n" +
+                    "}\n" +
+                    "}\n" +
+                    "]\n" +
+                    "},\n" +
+                    "{\n" +
+                    "\"type\": \"section\",\n" +
+                    "\"text\": {\n" +
+                    "\"type\": \"mrkdwn\",\n" +
+                    "\"text\": \"This is a section block with a button.\"\n" +
+                    "},\n" +
+                    "\"accessory\": {\n" +
+                    "\"type\": \"button\",\n" +
+                    "\"text\": {\n" +
+                    "\"type\": \"plain_text\",\n" +
+                    "\"text\": \"Click Me\",\n" +
+                    "\"emoji\": true\n" +
+                    "},\n" +
+                    "\"value\": \"click_me_123\",\n" +
+                    "\"url\": \"https://google.com\",\n" +
+                    "\"action_id\": \"button-action\"\n" +
+                    "}\n" +
+                    "},\n" +
+                    "{\n" +
+                    "\"type\": \"section\",\n" +
+                    "\"text\": {\n" +
+                    "\"type\": \"plain_text\",\n" +
+                    "\"text\": \"This is a plain text section block.\",\n" +
+                    "\"emoji\": true\n" +
+                    "}\n" +
+                    "}\n" +
+                    "]\n" +
+                    "}'"
         }
     }
 
