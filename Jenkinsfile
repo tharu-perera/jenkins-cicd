@@ -18,6 +18,13 @@ pipeline {
     }
     environment {
         SLACK_ACCESS_KEY = credentials('slack-token')
+        withCredentials([string(credentialsId: 'slack-token', variable: 'PW1')]) {
+            echo "My password is '${PW1}'!"
+        }
+
+        withCredentials([string(credentialsId: 'jen', variable: 'jen1')]) {
+            echo "My password is '${jen1}'!"
+        }
         jen = credentials('jen')
     }
     // =============== stages====================
