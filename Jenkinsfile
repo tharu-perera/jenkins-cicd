@@ -1,19 +1,24 @@
 #!groovy
-import groovy.json.JsonOutput
 
-def author = ""
-def DEPLOY_QA = 'qa'
-def buildCause = ""
+enum Type {
+    PR,
+    QA_RELEASE,
+    STAGE_RELEASE,
+    PROD_RELEASE,
+    CREATE_RELEASE,
+    CREATE_HOTFIX,
+}
+
+def AUTHOR = ""
 def BUILD_USER = ""
-def SLACK_ACCESS_KEY = ""
-def jen = ""
+
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
 //    try{
     agent any
     options {
-//        skipDefaultCheckout()
+        skipDefaultCheckout()
         buildDiscarder(logRotator(numToKeepStr: '1'))
     }
 
@@ -41,55 +46,80 @@ pipeline {
                     BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
                     echo "Current build was caused by: ${BUILD_USER}\n"
 
+
+                    if (env.BRANCH_NAME == 'master') {
+                        sh 'make'
+                    } else if (env.BRANCH_NAME.startsWith('PR')) {
+                        // do actions for pull request
+                    } else {
+                        // some other branch
+                    }
                 }
             }
         }
 
-        stage('build & test') {
-            steps {
-                notifySlack()
-                sh "./gradlew clean build test"
-                step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-            }
+//        stage('build & test') {
+//            steps {
+//                notifySlack()
+//                sh "./gradlew clean build -x test"
+//            }
+//
+//            post {
+//                failure {
+//                    echo 'build & test error'
+//                    slackSend channel: 'error',
+//                            color: 'good',
+//                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+//
+//                }
+//            }
+//        }
+//
+//        stage('unit test') {
+//            steps {
+//                notifySlack()
+//                sh "./gradlew test"
+//                step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+//            }
+//
+//            post {
+//                failure {
+//                    echo 'test error'
+//                    slackSend channel: 'error',
+//                            color: 'good',
+//                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+//
+//                }
+//            }
+//        }
+//
+//        stage('getting approval for qa release') {
+//            when { branch 'develop' }
+//            steps {
+//                echo 'getting approval for qa release'
+//                slackSend channel: 'qa-release-approval',
+//                        color: 'good',
+//                        message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+//
+//            }
+//        }
+//
+//        stage('inform  build status to slack ') {
+//            steps {
+//                echo 'inform  build status to slack'
+//            }
+//        }
+//    }
 
-            post {
-                failure {
-                    echo 'build & test error'
-                    slackSend channel: 'error',
-                            color: 'good',
-                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
-
-                }
-            }
-        }
-
-        stage('getting approval for qa release') {
-            when { branch 'develop' }
-            steps {
-                echo 'getting approval for qa release'
-                slackSend channel: 'qa-release-approval',
-                        color: 'good',
-                        message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
-
-            }
-        }
-
-        stage('inform  build status to slack ') {
-            steps {
-                echo 'inform  build status to slack'
-            }
-        }
-    }
-
-    post { // these post steps will get executed at the end of build
-        always {
-            echo ' post outside stages always '
-            sh "echo ${currentBuild.result}"
-        }
-        failure {
-            echo ' post outside stages failure '
-            sh "echo ${currentBuild.result}"
-        }
+//    post { // these post steps will get executed at the end of build
+//        always {
+//            echo ' post outside stages always '
+//            sh "echo ${currentBuild.result}"
+//        }
+//        failure {
+//            echo ' post outside stages failure '
+//            sh "echo ${currentBuild.result}"
+//        }
 
     }
 //    } catch (e) {
@@ -101,9 +131,10 @@ pipeline {
 //    }
 
 }
+
 def notifySlack() {
-     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
-         script {
+    withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+        script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{\n" +
                     "\"blocks\": [\n" +
                     "{\n" +
