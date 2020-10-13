@@ -22,7 +22,7 @@ enum Type {
 
 def AUTHOR = ""
 def BUILD_USER = ""
-def type = null
+Type type = null
 
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
