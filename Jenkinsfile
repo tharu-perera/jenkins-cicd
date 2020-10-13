@@ -141,16 +141,17 @@ pipeline {
 
         stage('test') {
             steps {
-//                notifySlack()
-                sh "./gradlew test"
-                step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-                jacoco(
-                        execPattern: 'target/*.exec',
-                        classPattern: 'target/classes',
-                        sourcePattern: 'src/main/java',
-                        exclusionPattern: 'src/test*'
-                )
-
+                script {
+                    try {
+                        sh 'chmod +x gradlew'
+                        sh './gradlew build -x test --no-daemon'
+                        sh './gradlew test jacocoTestReport --no-daemon'
+                    } finally {
+                        junit '**/build/test-results/test/*.xml' //make
+                        the junit test results available in any case
+                        (success & failure)
+                    }
+                }
             }
             post {
                 failure {
@@ -158,6 +159,26 @@ pipeline {
                     slackSend channel: 'error',
                             color: COLOR_MAP[currentBuild.currentResult],
                             message: "junit error"
+
+                }
+            }
+        }
+
+        stage('Publish Test Coverage Report') {
+            steps {
+                step([$class: 'JacocoPublisher',
+                      execPattern: '**/build/jacoco/*.exec',
+                      classPattern: '**/build/classes',
+                      sourcePattern: 'src/main/java',
+                      exclusionPattern: 'src/test*'
+                ])
+            }
+            post {
+                failure {
+                    echo 'Publish Test Coverage Report error'
+                    slackSend channel: 'error',
+                            color: COLOR_MAP[currentBuild.currentResult],
+                            message: "Publish Test Coverage Report error"
 
                 }
             }
@@ -172,10 +193,10 @@ pipeline {
 
             post {
                 failure {
-                    echo 'test error'
+                    echo 'Sonarqube error'
                     slackSend channel: 'error',
                             color: 'good',
-                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+                            message: "Sonarqube error"
 
                 }
             }
