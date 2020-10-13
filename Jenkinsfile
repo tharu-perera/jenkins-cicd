@@ -14,7 +14,7 @@ sh " echo $SLACK_ACCESS_KEY"
     sh "curl --location --request POST '$SLACK_ACCESS_KEY' " +
             "--header 'Content-Type: application/json' \\\n" +
             "--data-raw '{\n" +
-            "  \"channel\": \"YOUR_CHANNEL_ID\",\n" +
+            "  \"channel\": \"general\",\n" +
             "  \"text\": \"Hello, world\"\n" +
             "}'"
 }
@@ -42,10 +42,11 @@ pipeline {
                               jen=jenn
                              SLACK_ACCESS_KEY=st
                           }
+                    notifySlack("qd","wed","wed")
 
                 }
                 script {
-                    notifySlack("qd","wed","wed")
+
                     echo ">>getBuildUser>>>>>"
                     echo ">>SLACK_ACCESS_KEY >>>>>${SLACK_ACCESS_KEY}"
                     echo ">>jen >>>>>${jen}"
