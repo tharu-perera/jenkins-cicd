@@ -106,80 +106,8 @@ def notifySlack() {
             sh "curl --location --request POST '$st' " +
                     "--header 'Content-Type: application/json' \n" +
                     "--data-raw '{\n" +
-                    "  \"channel\": \"develop-pull-request\",\n" +
-                    "  \n" +
-                    "\t\"blocks\": [\n" +
-                    "\t\t{\n" +
-                    "\t\t\t\"type\": \"section\",\n" +
-                    "\t\t\t\"text\": {\n" +
-                    "\t\t\t\t\"type\": \"mrkdwn\",\n" +
-                    "\t\t\t\t\"text\": \"Danny Torrence left the following review for your property:\"\n" +
-                    "\t\t\t}\n" +
-                    "\t\t},\n" +
-                    "\t\t{\n" +
-                    "\t\t\t\"type\": \"section\",\n" +
-                    "\t\t\t\"block_id\": \"section567\",\n" +
-                    "\t\t\t\"text\": {\n" +
-                    "\t\t\t\t\"type\": \"mrkdwn\",\n" +
-                    "\t\t\t\t\"text\": \"<https://example.com|Overlook Hotel> \\n :star: \\n Doors had too many axe holes, guest in room 237 was far too rowdy, whole place felt stuck in the 1920s.\"\n" +
-                    "\t\t\t},\n" +
-                    "\t\t\t\"accessory\": {\n" +
-                    "\t\t\t\t\"type\": \"image\",\n" +
-                    "\t\t\t\t\"image_url\": \"https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/d3/72/5c/d3725c8f-c642-5d69-1904-aa36e4297885/source/256x256bb.jpg\",\n" +
-                    "\t\t\t\t\"alt_text\": \"Haunted hotel image\"\n" +
-                    "\t\t\t}\n" +
-                    "\t\t},\n" +
-                    "\t\t{\n" +
-                    "\t\t\t\"type\": \"section\",\n" +
-                    "\t\t\t\"block_id\": \"section789\",\n" +
-                    "\t\t\t\"fields\": [\n" +
-                    "\t\t\t\t{\n" +
-                    "\t\t\t\t\t\"type\": \"mrkdwn\",\n" +
-                    "\t\t\t\t\t\"text\": \"*Average Rating*\\n1.0\"\n" +
-                    "\t\t\t\t}\n" +
-                    "\t\t\t]\n" +
-                    "\t\t},\n" +
-                    "\t\t{\n" +
-                    "\t\t\t\"type\": \"actions\",\n" +
-                    "\t\t\t\"elements\": [\n" +
-                    "\t\t\t\t{\n" +
-                    "\t\t\t\t\t\"type\": \"button\",\n" +
-                    "\t\t\t\t\t\"text\": {\n" +
-                    "\t\t\t\t\t\t\"type\": \"plain_text\",\n" +
-                    "\t\t\t\t\t\t\"text\": \"Reply to review\",\n" +
-                    "\t\t\t\t\t\t\"emoji\": false\n" +
-                    "\t\t\t\t\t}\n" +
-                    "\t\t\t\t}\n" +
-                    "\t\t\t]\n" +
-                    "\t\t},\n" +
-                    "\t\t{\n" +
-                    "\t\t\t\"type\": \"section\",\n" +
-                    "\t\t\t\"text\": {\n" +
-                    "\t\t\t\t\"type\": \"mrkdwn\",\n" +
-                    "\t\t\t\t\"text\": \"This is a section block with a button.\"\n" +
-                    "\t\t\t},\n" +
-                    "\t\t\t\"accessory\": {\n" +
-                    "\t\t\t\t\"type\": \"button\",\n" +
-                    "\t\t\t\t\"text\": {\n" +
-                    "\t\t\t\t\t\"type\": \"plain_text\",\n" +
-                    "\t\t\t\t\t\"text\": \"Click Me\",\n" +
-                    "\t\t\t\t\t\"emoji\": true\n" +
-                    "\t\t\t\t},\n" +
-                    "\t\t\t\t\"value\": \"click_me_123\",\n" +
-                    "\t\t\t\t\"url\": \"https://google.com\",\n" +
-                    "\t\t\t\t\"action_id\": \"button-action\"\n" +
-                    "\t\t\t}\n" +
-                    "\t\t},\n" +
-                    "\t\t{\n" +
-                    "\t\t\t\"type\": \"section\",\n" +
-                    "\t\t\t\"text\": {\n" +
-                    "\t\t\t\t\"type\": \"plain_text\",\n" +
-                    "\t\t\t\t\"text\": \"This is a plain text section block.\",\n" +
-                    "\t\t\t\t\"emoji\": true\n" +
-                    "\t\t\t}\n" +
-                    "\t\t}\n" +
-                    "\t]\n" +
-                    " \n" +
+                    "  \"channel\": \"general\",\n" +
+                    "  \"text\": \"Hello, world\"\n" +
                     "}'"
         }
     }
