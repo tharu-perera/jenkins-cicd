@@ -22,6 +22,7 @@ pipeline {
 
         stage('preparation') {
             steps {
+                sh 'printenv'
                 script {
                     echo ">>getBuildUser>>>>>"
                     echo " git branch  ${env.GIT_BRANCH}  "
