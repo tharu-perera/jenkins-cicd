@@ -59,9 +59,13 @@ pipeline {
                     echo "Current build was caused by: ${BUILD_USER}\n"
 
                     try {
+                        echo " env.JOB_BASE_NAME =  ${env.JOB_BASE_NAME}"
+                        echo " env.CHANGE_TARGET  =  ${env.CHANGE_TARGET }"
+                        echo " env.par1  =  ${env.par1 }"
                         if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop") {
                             //develop PR
                             type = Type.DEV_PR
+                            echo "######"
                         } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('release')) {
                             //release bug fixing PR
                             type = Type.RELEASE_PR
@@ -115,7 +119,7 @@ pipeline {
                         }
 
                         echo "type ==  $type"
-                    }catch(Exception exception){
+                    } catch (Exception exception) {
                         echo "${exception.toString()}"
                     }
                 }
