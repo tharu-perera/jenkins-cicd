@@ -144,7 +144,6 @@ pipeline {
                 script {
                     try {
                         sh 'chmod +x gradlew'
-                        sh './gradlew build -x test --no-daemon'
                         sh './gradlew test jacocoTestReport --no-daemon'
                     } finally {
                         junit '**/build/test-results/test/*.xml'
