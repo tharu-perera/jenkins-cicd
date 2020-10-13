@@ -19,7 +19,6 @@ pipeline {
 
     // =============== stages====================
     stages {
-
         stage('preparation') {
             steps {
                 sh 'printenv'
@@ -49,8 +48,6 @@ pipeline {
         stage('build & test') {
             steps {
                 notifySlack()
-
-
                 sh "./gradlew clean build test"
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
             }
