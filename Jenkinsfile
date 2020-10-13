@@ -1,4 +1,5 @@
 #!groovy
+def COLOR_MAP = ['SUCCESS': 'good', 'FAILURE': 'danger',]
 
 enum Type {
     DEV_PR,
@@ -20,9 +21,10 @@ enum Type {
     HOTFIX_QA_RELEASE
 }
 
-def AUTHOR = ""
+def COMMIT_AUTHOR = ""
 def BUILD_USER = ""
-def type = ""
+def COMMIT_MSG = ""
+def TYPE = ""
 
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
@@ -40,117 +42,118 @@ pipeline {
             steps {
                 sh 'printenv'
                 script {
-                    echo ">>getBuildUser>>>>>"
-                    echo ">>${env.par1}>>>>>"
-                    echo " git branch  ${env.GIT_BRANCH}  "
-                    echo "${currentBuild.getBuildCauses()}"
-                    echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
-                    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserCause')}"
-                    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
-                    // started by commit
-                    echo "${currentBuild.getBuildCauses('jenkins.branch.BranchEventCause')}"
-// started by timer
-                    echo "${currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause')}"
-// started by user
-                    echo "${currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')}"
-                    echo ">>getBuildUser> ENd >>>>"
-                    // get build cause (time triggered vs. SCM change)
-                    BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
-                    echo "Current build was caused by: ${BUILD_USER}\n"
-
-                    try {
-                        echo " env.JOB_BASE_NAME =  ${env.JOB_BASE_NAME}"
-                        echo " env.CHANGE_TARGET  =  ${env.CHANGE_TARGET }"
-                        echo " env.par1  =  ${env.par1 }"
-                        if(env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop"){
-                            echo "true"
-                            echo "$type"
-                            AUTHOR="xxxxx"
-                            echo "$AUTHOR"
-                            echo "$type"
-                        }else{
-                            echo "flasesss"
-                        }
-                        if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop") {
-                            //develop PR
-                            type = "DEV_PR"
-                            echo "######"
-                        } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('release')) {
-                            //release bug fixing PR
-                            type = "RELEASE_PR"
-                        } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('hotfix')) {
-                            //hotfix fixing PR
-                            type = "HOTFIX_PR"
-                        } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('release')) {
-                            //prod release PR
-                            type = "PROD_PR"
-                        } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('hotfix')) {
-                            // hotfix prod release PR
-                            type = "HOTFIX_PROD_PR"
-                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'qa') {
-                            // qa release request
-                            type = "QA_RELEASE_REQ"
-                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'staging') {
-                            // prep release request
-                            type = "STAGE_RELEASE_REQ"
-                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'dev') {
-                            // dev release request
-                            type = "DEV_RELEASE_REQ"
-                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'prod') {
-                            // prod release request with LATEST tag
-                            type = "PROD_RELEASE_REQ"
-                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-qa') {
-                            // hotfix qa release request
-                            type = "HOTFIX_QA_RELEASE_REQ"
-                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-staging') {
-                            // hotfix staging release request
-                            type = "HOTFIX_STAGING_RELEASE_REQ"
-                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
-                            // create release branch with tag
-                            type = "CREATE_RELEASE_BR"
-                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-hotfix') {
-                            // create hotfix branch with tag. check whether still have one
-                            type = "CREATE_HOTFIX_BR"
-                        } else if (env.JOB_BASE_NAME == "develop") {
-                            // start dev release. no need approval .
-                            type = "DEV_RELEASE"
-                        } else if (env.JOB_BASE_NAME.startsWith('release')) {
-                            // qa  release request. need approval
-                            type = "QA_RELEASE"
-                        } else if (env.JOB_BASE_NAME.startsWith('master')) {
-                            // tag and start prod"  release request .need approval.check last merged branch .if hot fix bumpup hotfix version
-                            type = "PROD_RELEASE"
-                        } else if (env.JOB_BASE_NAME.startsWith('hotfix')) {
-                            //  qa  release request. need approval
-                            type = "HOTFIX_QA_RELEASE"
-                        } else {
-                            echo "<<<could not find the change type>>>"
-                        }
-
-                        echo "type ==  $type"
-                    } catch (Exception exception) {
-                        echo "${exception.toString()}"
+                    if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop") {
+                        TYPE = "DEV_PR"
+                    } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('release')) {
+                        //release bug fixing PR
+                        TYPE = "RELEASE_PR"
+                    } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('hotfix')) {
+                        //hotfix fixing PR
+                        TYPE = "HOTFIX_PR"
+                    } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('release')) {
+                        //prod release PR
+                        TYPE = "PROD_PR"
+                    } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('hotfix')) {
+                        // hotfix prod release PR
+                        TYPE = "HOTFIX_PROD_PR"
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'qa') {
+                        // qa release request
+                        TYPE = "QA_RELEASE_REQ"
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'staging') {
+                        // prep release request
+                        TYPE = "STAGE_RELEASE_REQ"
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'dev') {
+                        // dev release request
+                        TYPE = "DEV_RELEASE_REQ"
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'prod') {
+                        // prod release request with LATEST tag
+                        TYPE = "PROD_RELEASE_REQ"
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-qa') {
+                        // hotfix qa release request
+                        TYPE = "HOTFIX_QA_RELEASE_REQ"
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-staging') {
+                        // hotfix staging release request
+                        TYPE = "HOTFIX_STAGING_RELEASE_REQ"
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
+                        // create release branch with tag
+                        TYPE = "CREATE_RELEASE_BR"
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-hotfix') {
+                        // create hotfix branch with tag. check whether still have one
+                        TYPE = "CREATE_HOTFIX_BR"
+                    } else if (env.JOB_BASE_NAME == "develop") {
+                        // start dev release. no need approval .
+                        TYPE = "DEV_RELEASE"
+                    } else if (env.JOB_BASE_NAME.startsWith('release')) {
+                        // qa  release request. need approval
+                        TYPE = "QA_RELEASE"
+                    } else if (env.JOB_BASE_NAME.startsWith('master')) {
+                        // tag and start prod"  release request .need approval.check last merged branch .if hot fix bumpup hotfix version
+                        TYPE = "PROD_RELEASE"
+                    } else if (env.JOB_BASE_NAME.startsWith('hotfix')) {
+                        //  qa  release request. need approval
+                        TYPE = "HOTFIX_QA_RELEASE"
+                    } else {
+                        echo "<<<could not find the change type>>>"
                     }
+
+                    echo "type ==  $TYPE"
+                }
+            }
+        }
+        stage('getting variable values ') {
+            steps {
+                BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
+                def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
+                COMMIT_AUTHOR = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
+                COMMIT_MSG = sh(returnStdout: true, script: "git log --format=%B -n 1  ${commit}").trim()
+                echo "Current build was caused by: ${BUILD_USER}\n"
+                echo "COMMIT_MSG: ${COMMIT_MSG}\n"
+            }
+
+            post {
+                failure {
+                    echo 'build & test error'
+                    slackSend channel: 'error',
+                            color: COLOR_MAP[currentBuild.currentResult],
+                            message: " ${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+
+                }
+            }
+        }
+        stage('build ') {
+            steps {
+//                notifySlack()
+                sh "./gradlew clean build -x test"
+            }
+
+            post {
+                failure {
+                    echo 'build & test error'
+                    slackSend channel: 'error',
+                            color: COLOR_MAP[currentBuild.currentResult],
+                            message: " ${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+
                 }
             }
         }
 
-//        stage('build & test') {
-//            steps {
-//                notifySlack()
-//                sh "./gradlew clean build -x test"
-//            }
-//
-//            post {
-//                failure {
-//                    echo 'build & test error'
-//                    slackSend channel: 'error',
-//                            color: 'good',
-//                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
-//
-//                }
-//            }
-//        }
+        stage('test') {
+            steps {
+                notifySlack()
+                sh "./gradlew  test"
+                step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+
+            }
+            post {
+                failure {
+                    echo 'test error'
+                    slackSend channel: 'error',
+                            color: COLOR_MAP[currentBuild.currentResult],
+                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+
+                }
+            }
+        }
 //
 //        stage('unit test') {
 //            steps {
