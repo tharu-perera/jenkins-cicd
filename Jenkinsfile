@@ -8,6 +8,80 @@ def BUILD_USER = ""
 def SLACK_ACCESS_KEY = ""
 def jen = ""
 
+def notifySlack(text, channel, attachments) {
+
+    sh "curl --location --request POST '$SLACK_ACCESS_KEY' " +
+            "--header 'Content-Type: application/json' \\\n" +
+            "--data-raw '" +
+            "{\n" +
+            "\t\"blocks\": [\n" +
+            "\t\t{\n" +
+            "\t\t\t\"type\": \"section\",\n" +
+            "\t\t\t\"text\": {\n" +
+            "\t\t\t\t\"type\": \"mrkdwn\",\n" +
+            "\t\t\t\t\"text\": \"Danny Torrence left the following review for your property:\"\n" +
+            "\t\t\t}\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"type\": \"section\",\n" +
+            "\t\t\t\"block_id\": \"section567\",\n" +
+            "\t\t\t\"text\": {\n" +
+            "\t\t\t\t\"type\": \"mrkdwn\",\n" +
+            "\t\t\t\t\"text\": \"<https://example.com|Overlook Hotel> \\n :star: \\n Doors had too many axe holes, guest in room 237 was far too rowdy, whole place felt stuck in the 1920s.\"\n" +
+            "\t\t\t},\n" +
+            "\t\t\t\"accessory\": {\n" +
+            "\t\t\t\t\"type\": \"image\",\n" +
+            "\t\t\t\t\"image_url\": \"https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/d3/72/5c/d3725c8f-c642-5d69-1904-aa36e4297885/source/256x256bb.jpg\",\n" +
+            "\t\t\t\t\"alt_text\": \"Haunted hotel image\"\n" +
+            "\t\t\t}\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"type\": \"section\",\n" +
+            "\t\t\t\"block_id\": \"section789\",\n" +
+            "\t\t\t\"fields\": [\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"type\": \"mrkdwn\",\n" +
+            "\t\t\t\t\t\"text\": \"*Average Rating*\\n1.0\"\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"type\": \"actions\",\n" +
+            "\t\t\t\"elements\": [\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"type\": \"button\",\n" +
+            "\t\t\t\t\t\"text\": {\n" +
+            "\t\t\t\t\t\t\"type\": \"plain_text\",\n" +
+            "\t\t\t\t\t\t\"text\": \"Reply to review\",\n" +
+            "\t\t\t\t\t\t\"emoji\": false\n" +
+            "\t\t\t\t\t}\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t]\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"type\": \"section\",\n" +
+            "\t\t\t\"text\": {\n" +
+            "\t\t\t\t\"type\": \"mrkdwn\",\n" +
+            "\t\t\t\t\"text\": \"This is a section block with a button.\"\n" +
+            "\t\t\t},\n" +
+            "\t\t\t\"accessory\": {\n" +
+            "\t\t\t\t\"type\": \"button\",\n" +
+            "\t\t\t\t\"text\": {\n" +
+            "\t\t\t\t\t\"type\": \"plain_text\",\n" +
+            "\t\t\t\t\t\"text\": \"Click Me\",\n" +
+            "\t\t\t\t\t\"emoji\": true\n" +
+            "\t\t\t\t},\n" +
+            "\t\t\t\t\"value\": \"click_me_123\",\n" +
+            "\t\t\t\t\"url\": \"https://google.com\",\n" +
+            "\t\t\t\t\"action_id\": \"button-action\"\n" +
+            "\t\t\t}\n" +
+            "\t\t}\n" +
+            "\t]\n" +
+            "}" +
+            "'"
+}
+
+
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
 //    try{
@@ -17,16 +91,6 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '1'))
     }
 
-    environment {
-        SLACK_ACCESS_KEY = credentials('slack-token')
-//        withCredentials([string(credentialsId: 'slack-token', variable: 'PW1')]) {
-//            echo "My password is '${PW1}'!"
-//        }
-//
-//        withCredentials([string(credentialsId: 'jen', variable: 'jen1')]) {
-//            echo "My password is '${jen1}'!"
-//        }
-     }
     // =============== stages====================
     stages {
 
@@ -36,16 +100,14 @@ pipeline {
                 withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
                     echo ">>SLACK_ACCESS_KEY >>>>>${st}"
                     echo ">>jen >>>>>${jenn}"
-
                          script {
-                             echo ">>jen >>>>>${jenn}"
-                             jen=jenn
+                              jen=jenn
                              SLACK_ACCESS_KEY=st
-                             echo ">>jen >>>>>${jen}"
-                         }
+                          }
 
                 }
                 script {
+                    notifySlack("qd","wed","wed")
                     echo ">>getBuildUser>>>>>"
                     echo ">>SLACK_ACCESS_KEY >>>>>${SLACK_ACCESS_KEY}"
                     echo ">>jen >>>>>${jen}"
