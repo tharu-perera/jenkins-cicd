@@ -67,63 +67,62 @@ pipeline {
                             echo "$type"
                             AUTHOR="xxxxx"
                             echo "$AUTHOR"
-                            type=Type.DEV_PR.toString()
                             echo "$type"
                         }else{
                             echo "flasesss"
                         }
                         if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop") {
                             //develop PR
-                            type = Type.DEV_PR
+                            type = "DEV_PR"
                             echo "######"
                         } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('release')) {
                             //release bug fixing PR
-                            type = Type.RELEASE_PR
+                            type = "RELEASE_PR"
                         } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('hotfix')) {
                             //hotfix fixing PR
-                            type = Type.HOTFIX_PR
+                            type = "HOTFIX_PR"
                         } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('release')) {
                             //prod release PR
-                            type = Type.PROD_PR
+                            type = "PROD_PR"
                         } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('hotfix')) {
                             // hotfix prod release PR
-                            type = Type.HOTFIX_PROD_PR
+                            type = "HOTFIX_PROD_PR"
                         } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'qa') {
                             // qa release request
-                            type = Type.QA_RELEASE_REQ
+                            type = "QA_RELEASE_REQ"
                         } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'staging') {
                             // prep release request
-                            type = Type.STAGE_RELEASE_REQ
+                            type = "STAGE_RELEASE_REQ"
                         } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'dev') {
                             // dev release request
-                            type = Type.DEV_RELEASE_REQ
+                            type = "DEV_RELEASE_REQ"
                         } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'prod') {
                             // prod release request with LATEST tag
-                            type = Type.PROD_RELEASE_REQ
+                            type = "PROD_RELEASE_REQ"
                         } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-qa') {
                             // hotfix qa release request
-                            type = Type.HOTFIX_QA_RELEASE_REQ
+                            type = "HOTFIX_QA_RELEASE_REQ"
                         } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-staging') {
                             // hotfix staging release request
-                            type = Type.HOTFIX_STAGING_RELEASE_REQ
+                            type = "HOTFIX_STAGING_RELEASE_REQ"
                         } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
                             // create release branch with tag
-                            type = Type.CREATE_RELEASE_BR
+                            type = "CREATE_RELEASE_BR"
                         } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-hotfix') {
                             // create hotfix branch with tag. check whether still have one
-                            type = Type.CREATE_HOTFIX_BR
+                            type = "CREATE_HOTFIX_BR"
                         } else if (env.JOB_BASE_NAME == "develop") {
                             // start dev release. no need approval .
-                            type = Type.DEV_RELEASE
+                            type = "DEV_RELEASE"
                         } else if (env.JOB_BASE_NAME.startsWith('release')) {
                             // qa  release request. need approval
-                            type = Type.QA_RELEASE
+                            type = "QA_RELEASE"
                         } else if (env.JOB_BASE_NAME.startsWith('master')) {
-                            // tag and start prod  release request .need approval.check last merged branch .if hot fix bumpup hotfix version
-                            type = Type.PROD_RELEASE
+                            // tag and start prod"  release request .need approval.check last merged branch .if hot fix bumpup hotfix version
+                            type = "PROD_RELEASE"
                         } else if (env.JOB_BASE_NAME.startsWith('hotfix')) {
                             //  qa  release request. need approval
-                            type = Type.HOTFIX_QA_RELEASE
+                            type = "HOTFIX_QA_RELEASE"
                         } else {
                             echo "<<<could not find the change type>>>"
                         }
