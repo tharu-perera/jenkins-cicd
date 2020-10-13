@@ -103,12 +103,7 @@ pipeline {
 def notifySlack() {
      withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
          script {
-            sh "curl --location --request POST '$st' " +
-                    "--header 'Content-Type: application/json' \n" +
-                    "--data-raw '{\n" +
-                    "  \"channel\": \"general\",\n" +
-                    "  \"text\": \"Hello, world\"\n" +
-                    "}'"
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{\"channel\": \"general\",\n  \"text\": \"Hello, world\"}'"
         }
     }
 
