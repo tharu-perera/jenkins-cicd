@@ -25,6 +25,7 @@ pipeline {
                 sh 'printenv'
                 script {
                     echo ">>getBuildUser>>>>>"
+                    echo ">>${env.par1}>>>>>"
                     echo " git branch  ${env.GIT_BRANCH}  "
                     echo "${currentBuild.getBuildCauses()}"
                     echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
