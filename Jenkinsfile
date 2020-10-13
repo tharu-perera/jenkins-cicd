@@ -9,14 +9,23 @@ def SLACK_ACCESS_KEY = ""
 def jen = ""
 
 def notifySlack(text, channel, attachments) {
-sh " echo ${SLACK_ACCESS_KEY}"
-sh " echo $SLACK_ACCESS_KEY"
-    sh "curl --location --request POST '$SLACK_ACCESS_KEY' " +
-            "--header 'Content-Type: application/json' \\\n" +
-            "--data-raw '{\n" +
-            "  \"channel\": \"general\",\n" +
-            "  \"text\": \"Hello, world\"\n" +
-            "}'"
+    echo ">>jen >>>>>${text}"
+    sh "  echo  ${text}"
+    withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+        echo ">>SLACK_ACCESS_KEY >>>>>${st}"
+        echo ">>jen >>>>>${jenn}"
+        script {
+            jen=jenn
+            SLACK_ACCESS_KEY=st
+            sh "curl --location --request POST '$SLACK_ACCESS_KEY' " +
+                    "--header 'Content-Type: application/json' \\\n" +
+                    "--data-raw '{\n" +
+                    "  \"channel\": \"general\",\n" +
+                    "  \"text\": \"Hello, world\"\n" +
+                    "}'"
+        }
+    }
+
 }
 
 
@@ -35,20 +44,7 @@ pipeline {
         stage('preparation') {
 
             steps {
-                withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
-                    echo ">>SLACK_ACCESS_KEY >>>>>${st}"
-                    echo ">>jen >>>>>${jenn}"
-                         script {
-                              jen=jenn
-                             SLACK_ACCESS_KEY=st
-                             sh "curl --location --request POST '$SLACK_ACCESS_KEY' " +
-                                     "--header 'Content-Type: application/json' \\\n" +
-                                     "--data-raw '{\n" +
-                                     "  \"channel\": \"general\",\n" +
-                                     "  \"text\": \"Hello, world\"\n" +
-                                     "}'"
-                          }
-                }
+
                 script {
 
                     echo ">>getBuildUser>>>>>"
