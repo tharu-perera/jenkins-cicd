@@ -43,7 +43,7 @@ pipeline {
             stage('build & test') {
                 steps {
                     sh "./gradlew clean build test"
-                    junit allowEmptyResults: true, testResults: ''
+//                    junit allowEmptyResults: true, testResults: ''
                     step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
                 }
 
