@@ -144,7 +144,12 @@ pipeline {
 //                notifySlack()
                 sh "./gradlew test"
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-                step( [ $class: 'JacocoPublisher' ] )
+                jacoco(
+                        execPattern: 'target/*.exec',
+                        classPattern: 'target/classes',
+                        sourcePattern: 'src/main/java',
+                        exclusionPattern: 'src/test*'
+                )
 
             }
             post {
@@ -157,24 +162,24 @@ pipeline {
                 }
             }
         }
-//
-//        stage('unit test') {
-//            steps {
-//                notifySlack()
-//                sh "./gradlew test"
-//                step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-//            }
-//
-//            post {
-//                failure {
-//                    echo 'test error'
-//                    slackSend channel: 'error',
-//                            color: 'good',
-//                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
-//
-//                }
-//            }
-//        }
+
+        stage('Sonarqube analysis') {
+            steps {
+                notifySlack()
+                sh "./gradlew test"
+                step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+            }
+
+            post {
+                failure {
+                    echo 'test error'
+                    slackSend channel: 'error',
+                            color: 'good',
+                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+
+                }
+            }
+        }
 //
 //        stage('getting approval for qa release') {
 //            when { branch 'develop' }
