@@ -147,9 +147,7 @@ pipeline {
                         sh './gradlew build -x test --no-daemon'
                         sh './gradlew test jacocoTestReport --no-daemon'
                     } finally {
-                        junit '**/build/test-results/test/*.xml' //make
-                        the junit test results available in any case
-                        (success & failure)
+                        junit '**/build/test-results/test/*.xml'
                     }
                 }
             }

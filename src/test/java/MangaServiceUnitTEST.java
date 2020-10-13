@@ -9,9 +9,9 @@ public class MangaServiceUnitTEST {
 
     @Test
     public void testGetMangasByTitle() throws IOException {
-//        User user = new User();
-//        user.setCount(1);
-//        assertEquals(1, user.getCount());
+        User user = new User();
+        user.setCount(13);
+        assertEquals(1, user.getCount());
     }
 
 }
