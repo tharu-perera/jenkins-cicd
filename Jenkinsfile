@@ -32,10 +32,11 @@ pipeline {
     stages {
 
         stage('preparation') {
-            withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
-                // some block
-            }
+
             steps {
+                withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+                    // some block
+                }
                 script {
                     echo ">>getBuildUser>>>>>"
                     echo ">>SLACK_ACCESS_KEY >>>>>${st}"
