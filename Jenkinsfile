@@ -22,7 +22,7 @@ enum Type {
 
 def AUTHOR = ""
 def BUILD_USER = ""
-Type type = null
+def type = ""
 
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
@@ -67,7 +67,7 @@ pipeline {
                             echo "$type"
                             AUTHOR="xxxxx"
                             echo "$AUTHOR"
-                            type=Type.DEV_PR
+                            type=Type.DEV_PR.toString()
                             echo "$type"
                         }else{
                             echo "flasesss"
