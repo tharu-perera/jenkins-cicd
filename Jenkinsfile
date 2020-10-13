@@ -58,63 +58,66 @@ pipeline {
                     BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
                     echo "Current build was caused by: ${BUILD_USER}\n"
 
+                    try {
+                        if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop") {
+                            //develop PR
+                            type = Type.DEV_PR
+                        } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('release')) {
+                            //release bug fixing PR
+                            type = Type.RELEASE_PR
+                        } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('hotfix')) {
+                            //hotfix fixing PR
+                            type = Type.HOTFIX_PR
+                        } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('release')) {
+                            //prod release PR
+                            type = Type.PROD_PR
+                        } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('hotfix')) {
+                            // hotfix prod release PR
+                            type = Type.HOTFIX_PROD_PR
+                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'qa') {
+                            // qa release request
+                            type = Type.QA_RELEASE_REQ
+                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'staging') {
+                            // prep release request
+                            type = Type.STAGE_RELEASE_REQ
+                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'dev') {
+                            // dev release request
+                            type = Type.DEV_RELEASE_REQ
+                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'prod') {
+                            // prod release request with LATEST tag
+                            type = Type.PROD_RELEASE_REQ
+                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-qa') {
+                            // hotfix qa release request
+                            type = Type.HOTFIX_QA_RELEASE_REQ
+                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-staging') {
+                            // hotfix staging release request
+                            type = Type.HOTFIX_STAGING_RELEASE_REQ
+                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
+                            // create release branch with tag
+                            type = Type.CREATE_RELEASE_BR
+                        } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-hotfix') {
+                            // create hotfix branch with tag. check whether still have one
+                            type = Type.CREATE_HOTFIX_BR
+                        } else if (env.JOB_BASE_NAME == "develop") {
+                            // start dev release. no need approval .
+                            type = Type.DEV_RELEASE
+                        } else if (env.JOB_BASE_NAME.startsWith('release')) {
+                            // qa  release request. need approval
+                            type = Type.QA_RELEASE
+                        } else if (env.JOB_BASE_NAME.startsWith('master')) {
+                            // tag and start prod  release request .need approval.check last merged branch .if hot fix bumpup hotfix version
+                            type = Type.PROD_RELEASE
+                        } else if (env.JOB_BASE_NAME.startsWith('hotfix')) {
+                            //  qa  release request. need approval
+                            type = Type.HOTFIX_QA_RELEASE
+                        } else {
+                            echo "<<<could not find the change type>>>"
+                        }
 
-                    if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop") {
-                        //develop PR
-                        type = Type.DEV_PR
-                    } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('release')) {
-                        //release bug fixing PR
-                        type = Type.RELEASE_PR
-                    } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('hotfix')) {
-                        //hotfix fixing PR
-                        type = Type.HOTFIX_PR
-                    } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('release')) {
-                        //prod release PR
-                        type = Type.PROD_PR
-                    } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('hotfix')) {
-                        // hotfix prod release PR
-                        type = Type.HOTFIX_PROD_PR
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'qa') {
-                        // qa release request
-                        type = Type.QA_RELEASE_REQ
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'staging') {
-                        // prep release request
-                        type = Type.STAGE_RELEASE_REQ
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'dev') {
-                        // dev release request
-                        type = Type.DEV_RELEASE_REQ
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'prod') {
-                        // prod release request with LATEST tag
-                        type = Type.PROD_RELEASE_REQ
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-qa') {
-                        // hotfix qa release request
-                        type = Type.HOTFIX_QA_RELEASE_REQ
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-staging') {
-                        // hotfix staging release request
-                        type = Type.HOTFIX_STAGING_RELEASE_REQ
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
-                        // create release branch with tag
-                        type = Type.CREATE_RELEASE_BR
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-hotfix') {
-                        // create hotfix branch with tag. check whether still have one
-                        type = Type.CREATE_HOTFIX_BR
-                    } else if (env.JOB_BASE_NAME == "develop") {
-                        // start dev release. no need approval .
-                        type = Type.DEV_RELEASE
-                    } else if (env.JOB_BASE_NAME.startsWith('release')) {
-                        // qa  release request. need approval
-                        type = Type.QA_RELEASE
-                    } else if (env.JOB_BASE_NAME.startsWith('master')) {
-                        // tag and start prod  release request .need approval.check last merged branch .if hot fix bumpup hotfix version
-                        type = Type.PROD_RELEASE
-                    } else if (env.JOB_BASE_NAME.startsWith('hotfix')) {
-                        //  qa  release request. need approval
-                        type = Type.HOTFIX_QA_RELEASE
-                    } else {
-                        echo "<<<could not find the change type>>>"
+                        echo "type ==  $type"
+                    }catch(Exception exception){
+                        echo "${exception.toString()}"
                     }
-
-                    echo "type ==  $type"
                 }
             }
         }
