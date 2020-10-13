@@ -16,9 +16,7 @@ pipeline {
 //        skipDefaultCheckout()
         buildDiscarder(logRotator(numToKeepStr: '1'))
     }
-    withCredentials([string(credentialsId: 'slack-token', variable: 'PW1')]) {
-        echo "My password is '${PW1}'!"
-    }
+
     environment {
         SLACK_ACCESS_KEY = credentials('slack-token')
 //        withCredentials([string(credentialsId: 'slack-token', variable: 'PW1')]) {
@@ -34,11 +32,14 @@ pipeline {
     stages {
 
         stage('preparation') {
+            withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+                // some block
+            }
             steps {
                 script {
                     echo ">>getBuildUser>>>>>"
-                    echo ">>SLACK_ACCESS_KEY >>>>>${SLACK_ACCESS_KEY}"
-                    echo ">>jen >>>>>${jen}"
+                    echo ">>SLACK_ACCESS_KEY >>>>>${st}"
+                    echo ">>jen >>>>>${jenn}"
                     echo " git branch  ${env.GIT_BRANCH}  "
                     echo "${currentBuild.getBuildCauses()}"
                     echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
