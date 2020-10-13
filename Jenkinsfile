@@ -42,8 +42,6 @@ pipeline {
                               jen=jenn
                              SLACK_ACCESS_KEY=st
                           }
-                    notifySlack("qd","wed","wed")
-
                 }
                 script {
 
@@ -73,6 +71,7 @@ pipeline {
 
         stage('build & test') {
             steps {
+                notifySlack("qd","wed","wed")
                 sh "./gradlew clean build test"
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
             }
