@@ -37,6 +37,8 @@ pipeline {
                 withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
                     echo ">>SLACK_ACCESS_KEY >>>>>${st}"
                     echo ">>jen >>>>>${jenn}"
+                    SLACK_ACCESS_KEY=st
+                    jen=jenn
                 }
                 script {
                     echo ">>getBuildUser>>>>>"
