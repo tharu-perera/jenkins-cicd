@@ -6,6 +6,7 @@ def DEPLOY_QA = 'qa'
 def buildCause = ""
 def BUILD_USER = ""
 def SLACK_ACCESS_KEY = ""
+def jen = ""
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
@@ -17,6 +18,7 @@ pipeline {
     }
     environment {
         SLACK_ACCESS_KEY = credentials('slack-token')
+        jen = credentials('jen')
     }
     // =============== stages====================
     stages {
@@ -26,6 +28,7 @@ pipeline {
                 script {
                     echo ">>getBuildUser>>>>>"
                     echo ">>SLACK_ACCESS_KEY >>>>>${SLACK_ACCESS_KEY}"
+                    echo ">>jen >>>>>${jen}"
                     echo " git branch  ${env.GIT_BRANCH}  "
                     echo "${currentBuild.getBuildCauses()}"
                     echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
