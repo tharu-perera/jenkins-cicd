@@ -65,6 +65,8 @@ pipeline {
                         if(env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop"){
                             echo "true"
                             echo "$type"
+                            AUTHOR="xxxxx"
+                            echo "$AUTHOR"
                             type=Type.DEV_PR
                             echo "$type"
                         }else{
