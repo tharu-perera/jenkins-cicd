@@ -46,7 +46,7 @@ pipeline {
 
         stage('build & test') {
             steps {
-                notifySlack("qd","wed","wed")
+                notifySlack()
                 sh "./gradlew clean build test"
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
             }
