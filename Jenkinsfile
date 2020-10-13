@@ -62,6 +62,11 @@ pipeline {
                         echo " env.JOB_BASE_NAME =  ${env.JOB_BASE_NAME}"
                         echo " env.CHANGE_TARGET  =  ${env.CHANGE_TARGET }"
                         echo " env.par1  =  ${env.par1 }"
+                        if(env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop"){
+                            echo "true"
+                        }else{
+                            echo "flasesss"
+                        }
                         if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop") {
                             //develop PR
                             type = Type.DEV_PR
