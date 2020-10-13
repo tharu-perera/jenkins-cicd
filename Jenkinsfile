@@ -102,12 +102,14 @@ pipeline {
         }
         stage('getting variable values ') {
             steps {
-                BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
-                def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
-                COMMIT_AUTHOR = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
-                COMMIT_MSG = sh(returnStdout: true, script: "git log --format=%B -n 1  ${commit}").trim()
-                echo "Current build was caused by: ${BUILD_USER}\n"
-                echo "COMMIT_MSG: ${COMMIT_MSG}\n"
+                script {
+                    BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
+                    def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
+                    COMMIT_AUTHOR = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
+                    COMMIT_MSG = sh(returnStdout: true, script: "git log --format=%B -n 1  ${commit}").trim()
+                    echo "Current build was caused by: ${BUILD_USER}\n"
+                    echo "COMMIT_MSG: ${COMMIT_MSG}\n"
+                }
             }
 
             post {
@@ -139,7 +141,7 @@ pipeline {
 
         stage('test') {
             steps {
-                notifySlack()
+//                notifySlack()
                 sh "./gradlew  test"
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
 
@@ -184,11 +186,11 @@ pipeline {
 //            }
 //        }
 //
-//        stage('inform  build status to slack ') {
-//            steps {
-//                echo 'inform  build status to slack'
-//            }
-//        }
+        stage('inform  build status to slack ') {
+            steps {
+                echo 'inform  build status to slack'
+            }
+        }
 //    }
 
 //    post { // these post steps will get executed at the end of build
