@@ -48,8 +48,6 @@ pipeline {
                 script {
 
                     echo ">>getBuildUser>>>>>"
-                    echo ">>SLACK_ACCESS_KEY >>>>>${SLACK_ACCESS_KEY}"
-                    echo ">>jen >>>>>${jen}"
                     echo " git branch  ${env.GIT_BRANCH}  "
                     echo "${currentBuild.getBuildCauses()}"
                     echo "${currentBuild.buildCauses}" // same as currentBuild.getBuildCauses()
