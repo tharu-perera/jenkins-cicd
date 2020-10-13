@@ -142,8 +142,9 @@ pipeline {
         stage('test') {
             steps {
 //                notifySlack()
-                sh "./gradlew  test"
+                sh "./gradlew test"
                 step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+                step( [ $class: 'JacocoPublisher' ] )
 
             }
             post {
@@ -151,7 +152,7 @@ pipeline {
                     echo 'test error'
                     slackSend channel: 'error',
                             color: COLOR_MAP[currentBuild.currentResult],
-                            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
+                            message: "junit error"
 
                 }
             }
@@ -191,27 +192,7 @@ pipeline {
                 echo 'inform  build status to slack'
             }
         }
-//    }
-
-//    post { // these post steps will get executed at the end of build
-//        always {
-//            echo ' post outside stages always '
-//            sh "echo ${currentBuild.result}"
-//        }
-//        failure {
-//            echo ' post outside stages failure '
-//            sh "echo ${currentBuild.result}"
-//        }
-
     }
-//    } catch (e) {
-//       echo 'Error in pipeline'
-//        slackSend channel: 'general',
-//                color: 'good',
-//                message: "Error in pipelin [${e.toString()}]"
-//
-//    }
-
 }
 
 def notifySlack() {
