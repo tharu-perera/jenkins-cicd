@@ -151,6 +151,16 @@ pipeline {
                 }
             }
             post {
+                success {
+                    publishHTML target: [
+                            allowMissing         : false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll              : true,
+                            reportDir            : "**/build/test-results/test",
+                            reportFiles          : 'index.html',
+                            reportName           : 'HTML Report'
+                    ]
+                }
                 failure {
                     echo 'test error'
                     slackSend channel: 'error',
