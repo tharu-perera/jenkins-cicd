@@ -13,7 +13,7 @@ apply plugin: 'application'
 
 sonarqube {
     properties {
-        property 'sonar.projectName', 'Jenkind Gradle Usage'
+//        property 'sonar.projectName', 'Jenkind Gradle Usage'
         property 'sonar.host.url', 'http://localhost:9000'
     }
 }
