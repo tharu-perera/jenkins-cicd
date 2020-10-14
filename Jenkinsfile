@@ -177,60 +177,26 @@ pipeline {
             }
         }
 
+        stage('SQ analysis') {
+            steps {
+                script{
+                    def scannerHome = tool 'SonarScanner 4.0';
+                    withSonarQubeEnv('mysona') { // If you have configured more than one global server connection, you can specify its name
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
 
-//        stage('Publish Test Coverage Report') {
-//            steps {
-//                step([$class: 'JacocoPublisher',
-//                      execPattern: '**/build/jacoco/*.exec',
-//                      classPattern: '**/build/classes',
-//                      sourcePattern: 'src/main/java',
-//                      exclusionPattern: 'src/test*'
-//                ])
-//            }
-//            post {
-//                failure {
-//                    echo 'Publish Test Coverage Report error'
-//                    slackSend channel: 'error',
-//                            color: COLOR_MAP[currentBuild.currentResult],
-//                            message: "Publish Test Coverage Report error"
-//
-//                }
-//            }
-//        }
+            post {
+                failure {
+                    echo 'Sonarqube error'
+                    slackSend channel: 'error',
+                            color: 'good',
+                            message: "Sonarqube error"
 
-//        post {
-//            always {
-//                junit "tests-results/*.xml"
-//            }
-//            success {
-//                publishHTML target: [
-//                        allowMissing         : false,
-//                        alwaysLinkToLastBuild: false,
-//                        keepAll              : true,
-//                        reportDir            : "tests-results/",
-//                        reportFiles          : 'index.html',
-//                        reportName           : 'HTML Report'
-//                ]
-//            }
-//        }
-//
-//        stage('Sonarqube analysis') {
-//            steps {
-//                notifySlack()
-//                sh "./gradlew test"
-//                step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-//            }
-//
-//            post {
-//                failure {
-//                    echo 'Sonarqube error'
-//                    slackSend channel: 'error',
-//                            color: 'good',
-//                            message: "Sonarqube error"
-//
-//                }
-//            }
-//        }
+                }
+            }
+        }
 //
 //        stage('getting approval for qa release') {
 //            when { branch 'develop' }
