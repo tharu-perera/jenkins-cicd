@@ -169,9 +169,7 @@ pipeline {
                 }
                 failure {
                     echo 'test error'
-                    slackSend channel: 'error',
-                            color: COLOR_MAP[currentBuild.currentResult],
-                            message: "junit error"
+                    slackSend channel: 'error',  color: COLOR_MAP[currentBuild.currentResult], message: "junit error"
 
                 }
             }
@@ -219,6 +217,8 @@ pipeline {
         stage('inform  build status to slack ') {
             steps {
                 echo 'inform  build status to slack'
+                slackSend channel: 'general',  color: COLOR_MAP[currentBuild.currentResult], message: "build completed"
+
             }
         }
     }
