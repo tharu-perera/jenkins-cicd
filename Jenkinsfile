@@ -156,7 +156,7 @@ pipeline {
                             allowMissing         : false,
                             alwaysLinkToLastBuild: false,
                             keepAll              : true,
-                            reportDir            : "**/build/test-results/test",
+                            reportDir            : "build/reports/tests/test",
                             reportFiles          : 'index.html',
                             reportName           : 'HTML Report'
                     ]
