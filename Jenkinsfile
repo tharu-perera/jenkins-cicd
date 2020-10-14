@@ -181,6 +181,22 @@ pipeline {
             }
         }
 
+//        post {
+//            always {
+//                junit "tests-results/*.xml"
+//            }
+//            success {
+//                publishHTML target: [
+//                        allowMissing         : false,
+//                        alwaysLinkToLastBuild: false,
+//                        keepAll              : true,
+//                        reportDir            : "tests-results/",
+//                        reportFiles          : 'index.html',
+//                        reportName           : 'HTML Report'
+//                ]
+//            }
+//        }
+
         stage('Sonarqube analysis') {
             steps {
                 notifySlack()
