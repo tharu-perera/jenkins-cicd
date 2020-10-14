@@ -177,13 +177,20 @@ pipeline {
             }
         }
 
-        stage('SQ analysis') {
+        stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
+            //one method usingg jenkins global configuration
             steps {
-                script{
-                    def scannerHome = tool 'SonarScanner 4.0';
-                    withSonarQubeEnv('mysona') { // If you have configured more than one global server connection, you can specify its name
-                        sh "${scannerHome}/bin/sonar-scanner"
+                script {
+//                    def scannerHome = tool 'SonarScanner 4.0';
+//                    withSonarQubeEnv('mysona') { // If you have configured more than one global server connection, you can specify its name
+//                        sh "${scannerHome}/bin/sonar-scanner"
+//                    }
+
+                    //other one is using gradle build
+                    withSonarQubeEnv() { // Will pick the global server connection you have configured
+                        sh './gradlew sonarqube'
                     }
+
                 }
             }
 
@@ -191,7 +198,7 @@ pipeline {
                 failure {
                     echo 'Sonarqube error'
                     slackSend channel: 'error',
-                            color: 'good',
+                            color: COLOR_MAP[currentBuild.currentResult],
                             message: "Sonarqube error"
 
                 }
