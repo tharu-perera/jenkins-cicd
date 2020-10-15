@@ -124,25 +124,23 @@ pipeline {
 
 
         stage('release') {
-            steps {
-                script {
-                    when {
-                        expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
+
+            when {
+                expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
+            }
+            stages {
+                stage('checking build type111') {
+                    steps {
+                        echo 'dw'
                     }
-                    stages {
-                        stage('checking build type111') {
-                            steps {
-                                echo 'dw'
-                            }
-                        }
-                        stage('checking build type2222') {
-                            steps {
-                                echo 'dw222'
-                            }
-                        }
+                }
+                stage('checking build type2222') {
+                    steps {
+                        echo 'dw222'
                     }
                 }
             }
+
         }
 
 
