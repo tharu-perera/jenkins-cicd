@@ -184,7 +184,7 @@ pipeline {
         }
 
 
-        stage('Run Tests') {r
+        stage('Run Tests') {
             parallel {
                 stage('Test On Windows') {
                     steps {
