@@ -142,7 +142,7 @@ pipeline {
         }
 
         stage('test') {
-            steps {
+            steps('runnning junit') {
                 script {
                     try {
                         sh 'chmod +x gradlew'
@@ -207,11 +207,10 @@ pipeline {
                         sh "./gradlew checkstyleMain checkstyleTest"
                     }catch (exception) {
                         echo "$exception"
-
                     } finally {
                         recordIssues(
                                 enabledForFailure: true, aggregatingResults: true,
-                                tools: [java(), checkStyle(pattern: 'build/reports/checkstyle/main.xml', reportEncoding: 'UTF-8')]
+                                tools: [java(), checkStyle(pattern: 'build/reports/checkstyle/main.html', reportEncoding: 'UTF-8')]
                         )
 
                     }
