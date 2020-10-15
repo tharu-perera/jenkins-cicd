@@ -210,7 +210,7 @@ pipeline {
                     } finally {
                         recordIssues(
                                 enabledForFailure: true, aggregatingResults: true,
-                                tools: [java(), checkStyle()]
+                                tools: [java(), checkStyle(pattern: 'build/reports/checkstyle/main.xml', reportEncoding: 'UTF-8')]
                         )
 
                     }
