@@ -184,7 +184,7 @@ pipeline {
         }
 
 
-        stage('Run Tests') {
+        stage('Run Tests') {r
             parallel {
                 stage('Test On Windows') {
                     steps {
@@ -192,11 +192,9 @@ pipeline {
                     }
                 }
                 stage('Test On Linux') {
-
                     steps {
                        echo " bbbb"
                     }
-
                 }
             }
         }
@@ -210,7 +208,10 @@ pipeline {
                         echo "$exception"
 
                     } finally {
-                        recordIssues(tools: [checkStyle(reportEncoding: 'UTF-8')])
+                        recordIssues(
+                                enabledForFailure: true, aggregatingResults: true,
+                                tools: [java(), checkStyle(pattern: 'build/reports/checkstyle/main.html', reportEncoding: 'UTF-8')]
+                        )
 
                     }
                 }
