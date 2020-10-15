@@ -125,7 +125,7 @@ pipeline {
         stage('build ') {
             steps {
 //                notifySlack()
-                sh "./gradlew clean build -x test"
+                sh "./gradlew clean build -x test -x check"
             }
 
             post {
