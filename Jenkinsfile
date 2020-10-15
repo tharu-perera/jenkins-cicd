@@ -239,7 +239,7 @@ pipeline {
                                 alwaysLinkToLastBuild: false,
                                 keepAll              : true,
                                 reportDir            : "build/reports/pmd",
-                                reportFiles          : '**/*',
+                                reportFiles          : 'main.html,test.html',
                                 reportName           : 'PMD Report'
                         ]
 //                        recordIssues(
