@@ -155,11 +155,6 @@ pipeline {
                     } finally {
                         junit '**/build/test-results/test/*.xml'
 
-                            step([$class: 'hudson.plugins.checkstyle.CheckStylePublisher', checkstyle: '**/target/checkstyle-result.xml'])
-
-                            step([$class: 'hudson.plugins.pmd.PmdPublisher', checkstyle: '**/target/pmd.xml'])
-
-
                     }
                 }
             }
