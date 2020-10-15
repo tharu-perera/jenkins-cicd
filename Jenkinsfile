@@ -38,47 +38,6 @@ pipeline {
 
     // =============== stages====================
     stages {
-        stage('dwe') {
-            parallel {
-                stage('relase') {
-                    when {
-                        // case insensitive regular expression for truthy values
-                        expression { return true }
-                    }
-                    stages {
-                        stage('checking build type111') {
-                            steps {
-                                echo 'dw'
-                            }
-                        }
-                        stage('checking build type2222') {
-                            steps {
-                                echo 'dw222'
-                            }
-                        }
-                    }
-                }
-                stage('relaseB') {
-                    when {
-                        // case insensitive regular expression for truthy values
-                        expression { return true }
-                    }
-                    stages {
-                        stage('checking build 3333') {
-                            steps {
-                                echo 'dw'
-                            }
-                        }
-                        stage('checking build 4444') {
-                            steps {
-                                echo 'dw222'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
 
         stage('checking build type') {
             steps {
@@ -162,6 +121,28 @@ pipeline {
                 }
             }
         }
+
+
+        stage('release') {
+            script {
+                when {
+                    expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
+                }
+                stages {
+                    stage('checking build type111') {
+                        steps {
+                            echo 'dw'
+                        }
+                    }
+                    stage('checking build type2222') {
+                        steps {
+                            echo 'dw222'
+                        }
+                    }
+                }
+            }
+        }
+
 
         stage('build ') {
             steps {
