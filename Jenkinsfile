@@ -38,11 +38,20 @@ pipeline {
 
     // =============== stages====================
     stages {
-
-        when {
-            // case insensitive regular expression for truthy values
-            expression { return true }
+stage('dwe'){
+    when {
+        // case insensitive regular expression for truthy values
+        expression { return true }
+    }
+    stages {
+        stage('checking build type') {
+            steps{
+                echo 'dw'
+            }
         }
+    }
+}
+
 
         stage('checking build type') {
             steps {
