@@ -226,7 +226,7 @@ pipeline {
             }
         }
 
-        stage('Checkstyle') {
+        stage('PMD') {
             steps {
                 script{
                     try {
