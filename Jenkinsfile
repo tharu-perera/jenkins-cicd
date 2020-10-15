@@ -38,7 +38,31 @@ pipeline {
 
     // =============== stages====================
     stages {
-        stage('identifying build type') {
+
+        stage('test'){
+           if(true){
+               stages{
+                   stage('ddd'){
+                       echo '>>>>>'
+                   }
+                   stage('qwdwww'){
+                       echo '>>qdqd>>>'
+                   }
+               }
+           }else{
+               stages{
+                   stage('dddwedwd'){
+                       echo '>>>333>>'
+                   }
+                   stage('qwdw2332ww'){
+                       echo '>>qd23qd>>>'
+                   }
+               }
+           }
+        }
+
+
+        stage('checking build type') {
             steps {
                 sh 'printenv'
                 script {
@@ -100,7 +124,7 @@ pipeline {
                 }
             }
         }
-        stage('getting variable values ') {
+        stage('setting variables') {
             steps {
                 script {
                     BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
@@ -126,13 +150,11 @@ pipeline {
         }
         stage('build ') {
             steps {
-//                notifySlack()
                 sh "./gradlew clean build -x test -x check"
             }
 
             post {
                 failure {
-                    echo 'build  error'
                     slackSend channel: 'error',
                             color: COLOR_MAP[currentBuild.currentResult],
                             message: " ${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
