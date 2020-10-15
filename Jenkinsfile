@@ -39,19 +39,40 @@ pipeline {
     // =============== stages====================
     stages {
         stage('dwe') {
-            when {
-                // case insensitive regular expression for truthy values
-                expression { return true }
-            }
-            stages {
-                stage('checking build type111') {
-                    steps {
-                        echo 'dw'
+            parallel {
+
+
+                when {
+                    // case insensitive regular expression for truthy values
+                    expression { return true }
+                }
+                stages {
+                    stage('checking build type111') {
+                        steps {
+                            echo 'dw'
+                        }
+                    }
+                    stage('checking build type2222') {
+                        steps {
+                            echo 'dw222'
+                        }
                     }
                 }
-                stage('checking build type2222') {
-                    steps {
-                        echo 'dw222'
+
+                when {
+                    // case insensitive regular expression for truthy values
+                    expression { return true }
+                }
+                stages {
+                    stage('checking build 3333') {
+                        steps {
+                            echo 'dw'
+                        }
+                    }
+                    stage('checking build 4444') {
+                        steps {
+                            echo 'dw222'
+                        }
                     }
                 }
             }
