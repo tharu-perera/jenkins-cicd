@@ -40,38 +40,39 @@ pipeline {
     stages {
         stage('dwe') {
             parallel {
-
-
-                when {
-                    // case insensitive regular expression for truthy values
-                    expression { return true }
-                }
-                stages {
-                    stage('checking build type111') {
-                        steps {
-                            echo 'dw'
+                stage('relase') {
+                    when {
+                        // case insensitive regular expression for truthy values
+                        expression { return true }
+                    }
+                    stages {
+                        stage('checking build type111') {
+                            steps {
+                                echo 'dw'
+                            }
+                        }
+                        stage('checking build type2222') {
+                            steps {
+                                echo 'dw222'
+                            }
                         }
                     }
-                    stage('checking build type2222') {
-                        steps {
-                            echo 'dw222'
-                        }
-                    }
                 }
-
-                when {
-                    // case insensitive regular expression for truthy values
-                    expression { return true }
-                }
-                stages {
-                    stage('checking build 3333') {
-                        steps {
-                            echo 'dw'
-                        }
+                stage('relaseB') {
+                    when {
+                        // case insensitive regular expression for truthy values
+                        expression { return true }
                     }
-                    stage('checking build 4444') {
-                        steps {
-                            echo 'dw222'
+                    stages {
+                        stage('checking build 3333') {
+                            steps {
+                                echo 'dw'
+                            }
+                        }
+                        stage('checking build 4444') {
+                            steps {
+                                echo 'dw222'
+                            }
                         }
                     }
                 }
