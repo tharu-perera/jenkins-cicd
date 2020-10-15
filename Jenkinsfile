@@ -154,7 +154,6 @@ pipeline {
 
                     } finally {
                         junit '**/build/test-results/test/*.xml'
-                        recordIssues(tools: [checkStyle(pattern: 'build/reports/checkstyle/main.html')])
                     }
                 }
             }
@@ -204,8 +203,17 @@ pipeline {
 
         stage('Checkstyle') {
             steps {
-                sh "./gradlew checkstyleMain checkstyleTest"
-                recordIssues(tools: [checkStyle(reportEncoding: 'UTF-8')])
+                script{
+                    try {
+                        sh "./gradlew checkstyleMain checkstyleTest"
+                    }catch (exception) {
+                        echo "$exception"
+
+                    } finally {
+                        recordIssues(tools: [checkStyle(reportEncoding: 'UTF-8')])
+
+                    }
+                }
             }
         }
 
