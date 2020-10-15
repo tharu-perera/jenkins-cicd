@@ -240,7 +240,7 @@ pipeline {
                                 keepAll              : true,
                                 reportDir            : "build/reports/pmd",
                                 reportFiles          : '**/*',
-                                reportName           : 'Checkstyle Report'
+                                reportName           : 'PMD Report'
                         ]
 //                        recordIssues(
 //                                enabledForFailure: true, aggregatingResults: true,
