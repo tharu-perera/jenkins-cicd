@@ -186,7 +186,7 @@ pipeline {
 
         stage('Checkstyle') {
             steps {
-                sh "mvn checkstyle:check"
+                sh "./gradlew checkstyleMain checkstyleTest"
                 recordIssues(tools: [checkStyle(reportEncoding: 'UTF-8')])
             }
         }
