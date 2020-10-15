@@ -149,10 +149,11 @@ pipeline {
                         sh './gradlew test jacocoTestReport --no-daemon'
                         // if in case tests fail then subsequent stages
                         // will not run .but post block in this stage will run
-                    } catch (exception) {
-                        echo "$exception"
-
-                    } finally {
+                    }
+//                    catch (exception) {
+//                        echo "$exception"
+//                    }
+                    finally {
                         junit '**/build/test-results/test/*.xml'
                     }
                 }

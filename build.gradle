@@ -20,9 +20,9 @@ checkstyle {
 
 tasks.withType(Checkstyle) {
     reports {
-        xml.enabled true
-        html.enabled false
-        html.stylesheet resources.text.fromFile('config/checkstyle/xsl/checkstyle-simple.xsl')
+        xml.enabled false
+        html.enabled true
+//        html.stylesheet resources.text.fromFile('config/checkstyle/xsl/checkstyle-simple.xsl')
     }
 }
 
