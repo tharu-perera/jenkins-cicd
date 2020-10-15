@@ -20,10 +20,10 @@ checkstyle {
 
 tasks.withType(Checkstyle) {
     reports {
-        xml.enabled false
+        xml.enabled true
 
         html.enabled true
-        html.stylesheet resources.text.fromFile('/Users/tharindu/IdeaProjects/jenkins-testing/config/checkstyle/xsl/checkstyle-simple.xsl')
+        html.stylesheet resources.text.fromFile('config/checkstyle/xsl/checkstyle-simple.xsl')
     }
 }
 
