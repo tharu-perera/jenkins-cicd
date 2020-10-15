@@ -152,6 +152,13 @@ pipeline {
 
                     } finally {
                         junit '**/build/test-results/test/*.xml'
+                        checksPublishResults(
+                                tasks: true,
+                                pmd: [pattern: '**/target/pmd-results.xml', thresholds: [fail: [low: 100]]],
+                                cpd: [archive: false],
+                                aggregation: [thresholds: [fail: [high: 0]]],
+                                archive: true
+                        )
                     }
                 }
             }
