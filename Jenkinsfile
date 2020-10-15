@@ -142,7 +142,7 @@ pipeline {
         }
 
         stage('test') {
-            steps('runnning junit') {
+            steps('running junit') {
                 script {
                     try {
                         sh 'chmod +x gradlew'
@@ -173,7 +173,7 @@ pipeline {
                             keepAll              : true,
                             reportDir            : "build/reports/tests/test",
                             reportFiles          : 'index.html',
-                            reportName           : 'HTML Report'
+                            reportName           : 'Junit Report'
                     ]
                 }
                 failure {
@@ -208,15 +208,50 @@ pipeline {
                     }catch (exception) {
                         echo "$exception"
                     } finally {
-                        recordIssues(
-                                enabledForFailure: true, aggregatingResults: true,
-                                tools: [java(), checkStyle(pattern: 'build/reports/checkstyle/main.html', reportEncoding: 'UTF-8')]
-                        )
+                        publishHTML target: [
+                                allowMissing         : false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll              : true,
+                                reportDir            : "build/reports/checkstyle",
+                                reportFiles          : '**/*',
+                                reportName           : 'Checkstyle Report'
+                        ]
+//                        recordIssues(
+//                                enabledForFailure: true, aggregatingResults: true,
+//                                tools: [java(), checkStyle(pattern: 'build/reports/checkstyle/main.html', reportEncoding: 'UTF-8')]
+//                        )
 
                     }
                 }
             }
         }
+
+        stage('Checkstyle') {
+            steps {
+                script{
+                    try {
+                        sh "./gradlew pmdmain pmdtest"
+                    }catch (exception) {
+                        echo "$exception"
+                    } finally {
+                        publishHTML target: [
+                                allowMissing         : false,
+                                alwaysLinkToLastBuild: false,
+                                keepAll              : true,
+                                reportDir            : "build/reports/pmd",
+                                reportFiles          : '**/*',
+                                reportName           : 'Checkstyle Report'
+                        ]
+//                        recordIssues(
+//                                enabledForFailure: true, aggregatingResults: true,
+//                                tools: [java(), checkStyle(pattern: 'build/reports/checkstyle/main.html', reportEncoding: 'UTF-8')]
+//                        )
+
+                    }
+                }
+            }
+        }
+
 
 
         stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
