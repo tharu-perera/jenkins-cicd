@@ -154,7 +154,7 @@ pipeline {
 
                     } finally {
                         junit '**/build/test-results/test/*.xml'
-
+                        recordIssues(tools: [checkStyle(pattern: 'build/reports/checkstyle/main.html')])
                     }
                 }
             }
