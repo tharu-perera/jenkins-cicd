@@ -39,37 +39,10 @@ pipeline {
     // =============== stages====================
     stages {
 
-        stage('testwed'){
-           if(true){
-               stages{
-                   stage('ddd'){
-                       steps{
-                           echo '>>edwd>>>'
-                       }
-
-                   }
-                   stage('qwdwww'){
-                       steps{
-                           echo '>wed>>>>'
-                       }
-                   }
-               }
-           }else{
-               stages{
-                   stage('dddwedwd'){
-                       steps{
-                           echo '>>edw>>>'
-                       }
-                   }
-                   stage('qwdw2332ww'){
-                       steps{
-                           echo '>ed>>>>'
-                       }
-                   }
-               }
-           }
+        when {
+            // case insensitive regular expression for truthy values
+            expression { return true }
         }
-
 
         stage('checking build type') {
             steps {
@@ -149,14 +122,11 @@ pipeline {
 
             post {
                 failure {
-                    echo 'getting variable values  error'
-                    slackSend channel: 'error',
-                            color: COLOR_MAP[currentBuild.currentResult],
-                            message: " ${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
-
+                    slackSend channel: 'error', color: COLOR_MAP[currentBuild.currentResult], message: "setting variables error"
                 }
             }
         }
+
         stage('build ') {
             steps {
                 sh "./gradlew clean build -x test -x check"
@@ -225,7 +195,7 @@ pipeline {
                 }
                 stage('Test On Linux') {
                     steps {
-                       echo " bbbb"
+                        echo " bbbb"
                     }
                 }
             }
@@ -233,10 +203,10 @@ pipeline {
 
         stage('Checkstyle') {
             steps {
-                script{
+                script {
                     try {
                         sh "./gradlew checkstyleMain checkstyleTest"
-                    }catch (exception) {
+                    } catch (exception) {
                         echo "$exception"
                     } finally {
                         publishHTML target: [
@@ -259,10 +229,10 @@ pipeline {
 
         stage('PMD') {
             steps {
-                script{
+                script {
                     try {
                         sh "./gradlew pmdmain pmdtest"
-                    }catch (exception) {
+                    } catch (exception) {
                         echo "$exception"
                     } finally {
                         publishHTML target: [
@@ -282,7 +252,6 @@ pipeline {
                 }
             }
         }
-
 
 
         stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
