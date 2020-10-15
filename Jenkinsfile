@@ -39,23 +39,32 @@ pipeline {
     // =============== stages====================
     stages {
 
-        stage('test'){
+        stage('testwed'){
            if(true){
                stages{
                    stage('ddd'){
-                       echo '>>>>>'
+                       steps{
+                           echo '>>edwd>>>'
+                       }
+
                    }
                    stage('qwdwww'){
-                       echo '>>qdqd>>>'
+                       steps{
+                           echo '>wed>>>>'
+                       }
                    }
                }
            }else{
                stages{
                    stage('dddwedwd'){
-                       echo '>>>333>>'
+                       steps{
+                           echo '>>edw>>>'
+                       }
                    }
                    stage('qwdw2332ww'){
-                       echo '>>qd23qd>>>'
+                       steps{
+                           echo '>ed>>>>'
+                       }
                    }
                }
            }
