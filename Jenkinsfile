@@ -114,7 +114,7 @@ pipeline {
 
             post {
                 failure {
-                    echo 'build & test error'
+                    echo 'getting variable values  error'
                     slackSend channel: 'error',
                             color: COLOR_MAP[currentBuild.currentResult],
                             message: " ${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
@@ -130,7 +130,7 @@ pipeline {
 
             post {
                 failure {
-                    echo 'build & test error'
+                    echo 'build  error'
                     slackSend channel: 'error',
                             color: COLOR_MAP[currentBuild.currentResult],
                             message: " ${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
@@ -157,6 +157,7 @@ pipeline {
             }
             post {
                 success {
+                    echo "printing this message even unit test ara failing"
                     step([$class          : 'JacocoPublisher',
                           execPattern     : '**/build/jacoco/*.exec',
                           classPattern    : '**/build/classes',
