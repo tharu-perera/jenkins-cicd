@@ -107,8 +107,10 @@ pipeline {
                     def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
                     COMMIT_AUTHOR = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
                     COMMIT_MSG = sh(returnStdout: true, script: "git log --format=%B -n 1  ${commit}").trim()
-                    echo "Current build was caused by: ${BUILD_USER}\n"
+                    echo "BUILD_USER : ${BUILD_USER}\n"
                     echo "COMMIT_MSG: ${COMMIT_MSG}\n"
+                    echo "COMMIT_AUTHOR: ${COMMIT_AUTHOR}\n"
+                    echo "commit: ${commit}\n"
                 }
             }
 
@@ -152,13 +154,13 @@ pipeline {
 
                     } finally {
                         junit '**/build/test-results/test/*.xml'
-                        checksPublishResults(
-                                tasks: true,
-                                pmd: [pattern: '**/target/pmd-results.xml', thresholds: [fail: [low: 100]]],
-                                cpd: [archive: false],
-                                aggregation: [thresholds: [fail: [high: 0]]],
-                                archive: true
-                        )
+
+
+                            step([$class: 'hudson.plugins.checkstyle.CheckStylePublisher', checkstyle: '**/target/checkstyle-result.xml'])
+
+                            step([$class: 'hudson.plugins.pmd.PmdPublisher', checkstyle: '**/target/pmd.xml'])
+
+
                     }
                 }
             }
