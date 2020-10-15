@@ -155,7 +155,6 @@ pipeline {
                     } finally {
                         junit '**/build/test-results/test/*.xml'
 
-
                             step([$class: 'hudson.plugins.checkstyle.CheckStylePublisher', checkstyle: '**/target/checkstyle-result.xml'])
 
                             step([$class: 'hudson.plugins.pmd.PmdPublisher', checkstyle: '**/target/pmd.xml'])
@@ -182,12 +181,27 @@ pipeline {
                             reportName           : 'HTML Report'
                     ]
                 }
-                unstable {
-                    echo "printing this message even unit test ara unstable"
-                }
                 failure {
                     echo 'test error'
                     slackSend channel: 'error', color: COLOR_MAP[currentBuild.currentResult], message: "junit error"
+
+                }
+            }
+        }
+
+
+        stage('Run Tests') {
+            parallel {
+                stage('Test On Windows') {
+                    steps {
+                        echo " aaaa"
+                    }
+                }
+                stage('Test On Linux') {
+
+                    steps {
+                       echo " bbbb"
+                    }
 
                 }
             }
