@@ -147,10 +147,10 @@ pipeline {
                         sh './gradlew test jacocoTestReport --no-daemon'
                         // if in case tests fail then subsequent stages
                         // will not run .but post block in this stage will run
-                    } catch(exception){
+                    } catch (exception) {
                         echo "$exception"
 
-                    }  finally{
+                    } finally {
                         junit '**/build/test-results/test/*.xml'
                     }
                 }
@@ -173,6 +173,9 @@ pipeline {
                             reportName           : 'HTML Report'
                     ]
                 }
+                unstable {
+                    echo "printing this message even unit test ara unstable"
+                }
                 failure {
                     echo 'test error'
                     slackSend channel: 'error', color: COLOR_MAP[currentBuild.currentResult], message: "junit error"
@@ -180,6 +183,14 @@ pipeline {
                 }
             }
         }
+
+        stage('Checkstyle') {
+            steps {
+                sh "mvn checkstyle:check"
+                recordIssues(tools: [checkStyle(reportEncoding: 'UTF-8')])
+            }
+        }
+
 
         stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
             //one method usingg jenkins global configuration
