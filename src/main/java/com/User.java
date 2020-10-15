@@ -1,7 +1,8 @@
 package com;
 
 public class User {
-     private int count;   //dwedwedwed  dcwdwedwdwdc
+    private int count;   //dwedwedwed  dcwdwedwdwdc
+    private int codundwt;   //dwedwedwed  dcwdwedwdwdc
 
     public int getCount() {
         return count;

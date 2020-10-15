@@ -1,13 +1,14 @@
+#!groovy
 plugins {
     id 'java'
     id "org.sonarqube" version "3.0"
     id "io.spring.dependency-management" version "1.0.10.RELEASE"
-
+    id 'pmd'
     id "com.bmuschko.tomcat" version "2.5"
 
 }
-apply plugin: 'war'
 
+apply plugin: 'war'
 apply plugin: 'jacoco'
 apply plugin: 'application'
 apply plugin: 'checkstyle'
@@ -16,12 +17,29 @@ checkstyle {
     toolVersion '7.8.1'
     configFile file("config/checkstyle/checkstyle.xml")
 }
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled false
+
+        html.enabled true
+        html.stylesheet resources.text.fromFile('/Users/tharindu/IdeaProjects/jenkins-testing/config/checkstyle/xsl/checkstyle-simple.xsl')
+    }
+}
+
 checkstyleMain {
-    source ='src/main/java'
+    source = 'src/main/java'
 }
 checkstyleTest {
-    source ='src/test/java'
+    source = 'src/test/java'
 }
+
+pmd {
+    ruleSetFiles = files("config/pmd/pmd.xml")
+    ruleSets = []
+    ignoreFailures = false
+}
+
 
 sonarqube {
     properties {
