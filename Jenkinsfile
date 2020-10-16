@@ -25,7 +25,7 @@ def COMMIT_AUTHOR = ""
 def BUILD_USER = ""
 def COMMIT_MSG = ""
 def TYPE = ""
-
+def summary=""
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
@@ -173,10 +173,11 @@ pipeline {
 //                    }
                     finally {
 //                        junit '**/build/test-results/test/*.xml'
-                        def summary = junit testResults: '**/build/test-results/test/*.xml'
-                        echo "test >>> ${summary.getProperties()}"
+                          summary = junit testResults: '**/build/test-results/test/*.xml'
+//                        echo "test >>> ${summary.getProperties()}"
                     }
                 }
+                echo "test >>> ${summary.getProperties()}"
             }
             post {
                 success {
