@@ -179,9 +179,7 @@ pipeline {
                         stage('build code for all ') {
                             steps {
                                 script {
-                                   stage("wed"){
-
-                                   }
+                                    generateStage()
                                 }
                             }
                         }
