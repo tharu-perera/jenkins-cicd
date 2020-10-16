@@ -27,8 +27,12 @@ def COMMIT_MSG = ""
 def TYPE = ""
 def summary = ""
 
+def errorReportToSlack(type, info) {
+    echo " type =$type  info = $info"
+}
+
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
-pipeline {
+pipeline {{
 //    try{
     agent any
     options {
@@ -150,7 +154,7 @@ pipeline {
                         }
                     }
                 }
-                stage('$TYPE') {
+                stage("${TYPE}") {
                     when {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
@@ -194,9 +198,10 @@ pipeline {
                                                 reportName           : 'Junit Report'
                                         ]
                                     }
-//                                    catch (exception) {
-//                                        echo "$exception"
-//                                    }
+                                    catch (exception) {
+                                        echo "$exception"
+
+                                    }
                                     finally {
                                         summary = junit testResults: '**/build/test-results/test/*.xml'
                                         echo "test >>> ${summary.getProperties()}"
@@ -273,6 +278,13 @@ pipeline {
 
             }
 
+        }
+        post{
+            unstable {
+                slackSend channel: 'error',
+                        color: 'danger',
+                        message: "build error"
+            }
         }
     }
 }
