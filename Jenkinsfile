@@ -32,7 +32,7 @@ def errorReportToSlack(type, info) {
 }
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
-pipeline {{
+pipeline {
 //    try{
     agent any
     options {
@@ -41,7 +41,7 @@ pipeline {{
     }
 
     // =============== stages====================
-    stages {
+    stages {{
         stage('checking build type') {
             steps {
                 sh 'printenv'
