@@ -32,7 +32,7 @@ pipeline {
 //    try{
     agent any
     options {
-        skipDefaultCheckout()
+//        skipDefaultCheckout()
         buildDiscarder(logRotator(numToKeepStr: '1'))
     }
 
@@ -194,9 +194,9 @@ pipeline {
                                                 reportName           : 'Junit Report'
                                         ]
                                     }
-                                    catch (exception) {
-                                        echo "$exception"
-                                    }
+//                                    catch (exception) {
+//                                        echo "$exception"
+//                                    }
                                     finally {
                                         summary = junit testResults: '**/build/test-results/test/*.xml'
                                         echo "test >>> ${summary.getProperties()}"
