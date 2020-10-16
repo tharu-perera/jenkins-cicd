@@ -78,14 +78,6 @@ pipeline {
                         // hotfix staging release request
                         TYPE = "HOTFIX_STAGING_RELEASE_REQ"
 
-                        /* ---------------- branches create requests [ check and create]--------------------*/
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
-                        // create release branch with tag
-                        TYPE = "CREATE_RELEASE_BR"
-                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-hotfix') {
-                        // create hotfix branch with tag. check whether still have one
-                        TYPE = "CREATE_HOTFIX_BR"
-
                         /* ---------------- automatic release requests [ get the approval ,checkout and release ]--------------------*/
                     } else if (env.JOB_BASE_NAME == "develop") {
                         // start dev release. no need approval .
@@ -99,6 +91,15 @@ pipeline {
                     } else if (env.JOB_BASE_NAME.startsWith('hotfix')) {
                         //  qa  release request. need approval
                         TYPE = "HOTFIX_QA_RELEASE"
+
+                        /* ---------------- branches create requests [ check , create and inform general]--------------------*/
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
+                        // create release branch with tag
+                        TYPE = "CREATE_RELEASE_BR"
+                    } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-hotfix') {
+                        // create hotfix branch with tag. check whether still have one
+                        TYPE = "CREATE_HOTFIX_BR"
+
                     } else {
                         echo "<<<could not find the change type>>>"
                     }
@@ -132,7 +133,7 @@ pipeline {
 
         stage(" ") {
             parallel {
-                stage('Branch Creation') {
+                stage('Branch Creation[Slack]') {
                     when {
                         expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
                     }
@@ -149,23 +150,66 @@ pipeline {
                         }
                     }
                 }
-                stage('Non Branch Creation') {
+                stage('non Branch Creation') {
                     when {
-                        expression { TYPE == "DEV_RELEASE" }
+                        expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
                     stages {
-                        stage('checking build type111') {
-                            steps {
-                                echo 'DEV_RELEASE'
+                        parallel {
+                            stage('checkout code when on request release') {
+                                when {
+                                    expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                                }
+                                steps {
+                                    echo 'clean ws and checkkout code '
+                                }
                             }
-                        }
-                        stage('checking build type2222') {
-                            steps {
-                                echo 'DEV_RELEASE'
+
+                            stage('build code for all ') {
+
+                                steps {
+                                    echo ' build code '
+                                }
                             }
                         }
                     }
                 }
+
+//                stage('Release Requests[Slack]') {
+//                    when {
+//                        expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+//                    }
+//                    stages {
+//                        stage('checking build type111') {
+//                            steps {
+//                                echo 'DEV_RELEASE'
+//                            }
+//                        }
+//                        stage('checking build type2222') {
+//                            steps {
+//                                echo 'DEV_RELEASE'
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                stage('Auto Release Requests[PR Merged]') {
+//                    when {
+//                        expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
+//                    }
+//                    stages {
+//                        stage('checking build type111') {
+//                            steps {
+//                                echo 'DEV_RELEASE'
+//                            }
+//                        }
+//                        stage('checking build type2222') {
+//                            steps {
+//                                echo 'DEV_RELEASE'
+//                            }
+//                        }
+//                    }
+//                }
             }
 
         }
