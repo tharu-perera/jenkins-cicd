@@ -27,7 +27,8 @@ def COMMIT_MSG = ""
 def TYPE = ""
 def summary = ""
 
-def generateStage(job) {
+def generateStage() {
+    def job="xxxx"
     return {
         stage("stage: ${job}") {
             echo "This is ${job}."
