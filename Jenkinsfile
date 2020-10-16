@@ -173,14 +173,16 @@ pipeline {
                                 }
 
                                 stage('testing') {
-                                    def branches = [:]
-                                    for(i = 0; i < params.size(); i += 1) {
-                                        def param = params[i]
-                                        branches["Test${i}"] = {
-                                            build job: 'Test', parameters: [string(name: 'Name', value: param)], quietPeriod: 2
+                                    script {
+                                        def branches = [:]
+                                        for (i = 0; i < params.size(); i += 1) {
+                                            def param = params[i]
+                                            branches["Test${i}"] = {
+                                                build job: 'Test', parameters: [string(name: 'Name', value: param)], quietPeriod: 2
+                                            }
                                         }
+                                        parallel branches
                                     }
-                                    parallel branches
                                 }
                             }
                         }
