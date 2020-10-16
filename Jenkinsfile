@@ -173,6 +173,8 @@ pipeline {
 //                    }
                     finally {
                         junit '**/build/test-results/test/*.xml'
+                        def summary = junit testResults: '/somefolder/*-reports/TEST-*.xml'
+                        echo "test >>> ${summary}"
                     }
                 }
             }
