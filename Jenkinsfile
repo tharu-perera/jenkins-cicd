@@ -37,12 +37,13 @@ pipeline {
     }
 
     // =============== stages====================
-    stages {
+    stages("") {
 
         stage('checking build type') {
             steps {
                 sh 'printenv'
                 script {
+                    /* ---------------- PR requests section [just build and send build status]--------------------*/
                     if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET == "develop") {
                         TYPE = "DEV_PR"
                     } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('release')) {
@@ -57,6 +58,8 @@ pipeline {
                     } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('hotfix')) {
                         // hotfix prod release PR
                         TYPE = "HOTFIX_PROD_PR"
+
+                        /* ---------------- release requests [ get the approval ,checkout and release ] --------------------*/
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'qa') {
                         // qa release request
                         TYPE = "QA_RELEASE_REQ"
@@ -75,12 +78,16 @@ pipeline {
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-staging') {
                         // hotfix staging release request
                         TYPE = "HOTFIX_STAGING_RELEASE_REQ"
+
+                        /* ---------------- branches create requests [ check and create]--------------------*/
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
                         // create release branch with tag
                         TYPE = "CREATE_RELEASE_BR"
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-hotfix') {
                         // create hotfix branch with tag. check whether still have one
                         TYPE = "CREATE_HOTFIX_BR"
+
+                        /* ---------------- automatic release requests [ get the approval ,checkout and release ]--------------------*/
                     } else if (env.JOB_BASE_NAME == "develop") {
                         // start dev release. no need approval .
                         TYPE = "DEV_RELEASE"
@@ -124,7 +131,7 @@ pipeline {
         }
 
 
-        stage(''){
+        stage('') {
             parallel {
                 stage('Branch Creation') {
                     when {
