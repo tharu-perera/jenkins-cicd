@@ -33,6 +33,7 @@ pipeline {
     agent any
     options {
 //        skipDefaultCheckout()
+
         buildDiscarder(logRotator(numToKeepStr: '1'))
     }
 
