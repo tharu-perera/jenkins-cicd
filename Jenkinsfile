@@ -32,7 +32,7 @@ pipeline {
 //    try{
     agent any
     options {
-//        skipDefaultCheckout()
+        skipDefaultCheckout()
         buildDiscarder(logRotator(numToKeepStr: '1'))
     }
 
