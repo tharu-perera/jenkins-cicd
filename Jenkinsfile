@@ -155,7 +155,7 @@ pipeline {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
                     stages {
-                        stage {
+                        stage(" ") {
                             parallel {
                                 stage('checkout code when on request release') {
                                     when {
@@ -167,17 +167,15 @@ pipeline {
                                 }
 
                                 stage('build code for all ') {
-
                                     steps {
                                         echo ' build code '
                                     }
                                 }
+
                                 stage('testing') {
                                     def branches = [:]
-
                                     for(i = 0; i < params.size(); i += 1) {
                                         def param = params[i]
-
                                         branches["Test${i}"] = {
                                             build job: 'Test', parameters: [string(name: 'Name', value: param)], quietPeriod: 2
                                         }
