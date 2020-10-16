@@ -27,10 +27,6 @@ def COMMIT_MSG = ""
 def TYPE = ""
 def summary = ""
 
-def errorReportToSlack(type, stage,errorInfo) {
-    echo " type =$type  info = $info"
-}
-
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
 //    try{
@@ -297,11 +293,16 @@ pipeline {
         }
     }
 }
+def errorReportToSlack(type, stage,errorInfo) {
+    echo " type =$type  info = $errorInfo  stage = $stage"
+    notifySlack()
+}
 
 def notifySlack() {
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{\n" +
+                    "  \"channel\": \"error\",\n" +
                     "\"blocks\": [\n" +
                     "{\n" +
                     "\"type\": \"section\",\n" +
