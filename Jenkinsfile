@@ -179,6 +179,7 @@ pipeline {
                         stage('build code for all ') {
                             steps {
                                 script {
+
                                     parallel generateStage()
                                 }
                             }
