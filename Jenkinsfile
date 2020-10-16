@@ -27,7 +27,7 @@ def COMMIT_MSG = ""
 def TYPE = ""
 def summary = ""
 
-def errorReportToSlack(type, info) {
+def errorReportToSlack(type, stage,errorInfo) {
     echo " type =$type  info = $info"
 }
 
@@ -41,7 +41,7 @@ pipeline {
     }
 
     // =============== stages====================
-    stages {{
+    stages {
         stage('checking build type') {
             steps {
                 sh 'printenv'
@@ -171,7 +171,14 @@ pipeline {
 
                         stage('build ') {
                             steps {
-                                sh "./gradlew clean build -x test -x check"
+                                script {
+                                    try {
+                                        sh "./gradlew clean build -x test -x check"
+                                    }catch(exception){
+                                        errorReportToSlack(TYPE,"Build",exception)
+                                        throw RuntimeException("$exception")
+                                    }
+                                }
                             }
                         }
 
@@ -200,6 +207,8 @@ pipeline {
                                     }
                                     catch (exception) {
                                         echo "$exception"
+                                        errorReportToSlack(TYPE,"Junit",exception)
+                                        throw RuntimeException("$exception")
 
                                     }
                                     finally {
@@ -216,7 +225,8 @@ pipeline {
                                     try {
                                         sh "./gradlew checkstyleMain checkstyleTest"
                                     } catch (exception) {
-                                        echo "$exception"
+                                        errorReportToSlack(TYPE,"Checkstyle",exception)
+                                        throw RuntimeException("$exception")
                                     } finally {
                                         publishHTML target: [
                                                 allowMissing         : false,
@@ -237,7 +247,8 @@ pipeline {
                                     try {
                                         sh "./gradlew pmdmain pmdtest"
                                     } catch (exception) {
-                                        echo "$exception"
+                                        errorReportToSlack(TYPE,"PMD",exception)
+                                        throw RuntimeException("$exception")
                                     } finally {
                                         publishHTML target: [
                                                 allowMissing         : false,
@@ -272,19 +283,17 @@ pipeline {
                                     }
                                 }
                             }
+                            post{
+                               unstable{
+                                   errorReportToSlack(TYPE,"SQ","eroor")
+                               }
+                            }
                         }
                     }
                 }
 
             }
 
-        }
-    }
-    post{
-        unstable {
-            slackSend channel: 'error',
-                    color: 'danger',
-                    message: "build error"
         }
     }
 }
