@@ -37,7 +37,7 @@ pipeline {
     }
 
     // =============== stages====================
-    stages("xxx") {
+    stages('xxx') {
         stage('checking build type') {
             steps {
                 sh 'printenv'
