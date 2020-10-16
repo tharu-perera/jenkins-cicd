@@ -27,6 +27,16 @@ def COMMIT_MSG = ""
 def TYPE = ""
 def summary = ""
 
+def generateStage(job) {
+    return {
+        stage("stage: ${job}") {
+            echo "This is ${job}."
+
+        }
+    }
+}
+
+
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
 //    try{
@@ -167,11 +177,11 @@ pipeline {
 
                         stage('build code for all ') {
                             steps {
-                                echo ' build code '
+                                script {
+                                    parallel generateStage("xxxxx")
+                                }
                             }
                         }
-
-
                     }
                 }
 
