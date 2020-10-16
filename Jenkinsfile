@@ -124,9 +124,9 @@ pipeline {
         }
 
 
-        stage {
+        stage(''){
             parallel {
-                stage('Branch Creation'){
+                stage('Branch Creation') {
                     when {
                         expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
                     }
@@ -143,7 +143,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Non Branch Creation'){
+                stage('Non Branch Creation') {
                     when {
                         expression { TYPE == "DEV_RELEASE" }
                     }
