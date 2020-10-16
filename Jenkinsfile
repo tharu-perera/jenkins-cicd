@@ -154,21 +154,35 @@ pipeline {
                     when {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
-                    stage {
-                        parallel {
-                            stage('checkout code when on request release') {
-                                when {
-                                    expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                    stages {
+                        stage {
+                            parallel {
+                                stage('checkout code when on request release') {
+                                    when {
+                                        expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                                    }
+                                    steps {
+                                        echo 'clean ws and checkkout code '
+                                    }
                                 }
-                                steps {
-                                    echo 'clean ws and checkkout code '
+
+                                stage('build code for all ') {
+
+                                    steps {
+                                        echo ' build code '
+                                    }
                                 }
-                            }
+                                stage('testing') {
+                                    def branches = [:]
 
-                            stage('build code for all ') {
+                                    for(i = 0; i < params.size(); i += 1) {
+                                        def param = params[i]
 
-                                steps {
-                                    echo ' build code '
+                                        branches["Test${i}"] = {
+                                            build job: 'Test', parameters: [string(name: 'Name', value: param)], quietPeriod: 2
+                                        }
+                                    }
+                                    parallel branches
                                 }
                             }
                         }
