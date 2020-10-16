@@ -33,7 +33,6 @@ pipeline {
     agent any
     options {
 //        skipDefaultCheckout()
-
         buildDiscarder(logRotator(numToKeepStr: '1'))
     }
 
@@ -151,7 +150,7 @@ pipeline {
                         }
                     }
                 }
-                stage('non Branch Creation') {
+                stage("$TYPE") {
                     when {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
@@ -272,41 +271,6 @@ pipeline {
                     }
                 }
 
-//                stage('Release Requests[Slack]') {
-//                    when {
-//                        expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
-//                    }
-//                    stages {
-//                        stage('checking build type111') {
-//                            steps {
-//                                echo 'DEV_RELEASE'
-//                            }
-//                        }
-//                        stage('checking build type2222') {
-//                            steps {
-//                                echo 'DEV_RELEASE'
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                stage('Auto Release Requests[PR Merged]') {
-//                    when {
-//                        expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
-//                    }
-//                    stages {
-//                        stage('checking build type111') {
-//                            steps {
-//                                echo 'DEV_RELEASE'
-//                            }
-//                        }
-//                        stage('checking build type2222') {
-//                            steps {
-//                                echo 'DEV_RELEASE'
-//                            }
-//                        }
-//                    }
-//                }
             }
 
         }
