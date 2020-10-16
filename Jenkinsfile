@@ -25,7 +25,7 @@ def COMMIT_AUTHOR = ""
 def BUILD_USER = ""
 def COMMIT_MSG = ""
 def TYPE = ""
-def summary=""
+def summary = ""
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
@@ -101,6 +101,7 @@ pipeline {
                 }
             }
         }
+
         stage('setting variables') {
             steps {
                 script {
@@ -123,7 +124,7 @@ pipeline {
         }
 
 
-        stage('release') {
+
 
             when {
                 expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
@@ -141,7 +142,7 @@ pipeline {
                 }
             }
 
-        }
+
 
 
         stage('build ') {
@@ -168,12 +169,12 @@ pipeline {
                         // if in case tests fail then subsequent stages
                         // will not run .but post block in this stage will run
                     }
-//                    catch (exception) {
-//                        echo "$exception"
-//                    }
+                    catch (exception) {
+                        echo "$exception"
+                    }
                     finally {
 //                        junit '**/build/test-results/test/*.xml'
-                          summary = junit testResults: '**/build/test-results/test/*.xml'
+                        summary = junit testResults: '**/build/test-results/test/*.xml'
 //                        echo "test >>> ${summary.getProperties()}"
                     }
                 }
