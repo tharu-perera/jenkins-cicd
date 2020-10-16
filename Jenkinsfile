@@ -172,9 +172,9 @@ pipeline {
 //                        echo "$exception"
 //                    }
                     finally {
-                        junit '**/build/test-results/test/*.xml'
+//                        junit '**/build/test-results/test/*.xml'
                         def summary = junit testResults: '**/build/test-results/test/*.xml'
-                        echo "test >>> ${summary}"
+                        echo "test >>> ${summary.getProperties()}"
                     }
                 }
             }
