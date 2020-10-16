@@ -154,7 +154,7 @@ pipeline {
                     when {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
-                    stages {
+                    stage {
                         parallel {
                             stage('checkout code when on request release') {
                                 when {
