@@ -37,7 +37,7 @@ pipeline {
     }
 
     // =============== stages====================
-    stages("") {
+    stages("xxx") {
 
         stage('checking build type') {
             steps {
