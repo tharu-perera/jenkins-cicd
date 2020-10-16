@@ -124,7 +124,7 @@ pipeline {
         }
 
 
-        stage('Build Type') {
+        stage(TYPE) {
             parallel {
                 stage('Branch Creation'){
                     when {
