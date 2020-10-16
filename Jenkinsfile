@@ -169,17 +169,9 @@ pipeline {
                             steps {
                                 sh "./gradlew clean build -x test -x check"
                             }
-                            post {
-                                failure {
-                                    slackSend channel: 'error',
-                                            color: COLOR_MAP[currentBuild.currentResult],
-                                            message: " ${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER}\n More info at: ${env.BUILD_URL}"
-
-                                }
-                            }
                         }
 
-                        stage('test') {
+                        stage('Junit & Jacoco') {
                             steps('running junit') {
                                 script {
                                     try {
@@ -187,40 +179,28 @@ pipeline {
                                         sh './gradlew test jacocoTestReport --no-daemon'
                                         // if in case tests fail then subsequent stages
                                         // will not run .but post block in this stage will run
+                                        step([$class          : 'JacocoPublisher',
+                                              execPattern     : '**/build/jacoco/*.exec',
+                                              classPattern    : '**/build/classes',
+                                              sourcePattern   : 'src/main/java',
+                                              exclusionPattern: 'src/test*'
+                                        ])
+                                        publishHTML target: [
+                                                allowMissing         : false,
+                                                alwaysLinkToLastBuild: false,
+                                                keepAll              : true,
+                                                reportDir            : "build/reports/tests/test",
+                                                reportFiles          : 'index.html',
+                                                reportName           : 'Junit Report'
+                                        ]
                                     }
                                     catch (exception) {
                                         echo "$exception"
                                     }
                                     finally {
-//                        junit '**/build/test-results/test/*.xml'
                                         summary = junit testResults: '**/build/test-results/test/*.xml'
-//                        echo "test >>> ${summary.getProperties()}"
+                                        echo "test >>> ${summary.getProperties()}"
                                     }
-                                }
-                                echo "test >>> ${summary.getProperties()}"
-                            }
-                            post {
-                                success {
-                                    echo "printing this message even unit test ara failing"
-                                    step([$class          : 'JacocoPublisher',
-                                          execPattern     : '**/build/jacoco/*.exec',
-                                          classPattern    : '**/build/classes',
-                                          sourcePattern   : 'src/main/java',
-                                          exclusionPattern: 'src/test*'
-                                    ])
-                                    publishHTML target: [
-                                            allowMissing         : false,
-                                            alwaysLinkToLastBuild: false,
-                                            keepAll              : true,
-                                            reportDir            : "build/reports/tests/test",
-                                            reportFiles          : 'index.html',
-                                            reportName           : 'Junit Report'
-                                    ]
-                                }
-                                failure {
-                                    echo 'test error'
-                                    slackSend channel: 'error', color: COLOR_MAP[currentBuild.currentResult], message: "junit error"
-
                                 }
                             }
                         }
@@ -241,11 +221,6 @@ pipeline {
                                                 reportFiles          : '**/*',
                                                 reportName           : 'Checkstyle Report'
                                         ]
-//                        recordIssues(
-//                                enabledForFailure: true, aggregatingResults: true,
-//                                tools: [java(), checkStyle(pattern: 'build/reports/checkstyle/main.html', reportEncoding: 'UTF-8')]
-//                        )
-
                                     }
                                 }
                             }
@@ -267,11 +242,6 @@ pipeline {
                                                 reportFiles          : 'main.html,test.html',
                                                 reportName           : 'PMD Report'
                                         ]
-//                        recordIssues(
-//                                enabledForFailure: true, aggregatingResults: true,
-//                                tools: [java(), checkStyle(pattern: 'build/reports/checkstyle/main.html', reportEncoding: 'UTF-8')]
-//                        )
-
                                     }
                                 }
                             }
@@ -286,7 +256,6 @@ pipeline {
 //                    withSonarQubeEnv('mysona') { // If you have configured more than one global server connection, you can specify its name
 //                        sh "${scannerHome}/bin/sonar-scanner"
 //                    }
-
                                     //other one is using gradle build
                                     withSonarQubeEnv() { // Will pick the global server connection you have configured
                                         sh "./gradlew sonarqube -Dsonar.projectName=${TYPE}"
@@ -296,16 +265,6 @@ pipeline {
                                         // true = set pipeline to UNSTABLE, false = don't
                                         waitForQualityGate abortPipeline: true
                                     }
-                                }
-                            }
-
-                            post {
-                                failure {
-                                    echo 'Sonarqube error'
-                                    slackSend channel: 'error',
-                                            color: COLOR_MAP[currentBuild.currentResult],
-                                            message: "Sonarqube error"
-
                                 }
                             }
                         }
