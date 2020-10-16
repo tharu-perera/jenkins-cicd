@@ -32,7 +32,7 @@ def errorReportToSlack(type, info) {
 }
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
-pipeline {{
+pipeline {
 //    try{
     agent any
     options {
@@ -279,12 +279,12 @@ pipeline {{
             }
 
         }
-        post{
-            unstable {
-                slackSend channel: 'error',
-                        color: 'danger',
-                        message: "build error"
-            }
+    }
+    post{
+        unstable {
+            slackSend channel: 'error',
+                    color: 'danger',
+                    message: "build error"
         }
     }
 }
