@@ -127,7 +127,6 @@ pipeline {
         stage('release') {
             parallel {
 
-
                 when {
                     expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
                 }
