@@ -32,7 +32,6 @@ def generateStage() {
     return {
         stage("stage: ${job}") {
             echo "This is ${job}."
-
         }
     }
 }
