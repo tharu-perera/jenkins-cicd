@@ -150,7 +150,7 @@ pipeline {
                         }
                     }
                 }
-                stage("$TYPE") {
+                stage('$TYPE') {
                     when {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
