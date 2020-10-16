@@ -124,25 +124,28 @@ pipeline {
         }
 
 
+        stage('release') {
+            parallel {
 
 
-            when {
-                expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
-            }
-            stages {
-                stage('checking build type111') {
-                    steps {
-                        echo 'dw'
+                when {
+                    expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
+                }
+                stages {
+                    stage('checking build type111') {
+                        steps {
+                            echo 'dw'
+                        }
+                    }
+                    stage('checking build type2222') {
+                        steps {
+                            echo 'dw222'
+                        }
                     }
                 }
-                stage('checking build type2222') {
-                    steps {
-                        echo 'dw222'
-                    }
-                }
             }
 
-
+        }
 
 
         stage('build ') {
