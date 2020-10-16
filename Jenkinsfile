@@ -37,7 +37,7 @@ pipeline {
     }
 
     // =============== stages====================
-    stages('dwd') {
+    stages {
         stage('checking build type') {
             steps {
                 sh 'printenv'
@@ -130,7 +130,7 @@ pipeline {
         }
 
 
-        stage('') {
+        stage(" ") {
             parallel {
                 stage('Branch Creation') {
                     when {
