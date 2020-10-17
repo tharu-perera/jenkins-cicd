@@ -143,20 +143,8 @@ pipeline {
                             steps {
                                 script {
                                     try {
-                                        sh '''
- 
-  branch123=develop
-existed_in_local=$(git branch --list ${branch123})
-if [[ -z ${existed_in_local} ]]; then
-  echo 1
-  exit 1
-else
-  echo 1
-  exit 0
-fi
-         
-                                     '''
-
+                                        def br = sh(returnStdout: true, script: 'git branch --list  develop')
+                                        echo ">>>$br"
                                     } catch (exception) {
                                         echo 'deve exist'
                                         errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev exist")
@@ -164,21 +152,8 @@ fi
                                     }
 
                                     try {
-                                        sh '''
- 
-
-  branch123=develop123
-existed_in_local=$(git branch --list ${branch123})
-if [[ -z ${existed_in_local} ]]; then
-  echo 1
-  exit 1
-else
-  echo 1
-  exit 0
-fi
-          
-                                     '''
-
+                                        def br = sh(returnStdout: true, script: 'git branch --list  xxxxx')
+                                        echo ">>>$br"
                                     } catch (exception4) {
                                         echo 'xxxxx exist'
                                         errorReportToSlack(TYPE, "Branch Creation[Slack]", "xxxxx exist")
