@@ -237,7 +237,7 @@ pipeline {
                                     try {
                                         sh "./gradlew pmdmain pmdtest"
                                     } catch (exception) {
-                                        errorReportToSlack(TYPE, "PMD", exception)
+//                                        errorReportToSlack(TYPE, "PMD", exception)
 //                                        throw exception
                                     } finally {
                                         publishHTML target: [
@@ -280,24 +280,43 @@ pipeline {
                             }
                         }
 
-                        stage('Release Approval') {
-                            stages{
-                                stage('On request release'){
-                                    when {
-                                        expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
-                                    }
-                                    steps{
-                                        echo 'get permison for On request release '
-                                    }
-                                }
-                                stage('commit merged auto release'){
-                                    when {
-                                        expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
-                                    }
-                                    steps{
-                                        echo 'get permison for commit merged auto release'
-                                    }
-                                }
+//                        stage('Release Approval') {
+//                            when {
+//                                expression {
+//                                    TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ"
+//                                            || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE"
+//                                }
+//                            }
+//                            stages {
+                        stage('On request release approval') {
+                            when {
+                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                            }
+                            steps {
+                                echo 'get permison for On request release '
+                            }
+                        }
+                        stage('commit merged auto release approval') {
+                            when {
+                                expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
+                            }
+                            steps {
+                                echo 'get permison for commit merged auto release'
+                            }
+                        }
+//                            }
+
+//                        }
+
+                        stage("send build status") {
+                            when {
+                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                            }steps{
+                               echo "xxxxxxx"
+                            }
+                            when {
+                                expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }                            }steps{
+                                echo "zzzzzz"
                             }
 
                         }
