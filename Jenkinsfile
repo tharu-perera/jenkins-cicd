@@ -197,14 +197,15 @@ pipeline {
                                 sh 'pwd'
                                 script {
                                     if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ") {
-                                        sh 'git checkout '
+                                        sh 'git checkout origin/release'
                                     } else if (TYPE == "DEV_RELEASE_REQ") {
-
+                                        sh 'git checkout origin/develop'
                                     } else if (TYPE == "PROD_RELEASE_REQ") {
-
+                                        sh 'git checkout origin/master'
                                     } else if (TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-
+                                        sh 'git checkout origin/hotfix'
                                     }
+                                    sh 'cat README.md'
                                 }
                             }
                         }
