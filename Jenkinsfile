@@ -145,7 +145,7 @@ pipeline {
                         }
                     }
                 }
-                stage("non branch") {
+                stage("non \n branch") {
                     when {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
