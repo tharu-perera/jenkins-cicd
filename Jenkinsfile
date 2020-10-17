@@ -149,9 +149,8 @@ pipeline {
                             steps {
                                 script {
                                     try {
-                                        br = sh(returnStdout: true, script: 'git branch --list  develop')
+                                        br = sh(returnStdout: true, script: './test.sh develop')
                                         echo ">>>$br"
-                                        getGitAuthor()
                                     } catch (exception) {
                                         echo 'deve exist'
                                         errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev exist")
@@ -159,7 +158,7 @@ pipeline {
                                     }
 
                                     try {
-                                        def br = sh(returnStdout: true, script: 'git branch --list  xxxxx')
+                                        br = sh(returnStdout: true, script: './test.sh xxxx')
                                         echo ">>>$br"
                                     } catch (exception4) {
                                         echo 'xxxxx exist'

@@ -1,9 +1,27 @@
-branch123=develop
-existed_in_local=$(git branch --list ${branch123})
-if [[ -z ${existed_in_local} ]]; then
-  echo '1'
-  exit 1
-else
-  echo '0'
-  exit 0
-fi
+#!/bin/bash
+br="$1"
+function is_in_local() {
+    local branch=$br
+    echo $branch
+    local existed_in_local=$(git branch --list ${branch})
+
+    if [[ -z ${existed_in_local} ]]; then
+        echo 0
+    else
+        echo 1
+    fi
+}
+
+#function is_in_remote() {
+#    local branch=$br
+#    local existed_in_remote=$(git ls-remote --heads origin ${branch})
+#
+#    if [[ -z ${existed_in_remote} ]]; then
+#        echo 0
+#    else
+#        echo 1
+#    fi
+#}
+
+is_in_local br
+#is_in_remote br
