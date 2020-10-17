@@ -213,7 +213,7 @@ pipeline {
                                             errorDesc="Hotfix Staging release from hotfix branch request job is failed"
                                         }
                                     } catch (exception) {
-                                        errorReportToSlack(TYPE, "checkout code when on request release[Slack]", "$exception")
+                                        errorReportToSlack(TYPE, "checkout code when on request release[Slack]", "$errorDesc")
                                         throw exception
                                     } finally {
                                         sh 'cat README.md'
