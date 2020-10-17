@@ -45,12 +45,16 @@ pipeline {
 
     stages {
         stage ("Long Running Stage") {
-            hook = registerWebhook()
+            steps {
 
-            echo "Waiting for POST to ${hook.getURL()}"
 
-            data = waitForWebhook hook
-            echo "Webhook called with data: ${data}"
+                hook = registerWebhook()
+
+                echo "Waiting for POST to ${hook.getURL()}"
+
+                data = waitForWebhook hook
+                echo "Webhook called with data: ${data}"
+            }
         }
 
 //        stage('On request release approval') {
