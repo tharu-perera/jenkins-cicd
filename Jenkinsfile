@@ -238,7 +238,7 @@ pipeline {
                                         sh "./gradlew pmdmain pmdtest"
                                     } catch (exception) {
                                         errorReportToSlack(TYPE, "PMD", exception)
-                                        throw exception
+//                                        throw exception
                                     } finally {
                                         publishHTML target: [
                                                 allowMissing         : false,
