@@ -63,13 +63,15 @@ pipeline {
             steps {
                 sh 'printenv'
                 echo "get permison for On request release <<$par1>> "
+                echo "get permison for On request release <<$channel_id>> "
+                echo "get permison for On request release <<$user_name>> "
                 // Call a remote system to start execution, passing a callback url
                 echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
                 echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
-//send approval messgae with
+//send approval messgae with  linkn to this page
                 timeout(time: 10, unit: "MINUTES") {
-                    input id: 'Async-input', message: 'Waiting for remote system'
-                    input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
+                     def feedback = input(submitterParameter: 'submitter',  message: 'Do you want to approve the deploy in production?', ok: 'Yes')
+                    echo "It was ${feedback.submitter} who submitted the dialog."
                 }
 
             }
