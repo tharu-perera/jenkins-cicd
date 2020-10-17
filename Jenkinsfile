@@ -159,12 +159,12 @@ fi
 
                                     } catch (exception) {
                                         echo 'deve exist'
-                                        errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev exist") {
+                                        errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev exist")
 //                                        throw exception
-                                        }
+                                    }
 
-                                        try {
-                                            sh '''
+                                    try {
+                                        sh '''
  
 
   branch123=develop123
@@ -179,19 +179,19 @@ fi
           
                                      '''
 
-                                        } catch (exception4) {
-                                            echo 'xxxxx exist'
-                                            errorReportToSlack(TYPE, "Branch Creation[Slack]", "xxxxx exist") {
-//                                        throw exception
-                                            }
-                                        }
+                                    } catch (exception4) {
+                                        echo 'xxxxx exist'
+                                        errorReportToSlack(TYPE, "Branch Creation[Slack]", "xxxxx exist")
+                                        throw exception4
 
                                     }
+
                                 }
                             }
                         }
                     }
                 }
+
                 stage("non branch") {
                     when {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
