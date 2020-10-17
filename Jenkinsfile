@@ -309,16 +309,12 @@ pipeline {
 //                        }
 
                         stage("send build status") {
-                            when {
-                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
-                            }steps{
-                               echo "xxxxxxx"
+                            steps {
+                                script {
+                                    echo "sending final build status"
+                                    successReportToSlack(TYPE)
+                                }
                             }
-                            when {
-                                expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }                            }steps{
-                                echo "zzzzzz"
-                            }
-
                         }
 
 
@@ -331,23 +327,45 @@ pipeline {
     }
 }
 
-def errorReportToSlack(TYPE, stage, errorInfo) {
-    echo " type =$TYPE  info = $errorInfo  stage = $stage"
+def successReportToSlack(TYPE) {
+    echo " type =$TYPE"
     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
-        notifySlack("admin", errorInfo, TYPE, stage)
+        notifySlackSuccess("admin", TYPE, "release/hotfix branch created")
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-        notifySlack("admin", errorInfo, TYPE, stage)
+        notifySlackSuccess("admin",  TYPE, "Release done on request")
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
-        notifySlack("pull-request", errorInfo, TYPE, stage)
+        notifySlackSuccess("pull-request" , TYPE, "PR status is ok")
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
-        notifySlack("error", errorInfo, TYPE, stage)
+        notifySlackSuccess("error", TYPE, "merged commit released")
     }
 }
 
-def notifySlack(channel, error, type, stage) {
+def errorReportToSlack(TYPE, stage, errorInfo) {
+    echo " type =$TYPE  info = $errorInfo  stage = $stage"
+    if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
+        notifySlackError("admin", errorInfo, TYPE, stage)
+    } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+        notifySlackError("admin", errorInfo, TYPE, stage)
+    } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
+        notifySlackError("pull-request", errorInfo, TYPE, stage)
+    } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
+        notifySlackError("error", errorInfo, TYPE, stage)
+    }
+}
+
+def notifySlackError(channel, error, type, stage) {
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\": \"error=${error} : type= ${type} : stage=${stage}\"}'"
+        }
+    }
+
+}
+
+def notifySlackSuccess(channel, type, msg) {
+    withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+        script {
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\": \"msg=${msg} : type= ${type} \"}'"
         }
     }
 
