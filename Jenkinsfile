@@ -172,7 +172,7 @@ pipeline {
                                         sh "./gradlew clean build -x test -x check"
                                     }catch(exception){
                                         errorReportToSlack(TYPE,"Build",exception)
-                                        throw RuntimeException("$exception")
+                                        throw  exception
                                     }
                                 }
                             }
@@ -204,7 +204,7 @@ pipeline {
                                     catch (exception) {
                                         echo "$exception"
                                         errorReportToSlack(TYPE,"Junit",exception)
-                                        throw RuntimeException("$exception")
+                                        throw  exception
 
                                     }
                                     finally {
@@ -222,7 +222,7 @@ pipeline {
                                         sh "./gradlew checkstyleMain checkstyleTest"
                                     } catch (exception) {
                                         errorReportToSlack(TYPE,"Checkstyle",exception)
-                                        throw RuntimeException("$exception")
+                                        throw  exception
                                     } finally {
                                         publishHTML target: [
                                                 allowMissing         : false,
@@ -244,7 +244,7 @@ pipeline {
                                         sh "./gradlew pmdmain pmdtest"
                                     } catch (exception) {
                                         errorReportToSlack(TYPE,"PMD",exception)
-                                        throw RuntimeException("$exception")
+                                        throw  exception
                                     } finally {
                                         publishHTML target: [
                                                 allowMissing         : false,
