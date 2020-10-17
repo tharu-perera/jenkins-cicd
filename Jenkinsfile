@@ -44,35 +44,35 @@ pipeline {
     }
 
     stages {
-        stage ("Long Running Stage") {
-            steps {
-
-                script {
-                    def hook = registerWebhook()
-
-                    echo "Waiting for POST to ${hook.getURL()}"
-                    requestApproval(hook.getURL())
-                    def  data = waitForWebhook hook
-                    echo "Webhook called with data: ${data}"
-                }
-            }
-        }
-
-//        stage('On request release approval') {
-//
+//        stage ("Long Running Stage") {
 //            steps {
-//                echo "get permison for On request release <<$par1>> "
-//                // Call a remote system to start execution, passing a callback url
-//                echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
-//                echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
 //
-//                timeout(time: 10, unit: "MINUTES") {
-//                    input id: 'Async-input', message: 'Waiting for remote system'
-//                    input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
+//                script {
+//                    def hook = registerWebhook()
+//
+//                    echo "Waiting for POST to ${hook.getURL()}"
+//                    requestApproval(hook.getURL())
+//                    def  data = waitForWebhook hook
+//                    echo "Webhook called with data: ${data}"
 //                }
-//
 //            }
 //        }
+
+        stage('On request release approval') {
+
+            steps {
+                echo "get permison for On request release <<$par1>> "
+                // Call a remote system to start execution, passing a callback url
+                echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
+                echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
+
+                timeout(time: 10, unit: "MINUTES") {
+                    input id: 'Async-input', message: 'Waiting for remote system'
+                    input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
+                }
+
+            }
+        }
 
     }
 
