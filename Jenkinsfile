@@ -183,7 +183,7 @@ pipeline {
                     }
                     stages {
 
-                        stage('checkout code when on request release') {
+                        stage('checkout code when on request release[Slack]') {
                             when {
                                 expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
                             }
