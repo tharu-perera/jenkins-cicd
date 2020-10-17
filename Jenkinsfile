@@ -51,7 +51,7 @@ pipeline {
                     def hook = registerWebhook()
 
                     echo "Waiting for POST to ${hook.getURL()}"
-
+                    requestApproval(hook.getURL())
                     def  data = waitForWebhook hook
                     echo "Webhook called with data: ${data}"
                 }
@@ -78,6 +78,17 @@ pipeline {
 
 
 }
+
+def requestApproval(callBack){
+    def channel="release-approval"
+    withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+        script {
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\": \"wedwed\"}'"
+        }
+    }
+}
+
+
 
 def successReportToSlack(TYPE) {
     echo " type =$TYPE"
