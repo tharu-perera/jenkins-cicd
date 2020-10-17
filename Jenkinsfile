@@ -47,13 +47,14 @@ pipeline {
         stage ("Long Running Stage") {
             steps {
 
+                script {
+                    def hook = registerWebhook()
 
-                hook = registerWebhook()
+                    echo "Waiting for POST to ${hook.getURL()}"
 
-                echo "Waiting for POST to ${hook.getURL()}"
-
-                data = waitForWebhook hook
-                echo "Webhook called with data: ${data}"
+                    def  data = waitForWebhook hook
+                    echo "Webhook called with data: ${data}"
+                }
             }
         }
 
