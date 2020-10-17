@@ -145,7 +145,6 @@ pipeline {
                                     try {
                                         sh '''
  
-  #!/bin/sh
   echo $branch123
     export branch123=develop
     export  existed_in_local=$(git branch --list ${branch123})
@@ -162,13 +161,13 @@ pipeline {
 
                                     } catch (exception) {
                                         echo 'deve exist'
-                                        throw exception
+//                                        throw exception
                                     }
 
                                     try {
                                         sh '''
  
- #!/bin/sh
+
     export branch123=developwd
     export  existed_in_local=$(git branch --list ${branch123})
 
@@ -184,7 +183,7 @@ pipeline {
 
                                     } catch (exception) {
                                         echo 'xxxxx exist'
-                                        throw exception
+//                                        throw exception
                                     }
                                  }
 
