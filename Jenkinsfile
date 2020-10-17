@@ -31,8 +31,8 @@ def getGitAuthor = {
     def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
     def commit2 = sh(returnStdout: true, script: 'git branch --list  develop')
     sh 'git branch --list  develop'
-   echo "????? $commit   "
-   echo "?????### $commit2 "
+    echo "????? $commit   "
+    echo "?????### $commit2 "
 }
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
@@ -150,33 +150,27 @@ pipeline {
 //                                step([$class: 'WsCleanup'])
 //                                checkout scm
                                 script {
-                                    try {
-                                        sh 'pwd'
-                                        sh 'ls -ltr'
-                                        sh 'git ls-remote --heads origin develop'
-                                        sh 'git ls-remote --heads origin develop123'
-                                        sh 'git branch'
-                                        sh 'git branch --list '
-                                        sh 'git branch --list develop'
-                                        sh 'git branch --list developee'
-                                        br = sh(returnStdout: true, script: './test.sh develop')
-                                        echo ">>>$br"
-                                    } catch (exception) {
-                                        echo 'deve exist'
-                                        errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev exist")
-//                                        throw exception
+                                    def br = ""
+                                    if (TYPE == "CREATE_RELEASE_BR") {
+                                        br = sh(returnStdout: true, script: './test.sh release')
+                                        if (br == '1') {
+                                            errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev  branch exist")
+                                            throw exception
+                                        } else {
+                                            sh 'git checkout -b release'
+                                            sh 'git push origin release'
+                                        }
+
+                                    } else {
+                                        br = sh(returnStdout: true, script: './test.sh hotfix')
+                                        if (br == '1') {
+                                            errorReportToSlack(TYPE, "Branch Creation[Slack]", "hotfix branch exist")
+                                            throw exception
+                                        } else {
+                                            sh 'git checkout -b hotfix'
+                                            sh 'git push origin hotfix'
+                                        }
                                     }
-
-                                    try {
-                                        br = sh(returnStdout: true, script: './test.sh xxxx')
-                                        echo ">>>$br"
-                                    } catch (exception4) {
-                                        echo 'xxxxx exist'
-                                        errorReportToSlack(TYPE, "Branch Creation[Slack]", "xxxxx exist")
-                                        throw exception4
-
-                                    }
-
                                 }
                             }
                         }
