@@ -27,7 +27,12 @@ def COMMIT_MSG = ""
 def TYPE = ""
 def summary = ""
 def COMMIT_HASH = ""
-
+def getGitAuthor = {
+    def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
+    def commit2 = sh(returnStdout: true, script: 'git branch --list  develop')
+   echo "????? $commit   "
+   echo "?????### $commit2 "
+}
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
 //    try{
@@ -143,8 +148,9 @@ pipeline {
                             steps {
                                 script {
                                     try {
-                                        def br = sh(returnStdout: true, script: 'git branch --list  develop')
+                                        br = sh(returnStdout: true, script: 'git branch --list  develop')
                                         echo ">>>$br"
+                                        getGitAuthor()
                                     } catch (exception) {
                                         echo 'deve exist'
                                         errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev exist")
