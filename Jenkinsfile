@@ -194,23 +194,23 @@ pipeline {
                                     def errorDesc = ""
                                     try {
                                         if (TYPE == "QA_RELEASE_REQ") {
+                                            errorDesc = "QA release from release branch request job is failed"
                                             sh 'git checkout origin/release'
-                                            errorDesc="QA release from release branch request job is failed"
                                         } else if (TYPE == "STAGE_RELEASE_REQ") {
+                                            errorDesc = "Staging release from release branch request job is failed"
                                             sh 'git checkout origin/release'
-                                            errorDesc="Staging release from release branch request job is failed"
                                         } else if (TYPE == "DEV_RELEASE_REQ") {
+                                            errorDesc = "Dev release request job is failed"
                                             sh 'git checkout origin/develop'
-                                            errorDesc="Dev release request job is failed"
                                         } else if (TYPE == "PROD_RELEASE_REQ") {
+                                            errorDesc = "PROD release from master branch request job is failed"
                                             sh 'git checkout origin/master'
-                                            errorDesc="PROD release from master branch request job is failed"
                                         } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
+                                            errorDesc = "Hotfix QA release from hotfix branch request job is failed"
                                             sh 'git checkout origin/hotfix'
-                                            errorDesc="Hotfix QA release from hotfix branch request job is failed"
                                         } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+                                            errorDesc = "Hotfix Staging release from hotfix branch request job is failed"
                                             sh 'git checkout origin/hotfix'
-                                            errorDesc="Hotfix Staging release from hotfix branch request job is failed"
                                         }
                                     } catch (exception) {
                                         errorReportToSlack(TYPE, "checkout code when on request release[Slack]", "$errorDesc")
