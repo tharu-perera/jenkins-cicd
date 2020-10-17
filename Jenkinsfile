@@ -138,27 +138,56 @@ pipeline {
                         expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
                     }
                     stages {
-                        stage('checking build type111') {
+                        stage('checking and create branch') {
+
                             steps {
-                                sh '''
+                                script {
+                                    try {
+                                        sh '''
  
-    if [[ -z ${$(git branch --list develop)} ]]; then
-        echo 0
+  #!/bin/sh
+  echo $branch123
+    export branch123=develop
+    export  existed_in_local=$(git branch --list ${branch123})
+
+    if [[ -z ${existed_in_local} ]]; then
+      echo '1\'
+        exit 1
     else
-        echo 1
+       echo '0\'
+        exit 0
     fi
          
                                      '''
-                                sh '''
+
+                                    } catch (exception) {
+                                        echo 'deve exist'
+                                        throw exception
+                                    }
+
+                                    try {
+                                        sh '''
  
-    if [[ -z ${$(git branch --list xxxx)} ]]; then
-        echo 0
+ #!/bin/sh
+    export branch123=developwd
+    export  existed_in_local=$(git branch --list ${branch123})
+
+    if [[ -z ${existed_in_local} ]]; then
+      echo '1\'
+        exit 1
     else
-        echo 1
+       echo '0\'
+        exit 0
     fi
          
                                      '''
-                                echo 'Branch Creation'
+
+                                    } catch (exception) {
+                                        echo 'xxxxx exist'
+                                        throw exception
+                                    }
+                                 }
+
                             }
                         }
                     }
@@ -339,7 +368,7 @@ pipeline {
 def successReportToSlack(TYPE) {
     echo " type =$TYPE"
     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
-        notifySlackSuccess("admin", TYPE, "release/hotfix branch created")
+        notifySlackSuccess("general", TYPE, "release/hotfix branch created")
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
         notifySlackSuccess("admin", TYPE, "Release done on request")
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
