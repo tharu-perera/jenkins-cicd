@@ -153,7 +153,6 @@ pipeline {
                                     def br = ""
                                     if (TYPE == "CREATE_RELEASE_BR") {
                                         br = sh(returnStdout: true, script: './test.sh release').trim()
-                                        echo "<<<<$br>>>>"
                                         if (br == '1') {
                                             errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev  branch exist")
                                             throw exception
@@ -191,21 +190,22 @@ pipeline {
                             steps {
                                 step([$class: 'WsCleanup'])
                                 checkout scm
-                                sh 'git branch'
-                                sh 'git show HEAD'
-                                sh 'ls -ltr'
-                                sh 'pwd'
                                 script {
-                                    if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ") {
-                                        sh 'git checkout origin/release'
-                                    } else if (TYPE == "DEV_RELEASE_REQ") {
-                                        sh 'git checkout origin/develop'
-                                    } else if (TYPE == "PROD_RELEASE_REQ") {
-                                        sh 'git checkout origin/master'
-                                    } else if (TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-                                        sh 'git checkout origin/hotfix'
+                                    try {
+                                        if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ") {
+                                            sh 'git checkout origin/release'
+                                        } else if (TYPE == "DEV_RELEASE_REQ") {
+                                            sh 'git checkout origin/develop'
+                                        } else if (TYPE == "PROD_RELEASE_REQ") {
+                                            sh 'git checkout origin/master'
+                                        } else if (TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+                                            sh 'git checkout origin/hotfix'
+                                        }
+                                    }catch(exception){
+                                        errorReportToSlack(TYPE, "checkout code when on request release[Slack]", "$exception")
+                                        sh 'cat README.md'
+                                        throw exception
                                     }
-                                    sh 'cat README.md'
                                 }
                             }
                         }
