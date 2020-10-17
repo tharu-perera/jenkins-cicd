@@ -170,9 +170,9 @@ pipeline {
                                 script {
                                     try {
                                         sh "./gradlew clean build -x test -x check"
-                                    }catch(exception){
-                                        errorReportToSlack(TYPE,"Build",exception)
-                                        throw  exception
+                                    } catch (exception) {
+                                        errorReportToSlack(TYPE, "Build", exception)
+                                        throw exception
                                     }
                                 }
                             }
@@ -203,8 +203,8 @@ pipeline {
                                     }
                                     catch (exception) {
                                         echo "$exception"
-                                        errorReportToSlack(TYPE,"Junit",exception)
-                                        throw  exception
+                                        errorReportToSlack(TYPE, "Junit", exception)
+                                        throw exception
 
                                     }
                                     finally {
@@ -221,8 +221,8 @@ pipeline {
                                     try {
                                         sh "./gradlew checkstyleMain checkstyleTest"
                                     } catch (exception) {
-                                        errorReportToSlack(TYPE,"Checkstyle",exception)
-                                        throw  exception
+                                        errorReportToSlack(TYPE, "Checkstyle", exception)
+                                        throw exception
                                     } finally {
                                         publishHTML target: [
                                                 allowMissing         : false,
@@ -243,8 +243,8 @@ pipeline {
                                     try {
                                         sh "./gradlew pmdmain pmdtest"
                                     } catch (exception) {
-                                        errorReportToSlack(TYPE,"PMD",exception)
-                                        throw  exception
+                                        errorReportToSlack(TYPE, "PMD", exception)
+                                        throw exception
                                     } finally {
                                         publishHTML target: [
                                                 allowMissing         : false,
@@ -279,10 +279,10 @@ pipeline {
                                     }
                                 }
                             }
-                            post{
-                               unstable{
-                                   errorReportToSlack(TYPE,"SQ","eroor")
-                               }
+                            post {
+                                unstable {
+                                    errorReportToSlack(TYPE, "SQ", "eroor")
+                                }
                             }
                         }
                     }
@@ -293,88 +293,24 @@ pipeline {
         }
     }
 }
-def errorReportToSlack(type, stage,errorInfo) {
-    echo " type =$type  info = $errorInfo  stage = $stage"
-    notifySlack()
+
+def errorReportToSlack(TYPE, stage, errorInfo) {
+    echo " type =$TYPE  info = $errorInfo  stage = $stage"
+    if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
+        notifySlack("admin",errorInfo,TYPE)
+    } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+        notifySlack("admin",errorInfo,TYPE)
+    } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
+        notifySlack("pull-request",errorInfo,TYPE)
+    } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
+        notifySlack("error",errorInfo,TYPE)
+    }
 }
 
-def notifySlack() {
+def notifySlack(channel, error, type) {
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
-            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{\n" +
-                    "  \"channel\": \"error\",\n" +
-                    "\"blocks\": [\n" +
-                    "{\n" +
-                    "\"type\": \"section\",\n" +
-                    "\"text\": {\n" +
-                    "\"type\": \"mrkdwn\",\n" +
-                    "\"text\": \"Danny Torrence left the following review for your property:\"\n" +
-                    "}\n" +
-                    "},\n" +
-                    "{\n" +
-                    "\"type\": \"section\",\n" +
-                    "\"block_id\": \"section567\",\n" +
-                    "\"text\": {\n" +
-                    "\"type\": \"mrkdwn\",\n" +
-                    "\"text\": \"<https://example.com|Overlook Hotel> \\n :star: \\n Doors had too many axe holes, guest in room 237 was far too rowdy, whole place felt stuck in the 1920s.\"\n" +
-                    "},\n" +
-                    "\"accessory\": {\n" +
-                    "\"type\": \"image\",\n" +
-                    "\"image_url\": \"https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/d3/72/5c/d3725c8f-c642-5d69-1904-aa36e4297885/source/256x256bb.jpg\",\n" +
-                    "\"alt_text\": \"Haunted hotel image\"\n" +
-                    "}\n" +
-                    "},\n" +
-                    "{\n" +
-                    "\"type\": \"section\",\n" +
-                    "\"block_id\": \"section789\",\n" +
-                    "\"fields\": [\n" +
-                    "{\n" +
-                    "\"type\": \"mrkdwn\",\n" +
-                    "\"text\": \"*Average Rating*\\n1.0\"\n" +
-                    "}\n" +
-                    "]\n" +
-                    "},\n" +
-                    "{\n" +
-                    "\"type\": \"actions\",\n" +
-                    "\"elements\": [\n" +
-                    "{\n" +
-                    "\"type\": \"button\",\n" +
-                    "\"text\": {\n" +
-                    "\"type\": \"plain_text\",\n" +
-                    "\"text\": \"Reply to review\",\n" +
-                    "\"emoji\": false\n" +
-                    "}\n" +
-                    "}\n" +
-                    "]\n" +
-                    "},\n" +
-                    "{\n" +
-                    "\"type\": \"section\",\n" +
-                    "\"text\": {\n" +
-                    "\"type\": \"mrkdwn\",\n" +
-                    "\"text\": \"This is a section block with a button.\"\n" +
-                    "},\n" +
-                    "\"accessory\": {\n" +
-                    "\"type\": \"button\",\n" +
-                    "\"text\": {\n" +
-                    "\"type\": \"plain_text\",\n" +
-                    "\"text\": \"Click Me\",\n" +
-                    "\"emoji\": true\n" +
-                    "},\n" +
-                    "\"value\": \"click_me_123\",\n" +
-                    "\"url\": \"https://google.com\",\n" +
-                    "\"action_id\": \"button-action\"\n" +
-                    "}\n" +
-                    "},\n" +
-                    "{\n" +
-                    "\"type\": \"section\",\n" +
-                    "\"text\": {\n" +
-                    "\"type\": \"plain_text\",\n" +
-                    "\"text\": \"This is a plain text section block.\",\n" +
-                    "\"emoji\": true\n" +
-                    "}\n" +
-                    "}\n" +
-                    "]\n" +
-                    "}'"
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\": \"error=${error} : type= ${type} : stage=${stage}\"}'"
         }
     }
 
