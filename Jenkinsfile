@@ -145,7 +145,7 @@ pipeline {
                         }
                     }
                 }
-                stage("non \n branch") {
+                stage("non <br/> branch") {
                     when {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
@@ -156,7 +156,7 @@ pipeline {
                                 expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
                             }
                             steps {
-                                echo 'clean ws and checkkout code '
+                                echo 'clean ws and checkout code '
                             }
                         }
 
