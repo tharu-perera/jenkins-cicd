@@ -141,9 +141,8 @@ pipeline {
                         stage('checking build type111') {
                             steps {
                                 sh '''
-       existed_in_local=$(git branch --list develop)
-
-    if [[ -z ${existed_in_local} ]]; then
+ 
+    if [[ -z ${$(git branch --list develop)} ]]; then
         echo 0
     else
         echo 1
@@ -151,9 +150,8 @@ pipeline {
          
                                      '''
                                 sh '''
-       existed_in_local=$(git branch --list xxxx)
-
-    if [[ -z ${existed_in_local} ]]; then
+ 
+    if [[ -z ${$(git branch --list xxxx)} ]]; then
         echo 0
     else
         echo 1
