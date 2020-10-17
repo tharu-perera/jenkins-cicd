@@ -115,7 +115,7 @@ pipeline {
                 script {
                     BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
                     COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse HEAD')
-                    COMMIT_AUTHOR = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
+                    COMMIT_AUTHOR = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${COMMIT_HASH}").trim()
                     COMMIT_MSG = sh(returnStdout: true, script: "git log --format=%B -n 1  ${COMMIT_HASH}").trim()
                     echo "BUILD_USER : ${BUILD_USER}"
                     echo "COMMIT_MSG: ${COMMIT_MSG}"
