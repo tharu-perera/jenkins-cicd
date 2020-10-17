@@ -280,14 +280,7 @@ pipeline {
                             }
                         }
 
-//                        stage('Release Approval') {
-//                            when {
-//                                expression {
-//                                    TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ"
-//                                            || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE"
-//                                }
-//                            }
-//                            stages {
+
                         stage('On request release approval') {
                             when {
                                 expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
@@ -304,9 +297,7 @@ pipeline {
                                 echo 'get permison for commit merged auto release'
                             }
                         }
-//                            }
 
-//                        }
 
                         stage("send build status") {
                             steps {
@@ -332,9 +323,9 @@ def successReportToSlack(TYPE) {
     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
         notifySlackSuccess("admin", TYPE, "release/hotfix branch created")
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-        notifySlackSuccess("admin",  TYPE, "Release done on request")
+        notifySlackSuccess("admin", TYPE, "Release done on request")
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
-        notifySlackSuccess("pull-request" , TYPE, "PR status is ok")
+        notifySlackSuccess("pull-request", TYPE, "PR status is ok")
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
         notifySlackSuccess("error", TYPE, "merged commit released")
     }
