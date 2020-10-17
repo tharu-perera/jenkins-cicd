@@ -145,7 +145,7 @@ pipeline {
                         }
                     }
                 }
-                stage("non <br/> branch") {
+                stage("non branch") {
                     when {
                         expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
                     }
@@ -200,7 +200,6 @@ pipeline {
                                         echo "$exception"
                                         errorReportToSlack(TYPE, "Junit", exception)
                                         throw exception
-
                                     }
                                     finally {
                                         summary = junit testResults: '**/build/test-results/test/*.xml'
@@ -280,6 +279,30 @@ pipeline {
                                 }
                             }
                         }
+
+                        stage('Release Approval') {
+                            stages{
+                                stage('On request release'){
+                                    when {
+                                        expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                                    }
+                                    steps{
+                                        echo 'get permison for On request release '
+                                    }
+                                }
+                                stage('commit merged auto release'){
+                                    when {
+                                        expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
+                                    }
+                                    steps{
+                                        echo 'get permison for commit merged auto release'
+                                    }
+                                }
+                            }
+
+                        }
+
+
                     }
                 }
 
