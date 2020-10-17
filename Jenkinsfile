@@ -26,6 +26,7 @@ def BUILD_USER = ""
 def COMMIT_MSG = ""
 def TYPE = ""
 def summary = ""
+def COMMIT_HASH = ""
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 pipeline {
@@ -113,19 +114,18 @@ pipeline {
             steps {
                 script {
                     BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
-                    def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
+                    COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse HEAD')
                     COMMIT_AUTHOR = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim()
-                    COMMIT_MSG = sh(returnStdout: true, script: "git log --format=%B -n 1  ${commit}").trim()
-                    echo "BUILD_USER : ${BUILD_USER}\n"
-                    echo "COMMIT_MSG: ${COMMIT_MSG}\n"
-                    echo "COMMIT_AUTHOR: ${COMMIT_AUTHOR}\n"
-                    echo "commit: ${commit}\n"
+                    COMMIT_MSG = sh(returnStdout: true, script: "git log --format=%B -n 1  ${COMMIT_HASH}").trim()
+                    echo "BUILD_USER : ${BUILD_USER}"
+                    echo "COMMIT_MSG: ${COMMIT_MSG}"
+                    echo "COMMIT_AUTHOR: ${COMMIT_AUTHOR}"
+                    echo "commit: ${commit}"
                 }
             }
-
             post {
                 failure {
-                    slackSend channel: 'error', color: COLOR_MAP[currentBuild.currentResult], message: "setting variables error"
+                    notifySlackError("error", "var setting error", TYPE, "setting variables",)
                 }
             }
         }
@@ -327,7 +327,7 @@ def successReportToSlack(TYPE) {
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
         notifySlackSuccess("pull-request", TYPE, "PR status is ok")
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
-        notifySlackSuccess("error", TYPE, "merged commit released")
+        notifySlackSuccess("general", TYPE, "merged commit released")
     }
 }
 
