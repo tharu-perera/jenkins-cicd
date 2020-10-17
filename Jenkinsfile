@@ -189,7 +189,23 @@ pipeline {
                                 expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
                             }
                             steps {
-                                echo 'clean ws and checkout code '
+                                step([$class: 'WsCleanup'])
+                                checkout scm
+                                sh 'git branch'
+                                sh 'git show HEAD'
+                                sh 'ls -ltr'
+                                sh 'pwd'
+                                script {
+                                    if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ") {
+                                        sh 'git checkout '
+                                    } else if (TYPE == "DEV_RELEASE_REQ") {
+
+                                    } else if (TYPE == "PROD_RELEASE_REQ") {
+
+                                    } else if (TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+
+                                    }
+                                }
                             }
                         }
 
