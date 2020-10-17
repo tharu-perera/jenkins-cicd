@@ -69,9 +69,11 @@ pipeline {
                 echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
                 echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
 //send approval messgae with  linkn to this page
-                timeout(time: 10, unit: "MINUTES") {
-                     def feedback = input(submitterParameter: 'submitter',  message: 'Do you want to approve the deploy in production?', ok: 'Yes')
-                    echo "It was ${feedback.submitter} who submitted the dialog."
+                script {
+                    timeout(time: 10, unit: "MINUTES") {
+                        def feedback = input(submitterParameter: 'submitter', message: 'Do you want to approve the deploy in production?', ok: 'Yes')
+                        echo "It was ${feedback.submitter} who submitted the dialog."
+                    }
                 }
 
             }
