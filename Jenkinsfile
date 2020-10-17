@@ -120,7 +120,7 @@ pipeline {
                     echo "BUILD_USER : ${BUILD_USER}"
                     echo "COMMIT_MSG: ${COMMIT_MSG}"
                     echo "COMMIT_AUTHOR: ${COMMIT_AUTHOR}"
-                    echo "commit: ${commit}"
+                    echo "COMMIT_HASH: ${COMMIT_HASH}"
                 }
             }
             post {
