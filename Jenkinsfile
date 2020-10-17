@@ -149,6 +149,12 @@ pipeline {
                             steps {
                                 script {
                                     try {
+                                        sh 'pwd'
+                                        sh 'ls -ltr'
+                                        sh 'git branch'
+                                        sh 'git branch --list '
+                                        sh 'git branch --list develop'
+                                        sh 'git branch --list developee'
                                         br = sh(returnStdout: true, script: './test.sh develop')
                                         echo ">>>$br"
                                     } catch (exception) {
