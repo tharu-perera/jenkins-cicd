@@ -48,7 +48,7 @@ pipeline {
         stage('On request release approval') {
 
             steps {
-                echo 'get permison for On request release '
+                echo "get permison for On request release <<$par1>> "
                 timeout(time: 15, unit: "MINUTES") {
                     input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
                 }
