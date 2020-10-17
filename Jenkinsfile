@@ -191,174 +191,173 @@ fi
                             }
                         }
                     }
-                    stage("non branch") {
-                        when {
-                            expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
+                }
+                stage("non branch") {
+                    when {
+                        expression { TYPE != "CREATE_RELEASE_BR" && TYPE != "CREATE_HOTFIX_BR" }
+                    }
+                    stages {
+
+                        stage('checkout code when on request release') {
+                            when {
+                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                            }
+                            steps {
+                                echo 'clean ws and checkout code '
+                            }
                         }
-                        stages {
 
-                            stage('checkout code when on request release') {
-                                when {
-                                    expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
-                                }
-                                steps {
-                                    echo 'clean ws and checkout code '
-                                }
-                            }
-
-                            stage('build ') {
-                                steps {
-                                    script {
-                                        try {
-                                            sh "./gradlew clean build -x test -x check"
-                                        } catch (exception) {
-                                            errorReportToSlack(TYPE, "Build", exception)
-                                            throw exception
-                                        }
+                        stage('build ') {
+                            steps {
+                                script {
+                                    try {
+                                        sh "./gradlew clean build -x test -x check"
+                                    } catch (exception) {
+                                        errorReportToSlack(TYPE, "Build", exception)
+                                        throw exception
                                     }
                                 }
                             }
+                        }
 
-                            stage('Junit & Jacoco') {
-                                steps('running junit') {
-                                    script {
-                                        try {
-                                            sh 'chmod +x gradlew'
-                                            sh './gradlew test jacocoTestReport --no-daemon'
-                                            // if in case tests fail then subsequent stages
-                                            // will not run .but post block in this stage will run
-                                            step([$class          : 'JacocoPublisher',
-                                                  execPattern     : '**/build/jacoco/*.exec',
-                                                  classPattern    : '**/build/classes',
-                                                  sourcePattern   : 'src/main/java',
-                                                  exclusionPattern: 'src/test*'
-                                            ])
-                                            publishHTML target: [
-                                                    allowMissing         : false,
-                                                    alwaysLinkToLastBuild: false,
-                                                    keepAll              : true,
-                                                    reportDir            : "build/reports/tests/test",
-                                                    reportFiles          : 'index.html',
-                                                    reportName           : 'Junit Report'
-                                            ]
-                                        }
-                                        catch (exception) {
-                                            echo "$exception"
-                                            errorReportToSlack(TYPE, "Junit", exception)
-                                            throw exception
-                                        }
-                                        finally {
-                                            summary = junit testResults: '**/build/test-results/test/*.xml'
-                                            echo "test >>> ${summary.getProperties()}"
-                                        }
+                        stage('Junit & Jacoco') {
+                            steps('running junit') {
+                                script {
+                                    try {
+                                        sh 'chmod +x gradlew'
+                                        sh './gradlew test jacocoTestReport --no-daemon'
+                                        // if in case tests fail then subsequent stages
+                                        // will not run .but post block in this stage will run
+                                        step([$class          : 'JacocoPublisher',
+                                              execPattern     : '**/build/jacoco/*.exec',
+                                              classPattern    : '**/build/classes',
+                                              sourcePattern   : 'src/main/java',
+                                              exclusionPattern: 'src/test*'
+                                        ])
+                                        publishHTML target: [
+                                                allowMissing         : false,
+                                                alwaysLinkToLastBuild: false,
+                                                keepAll              : true,
+                                                reportDir            : "build/reports/tests/test",
+                                                reportFiles          : 'index.html',
+                                                reportName           : 'Junit Report'
+                                        ]
+                                    }
+                                    catch (exception) {
+                                        echo "$exception"
+                                        errorReportToSlack(TYPE, "Junit", exception)
+                                        throw exception
+                                    }
+                                    finally {
+                                        summary = junit testResults: '**/build/test-results/test/*.xml'
+                                        echo "test >>> ${summary.getProperties()}"
                                     }
                                 }
                             }
+                        }
 
-                            stage('Checkstyle') {
-                                steps {
-                                    script {
-                                        try {
-                                            sh "./gradlew checkstyleMain checkstyleTest"
-                                        } catch (exception) {
-                                            errorReportToSlack(TYPE, "Checkstyle", exception)
-                                            throw exception
-                                        } finally {
-                                            publishHTML target: [
-                                                    allowMissing         : false,
-                                                    alwaysLinkToLastBuild: false,
-                                                    keepAll              : true,
-                                                    reportDir            : "build/reports/checkstyle",
-                                                    reportFiles          : '**/*',
-                                                    reportName           : 'Checkstyle Report'
-                                            ]
-                                        }
+                        stage('Checkstyle') {
+                            steps {
+                                script {
+                                    try {
+                                        sh "./gradlew checkstyleMain checkstyleTest"
+                                    } catch (exception) {
+                                        errorReportToSlack(TYPE, "Checkstyle", exception)
+                                        throw exception
+                                    } finally {
+                                        publishHTML target: [
+                                                allowMissing         : false,
+                                                alwaysLinkToLastBuild: false,
+                                                keepAll              : true,
+                                                reportDir            : "build/reports/checkstyle",
+                                                reportFiles          : '**/*',
+                                                reportName           : 'Checkstyle Report'
+                                        ]
                                     }
                                 }
                             }
+                        }
 
-                            stage('PMD') {
-                                steps {
-                                    script {
-                                        try {
-                                            sh "./gradlew pmdmain pmdtest"
-                                        } catch (exception) {
+                        stage('PMD') {
+                            steps {
+                                script {
+                                    try {
+                                        sh "./gradlew pmdmain pmdtest"
+                                    } catch (exception) {
 //                                        errorReportToSlack(TYPE, "PMD", exception)
 //                                        throw exception
-                                        } finally {
-                                            publishHTML target: [
-                                                    allowMissing         : false,
-                                                    alwaysLinkToLastBuild: false,
-                                                    keepAll              : true,
-                                                    reportDir            : "build/reports/pmd",
-                                                    reportFiles          : 'main.html,test.html',
-                                                    reportName           : 'PMD Report'
-                                            ]
-                                        }
+                                    } finally {
+                                        publishHTML target: [
+                                                allowMissing         : false,
+                                                alwaysLinkToLastBuild: false,
+                                                keepAll              : true,
+                                                reportDir            : "build/reports/pmd",
+                                                reportFiles          : 'main.html,test.html',
+                                                reportName           : 'PMD Report'
+                                        ]
                                     }
                                 }
                             }
+                        }
 
 
-                            stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
-                                //one method usingg jenkins global configuration
-                                steps {
-                                    script {
+                        stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
+                            //one method usingg jenkins global configuration
+                            steps {
+                                script {
 //                    def scannerHome = tool 'SonarScanner 4.0';
 //                    withSonarQubeEnv('mysona') { // If you have configured more than one global server connection, you can specify its name
 //                        sh "${scannerHome}/bin/sonar-scanner"
 //                    }
-                                        //other one is using gradle build
-                                        withSonarQubeEnv() {
-                                            // Will pick the global server connection you have configured
-                                            sh "./gradlew sonarqube -Dsonar.projectName=${TYPE}"
-                                        }
-                                        timeout(time: 1, unit: 'HOURS') {
-                                            // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                                            // true = set pipeline to UNSTABLE, false = don't
-                                            waitForQualityGate abortPipeline: true
-                                        }
+                                    //other one is using gradle build
+                                    withSonarQubeEnv() {
+                                        // Will pick the global server connection you have configured
+                                        sh "./gradlew sonarqube -Dsonar.projectName=${TYPE}"
                                     }
-                                }
-                                post {
-                                    unstable {
-                                        errorReportToSlack(TYPE, "SQ", "eroor")
+                                    timeout(time: 1, unit: 'HOURS') {
+                                        // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                                        // true = set pipeline to UNSTABLE, false = don't
+                                        waitForQualityGate abortPipeline: true
                                     }
                                 }
                             }
-
-
-                            stage('On request release approval') {
-                                when {
-                                    expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
-                                }
-                                steps {
-                                    echo 'get permison for On request release '
+                            post {
+                                unstable {
+                                    errorReportToSlack(TYPE, "SQ", "eroor")
                                 }
                             }
-                            stage('commit merged auto release approval') {
-                                when {
-                                    expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
-                                }
-                                steps {
-                                    echo 'get permison for commit merged auto release'
-                                }
-                            }
-
-
-                            stage("send build status") {
-                                steps {
-                                    script {
-                                        echo "sending final build status"
-                                        successReportToSlack(TYPE)
-                                    }
-                                }
-                            }
-
-
                         }
-                    }
 
+
+                        stage('On request release approval') {
+                            when {
+                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                            }
+                            steps {
+                                echo 'get permison for On request release '
+                            }
+                        }
+                        stage('commit merged auto release approval') {
+                            when {
+                                expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
+                            }
+                            steps {
+                                echo 'get permison for commit merged auto release'
+                            }
+                        }
+
+
+                        stage("send build status") {
+                            steps {
+                                script {
+                                    echo "sending final build status"
+                                    successReportToSlack(TYPE)
+                                }
+                            }
+                        }
+
+
+                    }
                 }
 
             }
