@@ -30,6 +30,7 @@ def COMMIT_HASH = ""
 def getGitAuthor = {
     def commit = sh(returnStdout: true, script: 'git rev-parse HEAD')
     def commit2 = sh(returnStdout: true, script: 'git branch --list  develop')
+    sh 'git branch --list  develop'
    echo "????? $commit   "
    echo "?????### $commit2 "
 }
