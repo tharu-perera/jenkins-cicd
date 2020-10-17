@@ -143,11 +143,6 @@ pipeline {
                                 echo 'Branch Creation'
                             }
                         }
-                        stage('checking build type2222') {
-                            steps {
-                                echo 'Branch Creation'
-                            }
-                        }
                     }
                 }
                 stage("non branch") {
@@ -297,17 +292,17 @@ pipeline {
 def errorReportToSlack(TYPE, stage, errorInfo) {
     echo " type =$TYPE  info = $errorInfo  stage = $stage"
     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
-        notifySlack("admin",errorInfo,TYPE)
+        notifySlack("admin", errorInfo, TYPE, stage)
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-        notifySlack("admin",errorInfo,TYPE)
+        notifySlack("admin", errorInfo, TYPE, stage)
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
-        notifySlack("pull-request",errorInfo,TYPE)
+        notifySlack("pull-request", errorInfo, TYPE, stage)
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
-        notifySlack("error",errorInfo,TYPE)
+        notifySlack("error", errorInfo, TYPE, stage)
     }
 }
 
-def notifySlack(channel, error, type) {
+def notifySlack(channel, error, type, stage) {
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\": \"error=${error} : type= ${type} : stage=${stage}\"}'"
