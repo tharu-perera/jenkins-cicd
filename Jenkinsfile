@@ -158,7 +158,7 @@ pipeline {
                                             errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev  branch exist")
                                             throw exception
                                         } else {
-                                            sh 'git checkout -b release'
+                                            sh 'git checkout -b release develop'
                                             sh 'git push origin release'
                                         }
 
@@ -168,7 +168,7 @@ pipeline {
                                             errorReportToSlack(TYPE, "Branch Creation[Slack]", "hotfix branch exist")
                                             throw exception
                                         } else {
-                                            sh 'git checkout -b hotfix'
+                                            sh 'git checkout -b hotfix master'
                                             sh 'git push origin hotfix'
                                         }
                                     }
