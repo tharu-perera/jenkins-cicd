@@ -152,7 +152,8 @@ pipeline {
                                 script {
                                     def br = ""
                                     if (TYPE == "CREATE_RELEASE_BR") {
-                                        br = sh(returnStdout: true, script: './test.sh release')
+                                        br = sh(returnStdout: true, script: './test.sh release').trim()
+                                        echo "<<<<$br>>>>"
                                         if (br == '1') {
                                             errorReportToSlack(TYPE, "Branch Creation[Slack]", "dev  branch exist")
                                             throw exception
@@ -162,7 +163,7 @@ pipeline {
                                         }
 
                                     } else {
-                                        br = sh(returnStdout: true, script: './test.sh hotfix')
+                                        br = sh(returnStdout: true, script: './test.sh hotfix').trim()
                                         if (br == '1') {
                                             errorReportToSlack(TYPE, "Branch Creation[Slack]", "hotfix branch exist")
                                             throw exception
@@ -330,21 +331,17 @@ pipeline {
                                 echo 'get permison for commit merged auto release'
                             }
                         }
-
-
-                        stage("send build status") {
-                            steps {
-                                script {
-                                    echo "sending final build status"
-                                    successReportToSlack(TYPE)
-                                }
-                            }
-                        }
-
-
                     }
                 }
 
+            }
+        }
+        stage("send build status") {
+            steps {
+                script {
+                    echo "sending final build status"
+                    successReportToSlack(TYPE)
+                }
             }
         }
     }
