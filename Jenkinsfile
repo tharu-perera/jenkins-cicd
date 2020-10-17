@@ -154,6 +154,8 @@ pipeline {
                                     try {
                                         sh 'pwd'
                                         sh 'ls -ltr'
+                                        sh 'git ls-remote --heads origin develop'
+                                        sh 'git ls-remote --heads origin develop123'
                                         sh 'git branch'
                                         sh 'git branch --list '
                                         sh 'git branch --list develop'
