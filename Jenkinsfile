@@ -147,9 +147,8 @@ pipeline {
                         stage('checking and create branch') {
 
                             steps {
-                                step([$class: 'WsCleanup'])
-                                checkout scm
-
+//                                step([$class: 'WsCleanup'])
+//                                checkout scm
                                 script {
                                     try {
                                         sh 'pwd'
