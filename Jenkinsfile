@@ -61,11 +61,12 @@ pipeline {
         stage('On request release approval') {
 
             steps {
+                sh 'printenv'
                 echo "get permison for On request release <<$par1>> "
                 // Call a remote system to start execution, passing a callback url
                 echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
                 echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
-
+//send approval messgae with
                 timeout(time: 10, unit: "MINUTES") {
                     input id: 'Async-input', message: 'Waiting for remote system'
                     input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
@@ -75,8 +76,6 @@ pipeline {
         }
 
     }
-
-
 }
 
 def requestApproval(callBack){
