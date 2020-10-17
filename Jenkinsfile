@@ -52,7 +52,7 @@ pipeline {
                 // Call a remote system to start execution, passing a callback url
                 echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
 
-                timeout(time: 1, unit: "MINUTES") {
+                timeout(time: 10, unit: "MINUTES") {
                     input id: 'Async-input', message: 'Waiting for remote system'
                     input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
                 }
