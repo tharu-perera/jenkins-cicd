@@ -35,6 +35,8 @@ def getGitAuthor = {
     echo "?????### $commit2 "
 }
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
+def approvalMap             // collect data from approval step
+
 pipeline {
 //    try{
     agent any
@@ -69,13 +71,41 @@ pipeline {
                 echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
                 echo " ${env.BUILD_URL}input/Async-input/proceedEmpty "
 //send approval messgae with  linkn to this page
-                script {
-                    timeout(time: 10, unit: "MINUTES") {
-                        def feedback = input(submitterParameter: 'submitter', message: 'Do you want to approve the deploy in production?', ok: 'Yes')
-                        echo "It was ${feedback.submitter} who submitted the dialog."
-                    }
-                }
 
+                    timeout(time: 10, unit: "MINUTES") {
+                        script {
+                            // capture the approval details in approvalMap.
+                            approvalMap = input id: 'test',  message: 'Hello',
+                            ok: 'Proceed?',
+                            parameters: [
+                                    choice(
+                                            choices: 'apple\npear\norange',
+                                            description: 'Select a fruit for this build',
+                                            name: 'FRUIT'
+                                    ),
+                                    string(
+                                            defaultValue: '',
+                                            description: '',
+                                            name: 'myparam'
+                                    )
+                            ],
+                            submitter: 'user1,user2,group1',
+                            submitterParameter: 'APPROVER'
+
+                        }
+                    }
+
+
+            }
+        }
+        stage('Stage 2') {
+            agent any
+
+            steps {
+                // print the details gathered from the approval
+                echo "This build was approved by: ${approvalMap['APPROVER']}"
+                echo "This build is brought to you today by the fruit: ${approvalMap['FRUIT']}"
+                echo "This is myparam: ${approvalMap['myparam']}"
             }
         }
 
