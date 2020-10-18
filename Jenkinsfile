@@ -352,12 +352,13 @@ pipeline {
                                                     submitterParameter: 'APPROVER'
 
                                             echo "This build was approved by: ${env.USER}"
-                                            echo "This build was approved by: ${approvedBy.APPROVER}"
+                                            echo "This build was approved by: ${approvedBy}"
                                             approvedNotify(TYPE, "${env.USER}")
                                         }
+                                        echo ">>><<<<"
                                     } catch (exception) {
                                         echo " rejected>>>>${env.USER}"
-                                        echo "This build was rejected by: ${approvedBy.APPROVER}"
+                                        echo "This build was rejected by: ${approvedBy}"
 
                                         rejectedNotify(TYPE, "${env.USER}" )
                                         throw  exception
