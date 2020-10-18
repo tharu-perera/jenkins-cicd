@@ -28,7 +28,7 @@ def COMMIT_MSG = ""
 def TYPE = ""
 def summary = ""
 def COMMIT_HASH = ""
-def approvedBy = ""
+approvedBy = ""
 def branchCreatedRequestUser = ""
 def slackUserRequestedReleaseType = ""
 def autoTriggeredGitBranch = ""
@@ -485,7 +485,7 @@ def getApproval(type) {
 
 def notifyApproval(type) {
     def channel = "general"
-    def msg = "approved for release $approvedBy"
+    def msg = "approved for release ${approvedBy}"
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=${msg}   type= ${type} \"}'"
