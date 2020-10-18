@@ -342,21 +342,26 @@ pipeline {
                                 expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
                             }
                             steps {
-                                timeout(time: 10, unit: "MINUTES") {
-                                    script {
-                                        getApproval(type, "$user_name")
-                                        approvedBy = input id: 'reqApproval', message: "$user_name requested a $TYPE ",
-                                                ok: 'Proceed?',
-//                                                submitter: 'user1,user2,group1',
-                                                submitterParameter: 'APPROVER'
+                                script {
+                                    try {
+                                        timeout(time: 10, unit: "MINUTES") {
 
+                                            getApproval(type, "$user_name")
+                                            approvedBy = input id: 'reqApproval', message: "$user_name requested a $TYPE ",
+                                                    ok: 'Proceed?',
+//                                                submitter: 'user1,user2,group1',
+                                                    submitterParameter: 'APPROVER'
+
+                                        }
+                                        echo "This build was approved by: ${approvedBy['APPROVER']}"
+                                        approvedNotify(TYPE, $ { approvedBy['APPROVER'] })
+                                    } catch (exception) {
+                                        echo " rejected>>>>"
                                     }
                                 }
-                                echo "This build was approved by: ${approvedBy['APPROVER']}"
-                                approvedNotify(TYPE, ${approvedBy['APPROVER']})
-
                             }
                         }
+
                         stage('commit merged auto release approval') {
                             when {
                                 expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
@@ -434,22 +439,22 @@ def notifySlackBuildFileItselfHasError(channel, error, type, stage) {
 
 }
 
-
-def getApproval(type, msg) {
-    withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+def getApproval(type, user) {
+    def channel = "admin"
+    def msg = "need approval for release"
+    withCredentials([string(credentialsId: 'slack-token', variable: 'st')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" \n \"msg=${msg} \n type= ${type} \"}'"
         }
     }
-
 }
 
-
 def approvedNotify(type, user) {
+    def channel = "general"
+    def msg = "approved for release $user"
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" \n \"msg=${msg} \n type= ${type} \"}'"
         }
     }
-
 }
