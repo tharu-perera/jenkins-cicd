@@ -364,13 +364,39 @@ pipeline {
                                             echo "This build was rejected by: ${approvedBy}"
                                             def user123 = exception.getCauses()[0].getUser()
                                             echo "Production deployment aborted by: ${user123}"
-//                                        rejectedNotify(TYPE, "${user123}" )
-                                            approvedNotify(TYPE, "${env.USER}")
+                                            rejectedNotify(TYPE, "${user123}")
                                         } catch (exception123) {
 
                                         }
 //                                        throw  exception
                                     }
+                                }
+                            }
+                            post {
+                                aborted {
+                                    echo "pipeline has been aborted"
+                                    rejectedNotify(TYPE, "aborted")
+                                }
+                                always {
+                                    echo 'One way or another, I have finished'
+                                    rejectedNotify(TYPE, "always")
+
+                                }
+                                success {
+                                    echo 'I succeeded!'
+                                    rejectedNotify(TYPE, "success")
+                                }
+                                unstable {
+                                    echo 'I am unstable :/'
+                                    rejectedNotify(TYPE, "unstable")
+                                }
+                                failure {
+                                    echo 'I failed :('
+                                    rejectedNotify(TYPE, "failure")
+                                }
+                                changed {
+                                    echo 'Things were different before...'
+                                    rejectedNotify(TYPE, "changed")
                                 }
                             }
                         }
