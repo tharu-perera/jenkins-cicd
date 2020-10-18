@@ -168,7 +168,7 @@ pipeline {
 //                                    if (TYPE == "CREATE_RELEASE_BR") {
 //                                        br = sh(returnStdout: true, script: './test.sh release').trim()
 //                                        if (br == '1') {
-////                                            errorReport(TYPE, "Branch Creation[Slack]", "$user_name requested to create RELEASE branch. But RELEASE branch exists")
+////                                            errorReport(TYPE, "Branch Creation[Slack]", "$SLACK_USER requested to create RELEASE branch. But RELEASE branch exists")
 //                                            branchCreationError("release",SLACK_USER)
 //                                            throw exception
 //                                        } else {
@@ -358,9 +358,9 @@ pipeline {
 
                                 script {
                                     try {
-                                        timeout(time: 1, unit: "HOUR") {
+                                        timeout(time: 1, unit: "HOURS") {
                                             getApproval(TYPE)
-                                            approvedBy = input id: 'reqApproval', message: "$user_name requested  $slackUserRequestedReleaseType ",
+                                            approvedBy = input id: 'reqApproval', message: "$SLACK_USER requested  $slackUserRequestedReleaseType ",
                                                     ok: 'Approve?',
 //                                                submitter: 'user1,user2,group1',
                                                     submitterParameter: 'APPROVER'
