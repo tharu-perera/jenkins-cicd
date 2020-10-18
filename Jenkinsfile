@@ -361,8 +361,7 @@ pipeline {
                                         } catch (exception) {
                                             def user123 = exception.getCauses()[0].getUser()
                                             rejectedNotify(TYPE, "${user123}")
-
-//                                            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=rejected.. user={$user123}  type= ${TYPE} \"}'"
+                                            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=rejected.. user={$user123}  type= ${TYPE} \"}'"
                                             echo "Production deployment aborted by: ${user123}"
                                             sh 'curl -I google.com'
                                             sh 'pwd'
