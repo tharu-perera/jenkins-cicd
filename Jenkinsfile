@@ -368,8 +368,8 @@ pipeline {
                                             notifyApproval(TYPE)
                                         }
                                     } catch (exception) {
-                                        def rejectedUsr=exception.getCauses()[0].getUser().toString()
-                                        notifyReject(TYPE, rejectedUsr)
+//                                        def rejectedUsr=exception.getCauses()[0].getUser().toString()
+//                                        notifyReject(TYPE, rejectedUsr)
                                         throw exception
                                     }
                                 }
