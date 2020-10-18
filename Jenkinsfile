@@ -68,21 +68,27 @@ pipeline {
                         /* ---------------- release requests [ get the approval ,checkout and release ] --------------------*/
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'qa') {
                         // qa release request
+                        slackUserRequestedReleaseType = "QA release from RELEASE"
                         TYPE = "QA_RELEASE_REQ"
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'staging') {
                         // prep release request
+                        slackUserRequestedReleaseType = "STAGING release from RELEASE"
                         TYPE = "STAGE_RELEASE_REQ"
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'dev') {
                         // dev release request
+                        slackUserRequestedReleaseType = "DEV release from DEVELOP"
                         TYPE = "DEV_RELEASE_REQ"
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'prod') {
                         // prod release request with LATEST tag
+                        slackUserRequestedReleaseType = "PRODUCTION release from MASTER"
                         TYPE = "PROD_RELEASE_REQ"
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-qa') {
                         // hotfix qa release request
+                        slackUserRequestedReleaseType = "QA release from HOTFIX"
                         TYPE = "HOTFIX_QA_RELEASE_REQ"
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'hotfix-staging') {
                         // hotfix staging release request
+                        slackUserRequestedReleaseType = "STAGING release from HOTFIX"
                         TYPE = "HOTFIX_STAGING_RELEASE_REQ"
 
                         /* ---------------- automatic release requests [ get the approval ,checkout and release ]--------------------*/
@@ -202,22 +208,16 @@ pipeline {
                                     def errorDesc = ""
                                     try {
                                         if (TYPE == "QA_RELEASE_REQ") {
-                                            slackUserRequestedReleaseType = "QA release from RELEASE"
                                             sh 'git checkout origin/release'
                                         } else if (TYPE == "STAGE_RELEASE_REQ") {
-                                            slackUserRequestedReleaseType = "STAGING release from RELEASE"
                                             sh 'git checkout origin/release'
                                         } else if (TYPE == "DEV_RELEASE_REQ") {
-                                            slackUserRequestedReleaseType = "DEV release from DEVELOP"
                                             sh 'git checkout origin/develop'
                                         } else if (TYPE == "PROD_RELEASE_REQ") {
-                                            slackUserRequestedReleaseType = "PRODUCTION release from MASTER"
                                             sh 'git checkout origin/master'
                                         } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
-                                            slackUserRequestedReleaseType = "QA release from HOTFIX"
                                             sh 'git checkout origin/hotfix'
                                         } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-                                            slackUserRequestedReleaseType = "STAGING release from HOTFIX"
                                             sh 'git checkout origin/hotfix'
                                         }
                                     } catch (exception) {
@@ -368,7 +368,8 @@ pipeline {
                                             notifyApproval(TYPE)
                                         }
                                     } catch (exception) {
-                                        notifyReject(TYPE, exception.getCauses()[0].getUser().toString())
+                                        def rejectedUsr=exception.getCauses()[0].getUser().toString()
+                                        notifyReject(TYPE, rejectedUsr)
                                         throw exception
                                     }
                                 }
