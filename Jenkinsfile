@@ -360,7 +360,16 @@ pipeline {
                                             echo ">>><<<<"
                                         } catch (exception) {
                                             def user123 = exception.getCauses()[0].getUser().toString()
+                                            rejectedNotify(TYPE, "${user123}")
                                             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=rejected.. user={$user123}  type= ${TYPE} \"}'"
+                                            echo "Production deployment aborted by: ${user123}"
+                                            sh 'curl -I google.com'
+                                            sh 'pwd'
+                                            sh 'ls -ltr'
+                                            sh 'curl -I google.com'
+                                            sh "curl -I 'google.com' "
+                                            rejectedNotify(TYPE, "${user123}")
+                                            echo "****wewed"
                                             throw exception
                                         }
                                     }
