@@ -356,7 +356,9 @@ pipeline {
                                             approvedNotify(TYPE, "${env.USER}")
                                         }
                                     } catch (exception) {
-                                        echo " rejected>>>>"
+                                        echo " rejected>>>>${env.USER}"
+                                        echo "This build was rejected by: ${approvedBy.APPROVER}"
+
                                         rejectedNotify(TYPE, "${env.USER}" )
                                         throw  exception
                                     }
