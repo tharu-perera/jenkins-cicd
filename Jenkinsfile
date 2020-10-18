@@ -343,7 +343,7 @@ pipeline {
                             }
                             steps {
                                 script {
-                                    try {
+//                                    try {
                                         timeout(time: 10, unit: "MINUTES") {
                                             getApproval(type, "$user_name")
                                             approvedBy = input id: 'reqApproval', message: "$user_name requested a $TYPE ",
@@ -354,9 +354,9 @@ pipeline {
                                         }
                                         echo "This build was approved by: ${approvedBy['APPROVER']}"
                                         approvedNotify(TYPE, $ { approvedBy['APPROVER'] })
-                                    } catch (exception) {
-                                        echo " rejected>>>>"
-                                    }
+//                                    } catch (exception) {
+//                                        echo " rejected>>>>"
+//                                    }
                                 }
                             }
                         }
