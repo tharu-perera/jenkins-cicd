@@ -350,11 +350,14 @@ pipeline {
                                                     ok: 'Approve?',
 //                                                submitter: 'user1,user2,group1',
                                                     submitterParameter: 'APPROVER'
+
                                             echo "This build was approved by: ${approvedBy['APPROVER']}"
                                             approvedNotify(TYPE, ${approvedBy['APPROVER']})
                                         }
                                     } catch (exception) {
                                         echo " rejected>>>>"
+                                        rejectedNotify(TYPE, ${approvedBy['APPROVER']})
+                                        throw  exception
                                     }
                                 }
                             }
@@ -448,6 +451,16 @@ def getApproval(type, user) {
 def approvedNotify(type, user) {
     def channel = "general"
     def msg = "approved for release $user"
+    withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+        script {
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=${msg}   type= ${type} \"}'"
+        }
+    }
+}
+
+def rejectedNotify(type, user) {
+    def channel = "general"
+    def msg = "rejected release $user"
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=${msg}   type= ${type} \"}'"
