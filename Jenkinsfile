@@ -362,7 +362,7 @@ pipeline {
                                         def user123 = exception.getCauses()[0].getUser()
                                         echo "Production deployment aborted by:\n ${user123}"
 
-                                        rejectedNotify(TYPE, "${env.USER}" )
+                                        rejectedNotify(TYPE, user123 )
                                         throw  exception
                                     }
                                 }
