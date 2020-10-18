@@ -377,7 +377,7 @@ pipeline {
 
                         stage('commit merged auto release approval') {
                             when {
-                                expression { TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
+                                expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
                             }
                             steps {
                                 script {
