@@ -345,7 +345,7 @@ pipeline {
                                 script {
 //                                    try {
                                         timeout(time: 10, unit: "MINUTES") {
-                                            getApproval(type, "$user_name")
+                                            getApproval(TYPE, "$user_name")
                                             approvedBy = input id: 'reqApproval', message: "$user_name requested a $TYPE ",
                                                     ok: 'Proceed?',
 //                                                submitter: 'user1,user2,group1',
