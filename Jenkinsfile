@@ -122,7 +122,7 @@ pipeline {
                         echo "<<<could not find the change type>>>"
                     }
 
-                    echo "type ==  $TYPE"
+                    echo "Build trigger type ==  $TYPE"
                 }
             }
         }
