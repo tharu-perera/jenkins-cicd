@@ -347,7 +347,7 @@ pipeline {
                                         timeout(time: 10, unit: "MINUTES") {
                                             getApproval(TYPE, "$user_name")
                                             approvedBy = input id: 'reqApproval', message: "$user_name requested a $TYPE ",
-                                                    ok: 'Proceed?',
+                                                    ok: 'Approve?',
 //                                                submitter: 'user1,user2,group1',
                                                     submitterParameter: 'APPROVER'
 
@@ -441,7 +441,7 @@ def getApproval(type, user) {
     def msg = "need approval for release"
     withCredentials([string(credentialsId: 'slack-token', variable: 'st')]) {
         script {
-            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\"   \"msg=${msg}   type= ${type} \"}'"
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\"  : \"msg=${msg}   type= ${type} \"}'"
         }
     }
 }
@@ -451,7 +451,7 @@ def approvedNotify(type, user) {
     def msg = "approved for release $user"
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
-            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\"   \"msg=${msg}   type= ${type} \"}'"
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=${msg}   type= ${type} \"}'"
         }
     }
 }
