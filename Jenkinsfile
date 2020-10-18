@@ -361,7 +361,7 @@ pipeline {
                                         echo "This build was rejected by: ${approvedBy}"
                                         def user123 = exception.getCauses()[0].getUser()
                                         echo "Production deployment aborted by: ${user123}"
-                                        rejectedNotify(TYPE, user123 )
+                                        rejectedNotify(TYPE, "${user123}" )
 //                                        throw  exception
                                     }
                                 }
@@ -464,6 +464,7 @@ def approvedNotify(type, user) {
 }
 
 def rejectedNotify(type, user) {
+    echo " insode rejectedNotify"
     def channel = "general"
     def msg = "rejected release $user"
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
