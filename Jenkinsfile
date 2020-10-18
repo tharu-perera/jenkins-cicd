@@ -358,13 +358,16 @@ pipeline {
                                         echo ">>><<<<"
                                     } catch (exception) {
                                         try {
-
-
                                             echo " rejected>>>>${env.USER}"
                                             echo "This build was rejected by: ${approvedBy}"
                                             def user123 = exception.getCauses()[0].getUser()
                                             echo "Production deployment aborted by: ${user123}"
+                                           sh 'pwd'
+                                           sh 'ls -ltr'
+                                           sh 'curl -I google.com'
+                                           sh "curl -I 'google.com' "
                                             rejectedNotify(TYPE, "${user123}")
+                                            echo "****wewed"
                                         } catch (exception123) {
 
                                         }
@@ -372,35 +375,7 @@ pipeline {
                                     }
                                 }
                             }
-                            post {
-                                aborted {
-                                    echo "pipeline has been aborted"
-                                    rejectedNotify(TYPE, "aborted")
-                                }
-                                always {
-                                    echo "awlwas   by: ${approvedBy}"
-                                    echo "awlwas   by: ${APPROVER}"
-                                    echo "awlwas   by: ${approvedBy.APPROVER}"
-                                    rejectedNotify(TYPE, "always")
 
-                                }
-                                success {
-                                    echo 'I succeeded!'
-                                    rejectedNotify(TYPE, "success")
-                                }
-                                unstable {
-                                    echo 'I am unstable :/'
-                                    rejectedNotify(TYPE, "unstable")
-                                }
-                                failure {
-                                    echo 'I failed :('
-                                    rejectedNotify(TYPE, "failure")
-                                }
-                                changed {
-                                    echo 'Things were different before...'
-                                    rejectedNotify(TYPE, "changed")
-                                }
-                            }
                         }
 
                         stage('commit merged auto release approval') {
