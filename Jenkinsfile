@@ -386,7 +386,7 @@ pipeline {
                                         timeout(time: 1, unit: "HOURS") {
                                             getApproval(TYPE)
                                             approvedBy = input id: 'reqApprovalAuto', message: "Latest code changes have been merged to $autoTriggeredGitBranch branch.You can check " +
-                                                    "the coverge and sonarqube report .",
+                                                    "the coverage and sonarqube report .",
                                                     ok: 'Approve the release?',
 //                                                submitter: 'user1,user2,group1',
                                                     submitterParameter: 'APPROVER'
