@@ -359,6 +359,8 @@ pipeline {
                                     } catch (exception) {
                                         echo " rejected>>>>${env.USER}"
                                         echo "This build was rejected by: ${approvedBy}"
+                                        def user123 = e.getCauses()[0].getUser()
+                                        echo "Production deployment aborted by:\n ${user123}"
 
                                         rejectedNotify(TYPE, "${env.USER}" )
                                         throw  exception
