@@ -352,6 +352,7 @@ pipeline {
                                                     submitterParameter: 'APPROVER'
 
                                             echo "This build was approved by: ${env.USER}"
+                                            echo "This build was approved by: ${approvedBy.APPROVER}"
                                             approvedNotify(TYPE, "${env.USER}")
                                         }
                                     } catch (exception) {
@@ -425,7 +426,7 @@ def notifySlackError(channel, error, type, stage) {
 def notifySlackSuccess(channel, type, msg) {
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
-            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\"   \"msg=${msg}   type= ${type} \"}'"
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\"  : \"msg=${msg}   type= ${type} \"}'"
         }
     }
 }
