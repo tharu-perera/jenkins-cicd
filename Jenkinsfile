@@ -369,7 +369,7 @@ pipeline {
                                         }
                                     } catch (exception) {
                                         def user123 = exception.getCauses()[0].getUser().toString()
-                                        rejectedNotify(TYPE, "${user123}")
+                                        notifyReject(TYPE, "${user123}")
                                         throw exception
                                     }
                                 }
