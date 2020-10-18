@@ -28,6 +28,7 @@ def TYPE = ""
 def summary = ""
 def COMMIT_HASH = ""
 def approvedBy
+def branchCreatedRequestUser=""
 
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
@@ -148,7 +149,8 @@ pipeline {
                                     if (TYPE == "CREATE_RELEASE_BR") {
                                         br = sh(returnStdout: true, script: './test.sh release').trim()
                                         if (br == '1') {
-                                            errorReport(TYPE, "Branch Creation[Slack]", "$user_name requested to create RELEASE branch. But dev branch exists")
+//                                            errorReport(TYPE, "Branch Creation[Slack]", "$user_name requested to create RELEASE branch. But RELEASE branch exists")
+                                            branchCreationError("release",env.user_name)
                                             throw exception
                                         } else {
                                             sh 'git checkout -b release origin/develop'
@@ -157,7 +159,7 @@ pipeline {
                                     } else {
                                         br = sh(returnStdout: true, script: './test.sh hotfix').trim()
                                         if (br == '1') {
-                                            errorReport(TYPE, "Branch Creation[Slack]", "$user_name requested to create HOTFIX branch. But HOTFIX branch exists")
+                                            branchCreationError("hotfix",env.user_name)
                                             throw exception
                                         } else {
                                             sh 'git checkout -b hotfix origin/master'
@@ -412,7 +414,12 @@ pipeline {
             steps {
                 script {
                     echo "sending final build status"
-                    successReport(TYPE)
+                    if(TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR"){
+                        branchCreationSuccessful(TYPE)
+                    }else{
+                        successReport(TYPE)
+                    }
+
                 }
             }
         }
@@ -495,6 +502,31 @@ def rejectedNotify(type, user) {
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=${msg}   type= ${type} \"}'"
+        }
+    }
+}
+
+def branchCreationError(branch, user) {
+    def channel = "admin"
+    def msg="$user requested create $branch branch .But $branch branch already exist"
+    withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+        script {
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"${msg}\"}'"
+        }
+    }
+}
+
+def branchCreationSuccessful(TYPE) {
+    def msg=""
+    def channel = "general"
+    if(TYPE == "CREATE_HOTFIX_BR"){
+        msg="$user created  hotfix branch."
+    }else{
+        msg="$user created  release branch."
+    }
+    withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+        script {
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"${msg}\"}'"
         }
     }
 }
