@@ -351,7 +351,7 @@ pipeline {
 //                                                submitter: 'user1,user2,group1',
                                                     submitterParameter: 'APPROVER'
                                             echo "This build was approved by: ${approvedBy['APPROVER']}"
-                                            approvedNotify(TYPE, $ { approvedBy['APPROVER'] })
+                                            approvedNotify(TYPE, ${approvedBy['APPROVER']})
                                         }
                                     } catch (exception) {
                                         echo " rejected>>>>"
