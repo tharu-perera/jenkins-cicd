@@ -378,7 +378,9 @@ pipeline {
                                     rejectedNotify(TYPE, "aborted")
                                 }
                                 always {
-                                    echo 'One way or another, I have finished'
+                                    echo "awlwas   by: ${approvedBy}"
+                                    echo "awlwas   by: ${APPROVER}"
+                                    echo "awlwas   by: ${approvedBy.APPROVER}"
                                     rejectedNotify(TYPE, "always")
 
                                 }
@@ -497,7 +499,6 @@ def approvedNotify(type, user) {
 }
 
 def rejectedNotify(type, user) {
-    echo " insode rejectedNotify"
     def channel = "general"
     def msg = "rejected release $user"
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
