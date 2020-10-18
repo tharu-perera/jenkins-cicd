@@ -23,15 +23,14 @@ enum Type {
 
 def COMMIT_AUTHOR = ""
 def BUILD_USER = ""
-def SLACK_USER = ""
+SLACK_USER = ""
 def COMMIT_MSG = ""
 def TYPE = ""
-def summary = ""
 def COMMIT_HASH = ""
 approvedBy = ""
-def branchCreatedRequestUser = ""
-def slackUserRequestedReleaseType = ""
-def autoTriggeredGitBranch = ""
+slackUserRequestedReleaseType = ""
+autoTriggeredGitBranch = ""
+slackUserCreatedBranch = ""
 
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
@@ -112,9 +111,11 @@ pipeline {
                         /* ---------------- branches create requests [ check , create and inform general]--------------------*/
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
                         // create release branch with tag
+                        slackUserCreatedBranch = "release"
                         TYPE = "CREATE_RELEASE_BR"
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-hotfix') {
                         // create hotfix branch with tag. check whether still have one
+                        slackUserCreatedBranch = "hotfix"
                         TYPE = "CREATE_HOTFIX_BR"
 
                     } else {
@@ -168,8 +169,7 @@ pipeline {
 //                                    if (TYPE == "CREATE_RELEASE_BR") {
 //                                        br = sh(returnStdout: true, script: './test.sh release').trim()
 //                                        if (br == '1') {
-////                                            errorReport(TYPE, "Branch Creation[Slack]", "$SLACK_USER requested to create RELEASE branch. But RELEASE branch exists")
-//                                            branchCreationError("release",SLACK_USER)
+//                                            branchCreationError()
 //                                            throw exception
 //                                        } else {
 //                                            sh 'git checkout -b release origin/develop'
@@ -178,7 +178,7 @@ pipeline {
 //                                    } else {
 //                                        br = sh(returnStdout: true, script: './test.sh hotfix').trim()
 //                                        if (br == '1') {
-//                                            branchCreationError("hotfix",SLACK_USER)
+//                                            branchCreationError()
 //                                            throw exception
 //                                        } else {
 //                                            sh 'git checkout -b hotfix origin/master'
@@ -197,36 +197,36 @@ pipeline {
                     }
                     stages {
 
-                        stage('checkout code when on request releases[Slack]') {
-                            when {
-                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
-                            }
-                            steps {
-                                step([$class: 'WsCleanup'])
-                                checkout scm
-                                script {
-                                    def errorDesc = ""
-                                    try {
-                                        if (TYPE == "QA_RELEASE_REQ") {
-                                            sh 'git checkout origin/release'
-                                        } else if (TYPE == "STAGE_RELEASE_REQ") {
-                                            sh 'git checkout origin/release'
-                                        } else if (TYPE == "DEV_RELEASE_REQ") {
-                                            sh 'git checkout origin/develop'
-                                        } else if (TYPE == "PROD_RELEASE_REQ") {
-                                            sh 'git checkout origin/master'
-                                        } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
-                                            sh 'git checkout origin/hotfix'
-                                        } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-                                            sh 'git checkout origin/hotfix'
-                                        }
-                                    } catch (exception) {
-                                        errorReport(TYPE)
-                                        throw exception
-                                    }
-                                }
-                            }
-                        }
+//                        stage('checkout code when on request releases[Slack]') {
+//                            when {
+//                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+//                            }
+//                            steps {
+//                                step([$class: 'WsCleanup'])
+//                                checkout scm
+//                                script {
+//                                    def errorDesc = ""
+//                                    try {
+//                                        if (TYPE == "QA_RELEASE_REQ") {
+//                                            sh 'git checkout origin/release'
+//                                        } else if (TYPE == "STAGE_RELEASE_REQ") {
+//                                            sh 'git checkout origin/release'
+//                                        } else if (TYPE == "DEV_RELEASE_REQ") {
+//                                            sh 'git checkout origin/develop'
+//                                        } else if (TYPE == "PROD_RELEASE_REQ") {
+//                                            sh 'git checkout origin/master'
+//                                        } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
+//                                            sh 'git checkout origin/hotfix'
+//                                        } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+//                                            sh 'git checkout origin/hotfix'
+//                                        }
+//                                    } catch (exception) {
+//                                        errorReport(TYPE)
+//                                        throw exception
+//                                    }
+//                                }
+//                            }
+//                        }
 //
 //                        stage('build ') {
 //                            steps {
@@ -350,18 +350,44 @@ pipeline {
 //                        }
 
 
-                        stage('On request release approval') {
+//                        stage('On request release approval') {
+//                            when {
+//                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+//                            }
+//                            steps {
+//
+//                                script {
+//                                    try {
+//                                        timeout(time: 1, unit: "HOURS") {
+//                                            getApproval(TYPE)
+//                                            approvedBy = input id: 'reqApproval', message: "$SLACK_USER requested  $slackUserRequestedReleaseType ",
+//                                                    ok: 'Approve?',
+////                                                submitter: 'user1,user2,group1',
+//                                                    submitterParameter: 'APPROVER'
+//
+//                                            notifyApproval(TYPE)
+//                                        }
+//                                    } catch (exception) {
+//                                        def user123 = exception.getCauses()[0].getUser().toString()
+//                                        notifyReject(TYPE, "${user123}")
+//                                        throw exception
+//                                    }
+//                                }
+//                            }
+//                        }
+
+                        stage('commit merged auto release approval') {
                             when {
-                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                                expression { TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
                             }
                             steps {
-
                                 script {
                                     try {
                                         timeout(time: 1, unit: "HOURS") {
                                             getApproval(TYPE)
-                                            approvedBy = input id: 'reqApproval', message: "$SLACK_USER requested  $slackUserRequestedReleaseType ",
-                                                    ok: 'Approve?',
+                                            approvedBy = input id: 'reqApprovalAuto', message: "Latest code changes have been merged to $autoTriggeredGitBranch branch.You can check " +
+                                                    "the coverge and sonarqube report .",
+                                                    ok: 'Approve the release?',
 //                                                submitter: 'user1,user2,group1',
                                                     submitterParameter: 'APPROVER'
 
@@ -374,33 +400,8 @@ pipeline {
                                     }
                                 }
                             }
-                        }
 
-//                        stage('commit merged auto release approval') {
-//                            when {
-//                                expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
-//                            }
-//                            steps {
-//                                script {
-//                                    try {
-//                                        timeout(time: 1, unit: "HOUR") {
-//                                            getApproval(TYPE)
-//                                            approvedBy = input id: 'reqApprovalAuto', message: "Latest code changes have been merged to $autoTriggeredGitBranch branch.You can check " +
-//                                                    "the coverge and sonarqube report .",
-//                                                    ok: 'Approve the release?',
-////                                                submitter: 'user1,user2,group1',
-//                                                    submitterParameter: 'APPROVER'
-//
-//                                            notifyApproval(TYPE)
-//                                        }
-//                                    } catch (exception) {
-//                                        notifyReject(TYPE, exception.getCauses()[0].getUser().toString())
-//                                        throw exception
-//                                    }
-//                                }
-//                            }
-//
-//                        }
+                        }
 
 
                         stage('deployment') {
@@ -420,6 +421,7 @@ pipeline {
 
             }
         }
+
         stage("send build status") {
             steps {
                 script {
@@ -433,7 +435,7 @@ pipeline {
 
 def successReport(TYPE) {
     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
-        branchCreationSuccessful(TYPE)
+        branchCreationSuccessful()
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
         notifySlackSuccess("admin", TYPE, "Release done on request")
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
@@ -503,9 +505,9 @@ def notifyReject(type, user) {
     }
 }
 
-def branchCreationError(branch, user) {
+def branchCreationError() {
     def channel = "admin"
-    def msg = "$user requested to create $branch branch .But $branch branch already exist"
+    def msg = "$user requested to create $slackUserCreatedBranch branch .But $slackUserCreatedBranch branch already exist"
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"${msg}\"}'"
@@ -513,14 +515,10 @@ def branchCreationError(branch, user) {
     }
 }
 
-def branchCreationSuccessful(TYPE) {
+def branchCreationSuccessful() {
     def msg = ""
     def channel = "general"
-    if (TYPE == "CREATE_HOTFIX_BR") {
-        msg = "$SLACK_USER created  hotfix branch."
-    } else {
-        msg = "$SLACK_USER created  release branch."
-    }
+    msg = "$SLACK_USER created  $slackUserCreatedBranch branch."
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
             sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"${msg}\"}'"
