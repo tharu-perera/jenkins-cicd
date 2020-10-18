@@ -362,6 +362,7 @@ pipeline {
                                             echo "This build was rejected by: ${approvedBy}"
                                             def user123 = exception.getCauses()[0].getUser()
                                             echo "Production deployment aborted by: ${user123}"
+                                            sh 'curl -I google.com'
                                            sh 'pwd'
                                            sh 'ls -ltr'
                                            sh 'curl -I google.com'
