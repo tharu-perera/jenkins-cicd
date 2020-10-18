@@ -352,11 +352,11 @@ pipeline {
                                                     submitterParameter: 'APPROVER'
 
                                             echo "This build was approved by: ${approvedBy['APPROVER']}"
-                                            approvedNotify(TYPE, ${approvedBy['APPROVER']})
+                                            approvedNotify(TYPE, "${approvedBy['APPROVER']}")
                                         }
                                     } catch (exception) {
                                         echo " rejected>>>>"
-                                        rejectedNotify(TYPE, ${approvedBy['APPROVER']})
+                                        rejectedNotify(TYPE, "${approvedBy['APPROVER']}" )
                                         throw  exception
                                     }
                                 }
