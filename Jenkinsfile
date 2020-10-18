@@ -342,37 +342,37 @@ pipeline {
                                 expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
                             }
                             steps {
-                                script {
-                                    try {
-                                        timeout(time: 10, unit: "MINUTES") {
-                                            getApproval(TYPE, "$user_name")
-                                            approvedBy = input id: 'reqApproval', message: "$user_name requested a $TYPE ",
-                                                    ok: 'Approve?',
-//                                                submitter: 'user1,user2,group1',
-                                                    submitterParameter: 'APPROVER'
-
-                                            echo "This build was approved by: ${env.USER}"
-                                            echo "This build was approved by: ${approvedBy}"
-                                            approvedNotify(TYPE, "${env.USER}")
-                                        }
-                                        echo ">>><<<<"
-                                    } catch (exception) {
+                                withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+                                    script {
+                                        def channel = "general"
                                         try {
-                                            echo " rejected>>>>${env.USER}"
-                                            echo "This build was rejected by: ${approvedBy}"
+                                            timeout(time: 10, unit: "MINUTES") {
+                                                getApproval(TYPE, "$user_name")
+                                                approvedBy = input id: 'reqApproval', message: "$user_name requested a $TYPE ",
+                                                        ok: 'Approve?',
+//                                                submitter: 'user1,user2,group1',
+                                                        submitterParameter: 'APPROVER'
+
+                                                echo "This build was approved by: ${env.USER}"
+                                                echo "This build was approved by: ${approvedBy}"
+                                                approvedNotify(TYPE, "${env.USER}")
+                                            }
+                                            echo ">>><<<<"
+                                        } catch (exception) {
                                             def user123 = exception.getCauses()[0].getUser()
+                                            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=rejected.. user={$user123}  type= ${TYPE} \"}'"
+
                                             echo "Production deployment aborted by: ${user123}"
                                             sh 'curl -I google.com'
-                                           sh 'pwd'
-                                           sh 'ls -ltr'
-                                           sh 'curl -I google.com'
-                                           sh "curl -I 'google.com' "
+                                            sh 'pwd'
+                                            sh 'ls -ltr'
+                                            sh 'curl -I google.com'
+                                            sh "curl -I 'google.com' "
                                             rejectedNotify(TYPE, "${user123}")
                                             echo "****wewed"
-                                        } catch (exception123) {
 
+                                            throw exception
                                         }
-//                                        throw  exception
                                     }
                                 }
                             }
