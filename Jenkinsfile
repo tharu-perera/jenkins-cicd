@@ -560,7 +560,25 @@ def manualReleaseSuccessMSGBuilder(channel) {
 def manualReleaseFailedMSGBuilder(channel) {
     def branch = ""
     def envTemp = ""
-    if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ")
+    if (TYPE == "DEV_RELEASE_REQ") {
+        branch = "Develop"
+        envTemp = "Develop"
+    } else if (TYPE == "QA_RELEASE_REQ") {
+        branch = "Release"
+        envTemp = "QA"
+    } else if (TYPE == "STAGE_RELEASE_REQ") {
+        branch = "release"
+        envTemp = "staging"
+    } else if (TYPE == "PROD_RELEASE_REQ") {
+        branch = "Hotfix"
+        envTemp = "QA"
+    }else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
+        branch = "Hotfix"
+        envTemp = "QA"
+    }else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+        branch = "Hotfix"
+        envTemp = "QA"
+    }
 
         return '''
  {
@@ -660,9 +678,12 @@ def autoReleaseFailedMSGBuilder(channel) {
 \t\t\t"type": "section",
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
-\t\t\t\t"text": ":x: *Build Failed* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>:x:\\n 
-\\t :fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment :fire:\\n \\t
- Initiated by *SYSTEM* , Approved by [*''' + approvedBy + '''*]\\n \\t Git commit [*''' + COMMIT_HASH + '''*] , Author [*''' + COMMIT_AUTHOR + '''*]\\n \\t 
+\t\t\t\t"text": ":x: *Release Failed* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>:x:\n 
+\t :fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment :fire:\n 
+Initiated by *SYSTEM* \n
+Approved by [*''' + approvedBy + '''*]\n
+Git commit [*''' + COMMIT_HASH + '''*] \n
+Author [*''' + COMMIT_AUTHOR + '''*]\n  
 Git message[*''' + COMMIT_MSG + '''*]"
 \t\t\t}
 \t\t},
