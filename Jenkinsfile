@@ -21,17 +21,17 @@ enum Type {
     HOTFIX_QA_RELEASE
 }
 
-COMMIT_AUTHOR=""
-BUILD_USER
-SLACK_USER
-COMMIT_MSG
-TYPE
-COMMIT_HASH
-approvedBy
-slackUserRequestedReleaseType
-autoTriggeredGitBranch
-slackUserCreatedBranch
-summary
+COMMIT_AUTHOR = ""
+BUILD_USER = ""
+SLACK_USER = ""
+COMMIT_MSG = ""
+TYPE = ""
+COMMIT_HASH = ""
+approvedBy = ""
+slackUserRequestedReleaseType = ""
+autoTriggeredGitBranch = ""
+slackUserCreatedBranch = ""
+summary = ""
 
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
