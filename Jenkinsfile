@@ -588,7 +588,7 @@ def autoReleaseSuccessMSGBuilder(channel) {
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
 \t\t\t\t"text": ":white_check_mark: *Release Successful* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\\n 
-\\t :fire:*''' + branch + ''''* branch released to *''' + envTemp + '''* environment*:fire:\\n
+\\t :fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment*:fire:\\n
  \\t Initiated by *SYSTEM* , Approved by *''' + approvedBy + '''*\\n 
  \\t Git commit [*''' + COMMIT_HASH + '''*] , 
  Author [*''' + COMMIT_AUTHOR + '''*]\\n \\t
@@ -641,7 +641,7 @@ def autoReleaseFailedMSGBuilder(channel) {
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
 \t\t\t\t"text": ":x: *Build Failed* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>:x:\\n 
-\\t :fire:*''' + branch + ''''* branch released to *''' + envTemp + '''* environment :fire:\\n \\t
+\\t :fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment :fire:\\n \\t
  Initiated by *SYSTEM* , Approved by [*''' + approvedBy + '''*]\\n \\t Git commit [*''' + COMMIT_HASH + '''*] , Author [*''' + COMMIT_AUTHOR + '''*]\\n \\t 
 Git message[*''' + COMMIT_MSG + '''*]"
 \t\t\t}
