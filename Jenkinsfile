@@ -276,7 +276,7 @@ pipeline {
                             catch (exception) {
                                 echo "$exception"
                                 summary = junit testResults: '**/build/test-results/test/*.xml'
-                                testsummary = summary.getProperties().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
+                                testsummary = summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
                                 testRpeortLink = env.RUN_TESTS_DISPLAY_URL
                                 coverageRpeortLink = BUILD_URL + "jacoco"
                                 errorReport(TYPE)
@@ -284,7 +284,7 @@ pipeline {
                             }
                             finally {
                                 summary = junit testResults: '**/build/test-results/test/*.xml'
-                                testsummary =summary.getProperties().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
+                                testsummary =summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
                                 testRpeortLink = env.RUN_TESTS_DISPLAY_URL
                                 coverageRpeortLink = BUILD_URL + "jacoco"
                                 step([$class          : 'JacocoPublisher',
