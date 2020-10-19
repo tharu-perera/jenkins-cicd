@@ -558,8 +558,29 @@ def manualReleaseSuccessMSGBuilder(channel) {
 }
 
 def manualReleaseFailedMSGBuilder(channel) {
-    return '''
+    def branch = ""
+    def envTemp = ""
+    if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ")
 
+        return '''
+ {
+{ "channel":"''' + channel + '''",
+\t"blocks": [
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": ":x: *Build Failed* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>:x:\\n 
+\\t :fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment :fire:\\n \\t
+ Initiated by *SYSTEM* , Approved by [*''' + approvedBy + '''*]\\n \\t Git commit [*''' + COMMIT_HASH + '''*] , Author [*''' + COMMIT_AUTHOR + '''*]\\n \\t 
+Git message[*''' + COMMIT_MSG + '''*]"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "divider"
+\t\t}
+\t]
+}
  '''
 }
 
@@ -633,7 +654,6 @@ def autoReleaseFailedMSGBuilder(channel) {
     }
 
     return '''
- {
 { "channel":"''' + channel + '''",
 \t"blocks": [
 \t\t{
