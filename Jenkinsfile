@@ -696,33 +696,3 @@ Git message[*''' + COMMIT_MSG + '''*]"
 }
  '''
 }
-
-
-def errorLayoutSlack(channel) {
-    return ' {"channel":"' + channel + '","blocks": [ ' + getBuildStatusError() + br + getHeader() + br + getDivider() + ' ] }'
-}
-
-def successLayoutSlack(channel) {
-    return ' {"channel":"' + channel + '","blocks": [ ' + getBuildStatusSuccess() + br + getHeader() + br + getDetail("Test Summary " + testsummary) + br + getDivider() + br + getDetailWithLink("SonarQube", sonarLink) + br + getDetailWithLink("PMD", pmdLink) + br + getDetailWithLink("Checkstyle", checkstyleLink) + br + getDetailWithLink("Coverage", coverageRpeortLink) + ' ] }'
-}
-
-def getBuildStatusError() {
-    return '{ "type": "section" ,"text": {"type": "mrkdwn", "text": ":no_entry_sign: *Build Failed*  <' + env.RUN_DISPLAY_URL + '|Pipeline>" }}'
-}
-
-def getBuildStatusSuccess() {
-    return '{ "type": "section" ,"text": {"type": "mrkdwn", "text": ":white_check_mark: *Build Successful*  <' + env.RUN_DISPLAY_URL + '|Pipeline>" }}'
-}
-
-def getHeader() {
-    if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-        return '{"type": "section","text": {"type": "mrkdwn","text": "Action: *' + slackUserRequestedReleaseType + '*"}},' +
-                '{"type": "section","text": {"type": "mrkdwn","text": "Requested by *' + SLACK_USER + '*"}}'
-    } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
-        return '{"type": "section","text": {"type": "mrkdwn","text": "*PR Request* by *' + COMMIT_AUTHOR + '*"}}' +
-                ',{"type": "section","text": {"type": "mrkdwn","text": "*Commit Message*  *' + COMMIT_MSG + '*"}}' +
-                ',{"type": "section","text": {"type": "mrkdwn","text": "*GitHub* <' + GIT_PR_LINK + '|link>"}}'
-    } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
-        return '{"type": "section","text": {"type": "mrkdwn","text": "Commits merged to  *' + autoTriggeredGitBranch + ' branch*"}}'
-    }
-}
