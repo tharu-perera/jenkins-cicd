@@ -376,7 +376,11 @@ pipeline {
                             }
                             post {
                                 always{
-                                    sonarLink="http://localhost:9000/dashboard?id=${env.JOB_BASE_NAME}/${env.BUILD_NUMBER}"
+                                    step{
+                                        script{
+                                            sonarLink="http://localhost:9000/dashboard?id=${env.JOB_BASE_NAME}/${env.BUILD_NUMBER}"
+                                        }
+                                    }
                                 }
                                 unstable {
                                     errorReport(TYPE)
