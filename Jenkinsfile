@@ -311,6 +311,7 @@ pipeline {
                                     try {
                                         sh "./gradlew checkstyleMain checkstyleTest"
                                     } catch (exception) {
+                                        checkstyleLink=
                                         errorReport(TYPE)
                                         throw exception
                                     } finally {
@@ -551,10 +552,10 @@ def successLayoutSlack(channel) {
     return ' {"channel":"' + channel + '","blocks": [ ' + getBuildStatusSuccess() + getHeader()+ getDetail("Test Summary " + testsummary) + getDivider()+ getDetailWithLink("SonarQube",sonarLink)+ getDetailWithLink("PMD",pmdLink)+ getDetailWithLink("Checkstyle",checkstyleLink)+ getDetailWithLink("Coverage",coverageRpeortLink)+' ] }'
 }
 
-getBuildStatusError() {
+def getBuildStatusError() {
     return '{ "type": "section" ,"text": {"type": "mrkdwn", "text": ":no_entry_sign: *Build Failed*  <'+env.RUN_DISPLAY_URL+'|Pipeline>" }}'
 }
-getBuildStatusSuccess() {
+def getBuildStatusSuccess() {
     return '{ "type": "section" ,"text": {"type": "mrkdwn", "text": ":white_check_mark: *Build Successful*  <'+env.RUN_DISPLAY_URL+'|Pipeline>" }}'
 }
 def getHeader() {
