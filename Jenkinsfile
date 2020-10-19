@@ -323,7 +323,7 @@ pipeline {
                                 sh "./gradlew pmdmain pmdtest"
                             } catch (exception) {
                                 pmdLink = BUILD_URL + "PMD_20Report"
-                                errorReport(TYPE)
+//                                errorReport(TYPE)
 //                                        throw exception
                             } finally {
                                 pmdLink = BUILD_URL + "PMD_20Report"
@@ -552,8 +552,62 @@ def pullReqFailedMSGBuilder(channel) {
 }
 
 def manualReleaseSuccessMSGBuilder(channel) {
-    return '''
+    def branch = ""
+    def envTemp = ""
+    if (TYPE == "DEV_RELEASE_REQ") {
+        branch = "Develop"
+        envTemp = "Develop"
+    } else if (TYPE == "QA_RELEASE_REQ") {
+        branch = "Release"
+        envTemp = "QA"
+    } else if (TYPE == "STAGE_RELEASE_REQ") {
+        branch = "release"
+        envTemp = "staging"
+    } else if (TYPE == "PROD_RELEASE_REQ") {
+        branch = "master"
+        envTemp = "Production"
+    }else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
+        branch = "Hotfix"
+        envTemp = "QA"
+    }else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+        branch = "Hotfix"
+        envTemp = "Staging"
+    }
 
+
+    return '''
+ { "channel":"''' + channel + '''",
+\t"blocks": [
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": ":white_check_mark: *Release Successful* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\n 
+:fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment*:fire:\n
+Initiated by *'''+SLACK_USER+'''* , Approved by *''' + approvedBy + '''*\n 
+Git commit [*''' + COMMIT_HASH + '''*] \n
+Author [*''' + COMMIT_AUTHOR + '''*]\n
+Git message [*''' + COMMIT_MSG + '''*]"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": "
+\tReports \n  
+\t :heavy_check_mark:Test Summary ''' + testsummary + '''<''' + testRpeortLink + '''|[*Junit Report*]>\n 
+\t :heavy_check_mark:Jacoco Coverage <''' + coverageRpeortLink + '''|[*Jacoco Report*]>\n 
+\t :heavy_check_mark:PMD<''' + pmdLink + '''|[*PMD Report*]>\n 
+\t :heavy_check_mark:Checkstyle <''' + checkstyleLink + '''|[*Checkstyle Report*]>\n
+\t :heavy_check_mark:Sonarqube <''' + sonarLink + '''|[*Sonarqube Report*]>"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "divider"
+\t\t}
+\t]
+}
  '''
 }
 
@@ -628,24 +682,25 @@ def autoReleaseSuccessMSGBuilder(channel) {
 \t\t\t"type": "section",
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
-\t\t\t\t"text": ":white_check_mark: *Release Successful* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\\n 
-\\t :fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment*:fire:\\n
- \\t Initiated by *SYSTEM* , Approved by *''' + approvedBy + '''*\\n 
- \\t Git commit [*''' + COMMIT_HASH + '''*] , 
- Author [*''' + COMMIT_AUTHOR + '''*]\\n \\t
-  Git message [*''' + COMMIT_MSG + '''*]"
+\t\t\t\t"text": ":white_check_mark: *Release Successful* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\n 
+:fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment*:fire:\n
+Initiated by *SYSTEM* , Approved by *''' + approvedBy + '''*\n 
+Git commit [*''' + COMMIT_HASH + '''*] \n
+Author [*''' + COMMIT_AUTHOR + '''*]\n
+Git message [*''' + COMMIT_MSG + '''*]"
 \t\t\t}
 \t\t},
 \t\t{
 \t\t\t"type": "section",
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
-\t\t\t\t"text": "\\t\\t Reports \\n \\t :heavy_check_mark:
-Test Summary ''' + testsummary + '''<''' + testRpeortLink + '''|[*Junit Report*]>\\n \\t :heavy_check_mark:
-Jacoco Coverage <''' + coverageRpeortLink + '''|[*Jacoco Report*]>\\n \\t :heavy_check_mark:
-PMD<''' + pmdLink + '''|[*PMD Report*]>\\n \\t :heavy_check_mark:
-Checkstyle <''' + checkstyleLink + '''|[*Checkstyle Report*]>\\n \\t :heavy_check_mark:
-Sonarqube <''' + sonarLink + '''|[*Sonarqube Report*]>"
+\t\t\t\t"text": "
+\tReports \n  
+\t :heavy_check_mark:Test Summary ''' + testsummary + '''<''' + testRpeortLink + '''|[*Junit Report*]>\n 
+\t :heavy_check_mark:Jacoco Coverage <''' + coverageRpeortLink + '''|[*Jacoco Report*]>\n 
+\t :heavy_check_mark:PMD<''' + pmdLink + '''|[*PMD Report*]>\n 
+\t :heavy_check_mark:Checkstyle <''' + checkstyleLink + '''|[*Checkstyle Report*]>\n
+\t :heavy_check_mark:Sonarqube <''' + sonarLink + '''|[*Sonarqube Report*]>"
 \t\t\t}
 \t\t},
 \t\t{
