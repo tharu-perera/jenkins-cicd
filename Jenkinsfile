@@ -207,153 +207,152 @@ pipeline {
             }
             stages {
 
-                stage('checkout code when on request releases[Slack]') {
-                    when {
-                        expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
-                    }
-                    steps {
-                        step([$class: 'WsCleanup'])
-                        checkout scm
-                        script {
-                            try {
-                                if (TYPE == "QA_RELEASE_REQ") {
-                                    sh 'git checkout origin/release'
-                                } else if (TYPE == "STAGE_RELEASE_REQ") {
-                                    sh 'git checkout origin/release'
-                                } else if (TYPE == "DEV_RELEASE_REQ") {
-                                    sh 'git checkout origin/develop'
-                                } else if (TYPE == "PROD_RELEASE_REQ") {
-                                    sh 'git checkout origin/master'
-                                } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
-                                    sh 'git checkout origin/hotfix'
-                                } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-                                    sh 'git checkout origin/hotfix'
-                                }
-                            } catch (exception) {
-                                errorReport(TYPE)
-                                throw exception
-                            }
-                        }
-                    }
-                }
-
-                stage('build ') {
-                    steps {
-                        script {
-                            try {
-                                sh "./gradlew clean build -x test -x check"
-                            } catch (exception) {
-                                errorReport(TYPE)
-                                throw exception
-                            }
-                        }
-                    }
-                }
+//                stage('checkout code when on request releases[Slack]') {
+//                    when {
+//                        expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+//                    }
+//                    steps {
+//                        step([$class: 'WsCleanup'])
+//                        checkout scm
+//                        script {
+//                            try {
+//                                if (TYPE == "QA_RELEASE_REQ") {
+//                                    sh 'git checkout origin/release'
+//                                } else if (TYPE == "STAGE_RELEASE_REQ") {
+//                                    sh 'git checkout origin/release'
+//                                } else if (TYPE == "DEV_RELEASE_REQ") {
+//                                    sh 'git checkout origin/develop'
+//                                } else if (TYPE == "PROD_RELEASE_REQ") {
+//                                    sh 'git checkout origin/master'
+//                                } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
+//                                    sh 'git checkout origin/hotfix'
+//                                } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+//                                    sh 'git checkout origin/hotfix'
+//                                }
+//                            } catch (exception) {
+//                                errorReport(TYPE)
+//                                throw exception
+//                            }
+//                        }
+//                    }
+//                }
 //
-                stage('Junit & Jacoco') {
-                    steps('running junit') {
-                        script {
-                            try {
-                                sh 'chmod +x gradlew'
-                                sh './gradlew test jacocoTestReport --no-daemon'
-                                // if in case tests fail then subsequent stages
-                                // will not run .but post block in this stage will run
-//                                        step([$class          : 'JacocoPublisher',
-//                                              execPattern     : '**/build/jacoco/*.exec',
-//                                              classPattern    : '**/build/classes',
-//                                              sourcePattern   : 'src/main/java',
-//                                              exclusionPattern: 'src/test*'
-//                                        ])
+//                stage('build ') {
+//                    steps {
+//                        script {
+//                            try {
+//                                sh "./gradlew clean build -x test -x check"
+//                            } catch (exception) {
+//                                errorReport(TYPE)
+//                                throw exception
+//                            }
+//                        }
+//                    }
+//                }
+////
+//                stage('Junit & Jacoco') {
+//                    steps('running junit') {
+//                        script {
+//                            try {
+//                                sh 'chmod +x gradlew'
+//                                sh './gradlew test jacocoTestReport --no-daemon'
+//                                // if in case tests fail then subsequent stages
+//                                // will not run .but post block in this stage will run
+////                                        step([$class          : 'JacocoPublisher',
+////                                              execPattern     : '**/build/jacoco/*.exec',
+////                                              classPattern    : '**/build/classes',
+////                                              sourcePattern   : 'src/main/java',
+////                                              exclusionPattern: 'src/test*'
+////                                        ])
+////                                        publishHTML target: [
+////                                                allowMissing         : false,
+////                                                alwaysLinkToLastBuild: false,
+////                                                keepAll              : true,
+////                                                reportDir            : "build/reports/tests/test",
+////                                                reportFiles          : 'index.html',
+////                                                reportName           : 'Junit Report'
+////                                        ]
+//                            }
+//                            catch (exception) {
+//                                echo "$exception"
+//                                summary = junit testResults: '**/build/test-results/test/*.xml'
+//                                testsummary = summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
+//                                testRpeortLink = env.RUN_TESTS_DISPLAY_URL
+//                                coverageRpeortLink = BUILD_URL + "jacoco"
+//                                errorReport(TYPE)
+//                                throw exception
+//                            }
+//                            finally {
+//                                summary = junit testResults: '**/build/test-results/test/*.xml'
+//                                testsummary =summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
+//                                testRpeortLink = env.RUN_TESTS_DISPLAY_URL
+//                                coverageRpeortLink = BUILD_URL + "jacoco"
+//                                step([$class          : 'JacocoPublisher',
+//                                      execPattern     : '**/build/jacoco/*.exec',
+//                                      classPattern    : '**/build/classes',
+//                                      sourcePattern   : 'src/main/java',
+//                                      exclusionPattern: 'src/test*'
+//                                ])
+//                                publishHTML target: [
+//                                        allowMissing         : false,
+//                                        alwaysLinkToLastBuild: false,
+//                                        keepAll              : true,
+//                                        reportDir            : "build/reports/tests/test",
+//                                        reportFiles          : 'index.html',
+//                                        reportName           : 'Junit Report'
+//                                ]
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                        stage('Checkstyle') {
+//                            steps {
+//                                script {
+//                                    try {
+//                                        sh "./gradlew checkstyleMain checkstyleTest"
+//                                    } catch (exception) {
+//                                        checkstyleLink = BUILD_URL + "Checkstyle_20Report"
+//                                        errorReport(TYPE)
+//                                        throw exception
+//                                    } finally {
+//                                        checkstyleLink = BUILD_URL + "Checkstyle_20Report"
 //                                        publishHTML target: [
 //                                                allowMissing         : false,
 //                                                alwaysLinkToLastBuild: false,
 //                                                keepAll              : true,
-//                                                reportDir            : "build/reports/tests/test",
-//                                                reportFiles          : 'index.html',
-//                                                reportName           : 'Junit Report'
+//                                                reportDir            : "build/reports/checkstyle",
+//                                                reportFiles          : '**/*',
+//                                                reportName           : 'Checkstyle Report'
 //                                        ]
-                            }
-                            catch (exception) {
-                                echo "$exception"
-                                summary = junit testResults: '**/build/test-results/test/*.xml'
-                                testsummary = summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
-                                testRpeortLink = env.RUN_TESTS_DISPLAY_URL
-                                coverageRpeortLink = BUILD_URL + "jacoco"
-                                errorReport(TYPE)
-                                throw exception
-                            }
-                            finally {
-                                summary = junit testResults: '**/build/test-results/test/*.xml'
-                                testsummary =summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
-                                testRpeortLink = env.RUN_TESTS_DISPLAY_URL
-                                coverageRpeortLink = BUILD_URL + "jacoco"
-                                step([$class          : 'JacocoPublisher',
-                                      execPattern     : '**/build/jacoco/*.exec',
-                                      classPattern    : '**/build/classes',
-                                      sourcePattern   : 'src/main/java',
-                                      exclusionPattern: 'src/test*'
-                                ])
-                                publishHTML target: [
-                                        allowMissing         : false,
-                                        alwaysLinkToLastBuild: false,
-                                        keepAll              : true,
-                                        reportDir            : "build/reports/tests/test",
-                                        reportFiles          : 'index.html',
-                                        reportName           : 'Junit Report'
-                                ]
-                            }
-                        }
-                    }
-                }
-
-                        stage('Checkstyle') {
-                            steps {
-                                script {
-                                    try {
-                                        sh "./gradlew checkstyleMain checkstyleTest"
-                                    } catch (exception) {
-                                        checkstyleLink = BUILD_URL + "Checkstyle_20Report"
-                                        errorReport(TYPE)
-                                        throw exception
-                                    } finally {
-                                        checkstyleLink = BUILD_URL + "Checkstyle_20Report"
-                                        publishHTML target: [
-                                                allowMissing         : false,
-                                                alwaysLinkToLastBuild: false,
-                                                keepAll              : true,
-                                                reportDir            : "build/reports/checkstyle",
-                                                reportFiles          : '**/*',
-                                                reportName           : 'Checkstyle Report'
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-//
-                        stage('PMD') {
-                            steps {
-                                script {
-                                    try {
-                                        sh "./gradlew pmdmain pmdtest"
-                                    } catch (exception) {
-                                        pmdLink = BUILD_URL + "PMD_20Report"
-                                        errorReport(TYPE)
-//                                        throw exception
-                                    } finally {
-                                        pmdLink = BUILD_URL + "PMD_20Report"
-                                        publishHTML target: [
-                                                allowMissing         : false,
-                                                alwaysLinkToLastBuild: false,
-                                                keepAll              : true,
-                                                reportDir            : "build/reports/pmd",
-                                                reportFiles          : 'main.html,test.html',
-                                                reportName           : 'PMD Report'
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-//
+//                                    }
+//                                }
+//                            }
+//                        }
+////
+//                        stage('PMD') {
+//                            steps {
+//                                script {
+//                                    try {
+//                                        sh "./gradlew pmdmain pmdtest"
+//                                    } catch (exception) {
+//                                        pmdLink = BUILD_URL + "PMD_20Report"
+//                                        errorReport(TYPE)
+////                                        throw exception
+//                                    } finally {
+//                                        pmdLink = BUILD_URL + "PMD_20Report"
+//                                        publishHTML target: [
+//                                                allowMissing         : false,
+//                                                alwaysLinkToLastBuild: false,
+//                                                keepAll              : true,
+//                                                reportDir            : "build/reports/pmd",
+//                                                reportFiles          : 'main.html,test.html',
+//                                                reportName           : 'PMD Report'
+//                                        ]
+//                                    }
+//                                }
+//                            }
+//                        }
 //
                         stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
                             //one method usingg jenkins global configuration
