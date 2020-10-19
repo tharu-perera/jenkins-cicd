@@ -163,7 +163,7 @@ pipeline {
             }
         }
 
-        stage(" ") {
+
 
                 stage('Branch Creation') {
                     when {
@@ -457,7 +457,7 @@ pipeline {
                     }
                 }
 
-            }
+
 
 
         stage("send build status") {
