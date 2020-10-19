@@ -376,12 +376,10 @@ pipeline {
                             }
                             post {
                                 always {
-                                    steps {
-                                        step {
+
                                             script {
                                                 sonarLink = "http://localhost:9000/dashboard?id=${env.JOB_BASE_NAME}/${env.BUILD_NUMBER}"
-                                            }
-                                        }
+
                                     }
                                 }
                                 unstable {
