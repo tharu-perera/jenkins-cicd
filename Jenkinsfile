@@ -615,11 +615,11 @@ def autoReleaseSuccessMSGBuilder(channel) {
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
 \t\t\t\t"text": "\\t\\t Reports \\n \\t :heavy_check_mark:
-Test Summary [past:32,faile:23]<goog.com|[*Junit Report*]>\\n \\t :heavy_check_mark:
-Jacoco Coverage <goog.com|[*Jacoco Report*]>\\n \\t :heavy_check_mark:
-PMD<goog.com|[*PMD Report*]>\\n \\t :heavy_check_mark:
-Checkstyle <goog.com|[*Checkstyle Report*]>\\n \\t :heavy_check_mark:
-Sonarqube <goog.com|[*Sonarqube Report*]>"
+Test Summary '''+testsummary+'''<'''+testRpeortLink+'''|[*Junit Report*]>\\n \\t :heavy_check_mark:
+Jacoco Coverage <'''+coverageRpeortLink+'''|[*Jacoco Report*]>\\n \\t :heavy_check_mark:
+PMD<'''+pmdLink+'''|[*PMD Report*]>\\n \\t :heavy_check_mark:
+Checkstyle <'''+checkstyleLink+'''|[*Checkstyle Report*]>\\n \\t :heavy_check_mark:
+Sonarqube <'''+sonarLink+'''|[*Sonarqube Report*]>"
 \t\t\t}
 \t\t},
 \t\t{
