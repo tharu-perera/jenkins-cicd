@@ -32,13 +32,12 @@ slackUserRequestedReleaseType = ""
 autoTriggeredGitBranch = ""
 slackUserCreatedBranch = ""
 testsummary = ""
-sonarsummary = ""
 sonarLink = ""
 pmdLink = ""
 checkstyleLink = ""
-buildURL = ""
 testRpeortLink = ""
 coverageRpeortLink = ""
+gitPRLink=""
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 
@@ -142,6 +141,7 @@ pipeline {
                 script {
                     BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
                     SLACK_USER = env.user_name
+                    gitPRLink=env.
                     COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse HEAD')
                     COMMIT_AUTHOR = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${COMMIT_HASH}").trim()
                     COMMIT_MSG = sh(returnStdout: true, script: "git log --format=%B -n 1  ${COMMIT_HASH}").trim()
@@ -464,24 +464,23 @@ def successReport(TYPE) {
     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
         branchCreationSuccessful()
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-        notifySlack("admin")
+        notifySlack(successLayoutSlack('general'))
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
-        notifySlack("admin")
+        notifySlack(successLayoutSlack('pull-request'))
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
-        notifySlack("admin")
+        notifySlack(successLayoutSlack('general'))
     }
 }
 
 def errorReport(TYPE) {
     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
-        notifySlack("admin")
+        branchCreationError()
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-        errorLayoutSlack("admin")
         notifySlack(errorLayoutSlack("admin"))
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
-        notifySlack("pull-request")
+        notifySlack(errorLayoutSlack("pull-request"))
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
-        notifySlack("error")
+        notifySlack(errorLayoutSlack("general"))
     }
 }
 
@@ -545,23 +544,40 @@ def branchCreationSuccessful() {
 }
 
 def errorLayoutSlack(channel) {
-    echo "$testsummary"
-    echo "$testRpeortLink"
-    echo "$coverageRpeortLink"
-    echo "uild url ${env.RUN_DISPLAY_URL}"
-
-    return ' {"channel":"' + channel + '","blocks": [ ' + getHeader() + getDetailWithLink("Build Link", env.RUN_DISPLAY_URL) + getDetail("Test Summary " + testsummary) + ' ] }'
+    return ' {"channel":"' + channel + '","blocks": [ ' + getBuildStatusError() + getHeader() + getDivider() + ' ] }'
 }
 
+def successLayoutSlack(channel) {
+    return ' {"channel":"' + channel + '","blocks": [ ' + getBuildStatusSuccess() + getHeader()+ getDetail("Test Summary " + testsummary) + getDivider()+ getDetailWithLink("SonarQube",sonarLink)+ getDetailWithLink("PMD",pmdLink)+ getDetailWithLink("Checkstyle",checkstyleLink)+ getDetailWithLink("Coverage",coverageRpeortLink)+' ] }'
+}
 
+getBuildStatusError() {
+    return '{ "type": "section" ,"text": {"type": "mrkdwn", "text": ":no_entry_sign: *Build Failed*  <'+env.RUN_DISPLAY_URL+'|Pipeline>" }}'
+}
+getBuildStatusSuccess() {
+    return '{ "type": "section" ,"text": {"type": "mrkdwn", "text": ":white_check_mark: *Build Successful*  <'+env.RUN_DISPLAY_URL+'|Pipeline>" }}'
+}
 def getHeader() {
-    return '{"type": "section","text": {"type": "mrkdwn","text": "*This rele*[Requested by <fakeLink.toUser.com|Mark>"}}'
-}
+    if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+        return ',{"type": "section","text": {"type": "mrkdwn","text": "Action *'+slackUserRequestedReleaseType+'*"}},' +
+                '{"type": "section","text": {"type": "mrkdwn","text": "Requested by *'+SLACK_USER+'*"}}'
+    } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
+        return ',{"type": "section","text": {"type": "mrkdwn","text": "*PR Request* by *'+COMMIT_AUTHOR+'*"}}' +
+                ',{"type": "section","text": {"type": "mrkdwn","text": "*Commit Message*  *'+COMMIT_MSG+'*"}}'+
+                ',{"type": "section","text": {"type": "mrkdwn","text": "*GitHub* <'+env.RUN_DISPLAY_URL+'|link>"}}'
+    } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
+        return ',{"type": "section","text": {"type": "mrkdwn","text": "Commits merged to  *'+autoTriggeredGitBranch+' branch*"}}'
+    }
+ }
 
-def getDetailWithLink(msg,link) {
+def getDetailWithLink(msg, link) {
     return ',{"type": "section","text": {"type": "mrkdwn","text": "' + msg + ' <' + link + '|Report>"}}'
 }
 
 def getDetail(msg) {
     return ',{"type": "section","text": {"type": "mrkdwn","text": "' + msg + '"}}'
+}
+
+def getDivider() {
+    return ' ,{  "type": "divider" }'
 }
