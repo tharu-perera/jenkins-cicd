@@ -351,7 +351,7 @@ pipeline {
                             //other one is using gradle build
                             withSonarQubeEnv() {
                                 // Will pick the global server connection you have configured
-                                sh "./gradlew sonarqube -Dsonar.projectName=${TYPE}"
+                                sh "./gradlew sonarqube -Dsonar.projectName=${env.JOB_BASE_NAME}_${env.BUILD_NUMBER}"
                             }
                             timeout(time: 1, unit: 'HOURS') {
                                 // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
@@ -364,7 +364,7 @@ pipeline {
                         always {
 
                             script {
-                                sonarLink = "http://localhost:9000/dashboard?id=${env.JOB_BASE_NAME}/${env.BUILD_NUMBER}"
+                                sonarLink = "http://localhost:9000/dashboard?id=${env.JOB_BASE_NAME}_${env.BUILD_NUMBER}"
 
                             }
                         }
@@ -540,16 +540,64 @@ def branchCreationSuccessful() {
 }
 
 def pullReqSuccessMSGBuilder(channel) {
-    return '''
 
+    return '''
+ { "channel":"''' + channel + '''",
+\t"blocks": [
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": ":white_check_mark: *PR Build Successful* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\n 
+\\t:fire:Git commit [*''' + COMMIT_HASH + '''*]\\n 
+\\t:fire:Author [*''' + COMMIT_AUTHOR + '''*]\\n  
+\\t:fire:Git message[*''' + COMMIT_MSG + '''*]"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": "
+\tReports \n  
+\t :heavy_check_mark:Test Summary ''' + testsummary + '''<''' + testRpeortLink + '''|[*Junit Report*]>\n 
+\t :heavy_check_mark:Jacoco Coverage <''' + coverageRpeortLink + '''|[*Jacoco Report*]>\n 
+\t :heavy_check_mark:PMD<''' + pmdLink + '''|[*PMD Report*]>\n 
+\t :heavy_check_mark:Checkstyle <''' + checkstyleLink + '''|[*Checkstyle Report*]>\n
+\t :heavy_check_mark:Sonarqube <''' + sonarLink + '''|[*Sonarqube Report*]>"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "divider"
+\t\t}
+\t]
+}
  '''
 }
+
 
 def pullReqFailedMSGBuilder(channel) {
     return '''
-
+{ "channel":"''' + channel + '''",
+\t"blocks": [
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": ":x: *Pull Request Failed* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>:x:\n 
+\t:fire:Git commit [*''' + COMMIT_HASH + '''*]\n 
+\t:fire:Author [*''' + COMMIT_AUTHOR + '''*]\n  
+\t:fire:Git message[*''' + COMMIT_MSG + '''*]"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "divider"
+\t\t}
+\t]
+}
  '''
 }
+
 
 def manualReleaseSuccessMSGBuilder(channel) {
     def branch = ""
