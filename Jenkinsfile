@@ -548,15 +548,23 @@ def errorLayoutSlack(channel) {
     echo "$testsummary"
     echo "$testRpeortLink"
     echo "$coverageRpeortLink"
-    echo "uild url ${env.JOB_DISPLAY_URL}"
+    echo "uild url ${env.RUN_DISPLAY_URL}"
 
-    return ' {"channel":"'+channel+'",blocks": [ ' + getHeader() + getDetailWithLink("Build Link", env.JOB_DISPLAY_URL) + ' ] }'
+    return ' {"channel":"' + channel + '","blocks": [ ' +
+            getHeader()
+    +getDetailWithLink("Build Link", env.RUN_DISPLAY_URL)
+    +getDetail("Test Summary "+testsummary)
+    +' ] }'
 }
 
 def getHeader() {
-    return '{"type": "section","text": {"type": "mrkdwn","text": "*This rele*[Requested by <fakeLink.toUser.com|Mark>]"}}'
+    return '{"type": "section","text": {"type": "mrkdwn","text": "*This rele*[Requested by <fakeLink.toUser.com|Mark>"}}'
 }
 
-def getDetailWithLink(msg, link) {
-    return ',{"type": "section","text": {"type": "mrkdwn","text": "' + msg + ' <' + link + '|Report>]"}}'
+def getDetail(msg) {
+    return ',{"type": "section","text": {"type": "mrkdwn","text": "' + msg + ' <' + link + '|Report>"}}'
+}
+
+def getDetailWithLink(msg) {
+    return ',{"type": "section","text": {"type": "mrkdwn","text": "' + msg + '"}}'
 }
