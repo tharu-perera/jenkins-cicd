@@ -257,6 +257,31 @@ pipeline {
                                         sh './gradlew test jacocoTestReport --no-daemon'
                                         // if in case tests fail then subsequent stages
                                         // will not run .but post block in this stage will run
+//                                        step([$class          : 'JacocoPublisher',
+//                                              execPattern     : '**/build/jacoco/*.exec',
+//                                              classPattern    : '**/build/classes',
+//                                              sourcePattern   : 'src/main/java',
+//                                              exclusionPattern: 'src/test*'
+//                                        ])
+//                                        publishHTML target: [
+//                                                allowMissing         : false,
+//                                                alwaysLinkToLastBuild: false,
+//                                                keepAll              : true,
+//                                                reportDir            : "build/reports/tests/test",
+//                                                reportFiles          : 'index.html',
+//                                                reportName           : 'Junit Report'
+//                                        ]
+                                    }
+                                    catch (exception) {
+                                        echo "$exception"
+                                        errorReport(TYPE)
+                                        throw exception
+                                    }
+                                    finally {
+                                        summary = junit testResults: '**/build/test-results/test/*.xml'
+                                        testsummary=summary.getProperties()
+                                        testRpeortLink=env.BUILD_URL+"Junit_20Report"
+                                        echo "test >>> ${summary.getProperties()}"
                                         step([$class          : 'JacocoPublisher',
                                               execPattern     : '**/build/jacoco/*.exec',
                                               classPattern    : '**/build/classes',
@@ -271,17 +296,6 @@ pipeline {
                                                 reportFiles          : 'index.html',
                                                 reportName           : 'Junit Report'
                                         ]
-                                    }
-                                    catch (exception) {
-                                        echo "$exception"
-                                        errorReport(TYPE)
-                                        throw exception
-                                    }
-                                    finally {
-                                        summary = junit testResults: '**/build/test-results/test/*.xml'
-                                        testsummary=summary.getProperties()
-                                        testRpeortLink=env.BUILD_URL+"Junit_20Report"
-                                        echo "test >>> ${summary.getProperties()}"
                                     }
                                 }
                             }
