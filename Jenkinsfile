@@ -262,7 +262,7 @@ pipeline {
                             catch (exception) {
                                 echo "$exception"
                                 summary = junit testResults: '**/build/test-results/test/*.xml'
-                                testsummary = summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
+                                testsummary = summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,", "")
                                 testRpeortLink = env.RUN_TESTS_DISPLAY_URL
                                 coverageRpeortLink = BUILD_URL + "jacoco"
                                 errorReport(TYPE)
@@ -270,7 +270,7 @@ pipeline {
                             }
                             finally {
                                 summary = junit testResults: '**/build/test-results/test/*.xml'
-                                testsummary =summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,","")
+                                testsummary = summary.getProperties().toString().replaceAll("class:class hudson.tasks.junit.TestResultSummary,", "")
                                 testRpeortLink = env.RUN_TESTS_DISPLAY_URL
                                 coverageRpeortLink = BUILD_URL + "jacoco"
                                 step([$class          : 'JacocoPublisher',
@@ -292,87 +292,87 @@ pipeline {
                     }
                 }
 
-                        stage('Checkstyle') {
-                            steps {
-                                script {
-                                    try {
-                                        sh "./gradlew checkstyleMain checkstyleTest"
-                                    } catch (exception) {
-                                        checkstyleLink = BUILD_URL + "Checkstyle_20Report"
-                                        errorReport(TYPE)
-                                        throw exception
-                                    } finally {
-                                        checkstyleLink = BUILD_URL + "Checkstyle_20Report"
-                                        publishHTML target: [
-                                                allowMissing         : false,
-                                                alwaysLinkToLastBuild: false,
-                                                keepAll              : true,
-                                                reportDir            : "build/reports/checkstyle",
-                                                reportFiles          : '**/*',
-                                                reportName           : 'Checkstyle Report'
-                                        ]
-                                    }
-                                }
+                stage('Checkstyle') {
+                    steps {
+                        script {
+                            try {
+                                sh "./gradlew checkstyleMain checkstyleTest"
+                            } catch (exception) {
+                                checkstyleLink = BUILD_URL + "Checkstyle_20Report"
+                                errorReport(TYPE)
+                                throw exception
+                            } finally {
+                                checkstyleLink = BUILD_URL + "Checkstyle_20Report"
+                                publishHTML target: [
+                                        allowMissing         : false,
+                                        alwaysLinkToLastBuild: false,
+                                        keepAll              : true,
+                                        reportDir            : "build/reports/checkstyle",
+                                        reportFiles          : '**/*',
+                                        reportName           : 'Checkstyle Report'
+                                ]
                             }
                         }
+                    }
+                }
 //
-                        stage('PMD') {
-                            steps {
-                                script {
-                                    try {
-                                        sh "./gradlew pmdmain pmdtest"
-                                    } catch (exception) {
-                                        pmdLink = BUILD_URL + "PMD_20Report"
-                                        errorReport(TYPE)
+                stage('PMD') {
+                    steps {
+                        script {
+                            try {
+                                sh "./gradlew pmdmain pmdtest"
+                            } catch (exception) {
+                                pmdLink = BUILD_URL + "PMD_20Report"
+                                errorReport(TYPE)
 //                                        throw exception
-                                    } finally {
-                                        pmdLink = BUILD_URL + "PMD_20Report"
-                                        publishHTML target: [
-                                                allowMissing         : false,
-                                                alwaysLinkToLastBuild: false,
-                                                keepAll              : true,
-                                                reportDir            : "build/reports/pmd",
-                                                reportFiles          : 'main.html,test.html',
-                                                reportName           : 'PMD Report'
-                                        ]
-                                    }
-                                }
+                            } finally {
+                                pmdLink = BUILD_URL + "PMD_20Report"
+                                publishHTML target: [
+                                        allowMissing         : false,
+                                        alwaysLinkToLastBuild: false,
+                                        keepAll              : true,
+                                        reportDir            : "build/reports/pmd",
+                                        reportFiles          : 'main.html,test.html',
+                                        reportName           : 'PMD Report'
+                                ]
                             }
                         }
+                    }
+                }
 
-                        stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
-                            //one method usingg jenkins global configuration
-                            steps {
-                                script {
+                stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
+                    //one method usingg jenkins global configuration
+                    steps {
+                        script {
 //                    def scannerHome = tool 'SonarScanner 4.0';
 //                    withSonarQubeEnv('mysona') { // If you have configured more than one global server connection, you can specify its name
 //                        sh "${scannerHome}/bin/sonar-scanner"
 //                    }
-                                    //other one is using gradle build
-                                    withSonarQubeEnv() {
-                                        // Will pick the global server connection you have configured
-                                        sh "./gradlew sonarqube -Dsonar.projectName=${TYPE}"
-                                    }
-                                    timeout(time: 1, unit: 'HOURS') {
-                                        // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                                        // true = set pipeline to UNSTABLE, false = don't
-                                        waitForQualityGate abortPipeline: true
-                                    }
-                                }
+                            //other one is using gradle build
+                            withSonarQubeEnv() {
+                                // Will pick the global server connection you have configured
+                                sh "./gradlew sonarqube -Dsonar.projectName=${TYPE}"
                             }
-                            post {
-                                always {
-
-                                            script {
-                                                sonarLink = "http://localhost:9000/dashboard?id=${env.JOB_BASE_NAME}/${env.BUILD_NUMBER}"
-
-                                    }
-                                }
-                                unstable {
-                                    errorReport(TYPE)
-                                }
+                            timeout(time: 1, unit: 'HOURS') {
+                                // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                                // true = set pipeline to UNSTABLE, false = don't
+                                waitForQualityGate abortPipeline: true
                             }
                         }
+                    }
+                    post {
+                        always {
+
+                            script {
+                                sonarLink = "http://localhost:9000/dashboard?id=${env.JOB_BASE_NAME}/${env.BUILD_NUMBER}"
+
+                            }
+                        }
+                        unstable {
+                            errorReport(TYPE)
+                        }
+                    }
+                }
 
 
                 stage('Release Request[Manual]') {
@@ -564,20 +564,20 @@ def manualReleaseFailedMSGBuilder(channel) {
 }
 
 def autoReleaseSuccessMSGBuilder(channel) {
-    def branch=""
-    def envTemp=""
+    def branch = ""
+    def envTemp = ""
     if (TYPE == "DEV_RELEASE") {
-        branch="Develop"
-        envTemp="Develop"
+        branch = "Develop"
+        envTemp = "Develop"
     } else if (TYPE == "QA_RELEASE") {
-        branch="Release"
-        envTemp="QA"
+        branch = "Release"
+        envTemp = "QA"
     } else if (TYPE == "PROD_RELEASE") {
-        branch="Master"
-        envTemp="Production"
+        branch = "Master"
+        envTemp = "Production"
     } else if (TYPE == "HOTFIX_QA_RELEASE") {
-        branch="Hotfix"
-        envTemp="QA"
+        branch = "Hotfix"
+        envTemp = "QA"
     }
 
     return '''
@@ -588,11 +588,11 @@ def autoReleaseSuccessMSGBuilder(channel) {
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
 \t\t\t\t"text": ":white_check_mark: *Release Successful* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\\n 
-\\t :fire:*'''+branch+''''* branch released to *'''+envTemp+'''* environment*:fire:\\n
- \\t Initiated by *SYSTEM* , Approved by *'''+approvedBy+'''*\\n 
- \\t Git commit [*'''+COMMIT_HASH+'''*] , 
- Author [*'''+COMMIT_AUTHOR+'''*]\\n \\t
-  Git message [*'''+COMMIT_MSG+'''*]"
+\\t :fire:*''' + branch + ''''* branch released to *''' + envTemp + '''* environment*:fire:\\n
+ \\t Initiated by *SYSTEM* , Approved by *''' + approvedBy + '''*\\n 
+ \\t Git commit [*''' + COMMIT_HASH + '''*] , 
+ Author [*''' + COMMIT_AUTHOR + '''*]\\n \\t
+  Git message [*''' + COMMIT_MSG + '''*]"
 \t\t\t}
 \t\t},
 \t\t{
@@ -600,11 +600,11 @@ def autoReleaseSuccessMSGBuilder(channel) {
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
 \t\t\t\t"text": "\\t\\t Reports \\n \\t :heavy_check_mark:
-Test Summary '''+testsummary+'''<'''+testRpeortLink+'''|[*Junit Report*]>\\n \\t :heavy_check_mark:
-Jacoco Coverage <'''+coverageRpeortLink+'''|[*Jacoco Report*]>\\n \\t :heavy_check_mark:
-PMD<'''+pmdLink+'''|[*PMD Report*]>\\n \\t :heavy_check_mark:
-Checkstyle <'''+checkstyleLink+'''|[*Checkstyle Report*]>\\n \\t :heavy_check_mark:
-Sonarqube <'''+sonarLink+'''|[*Sonarqube Report*]>"
+Test Summary ''' + testsummary + '''<''' + testRpeortLink + '''|[*Junit Report*]>\\n \\t :heavy_check_mark:
+Jacoco Coverage <''' + coverageRpeortLink + '''|[*Jacoco Report*]>\\n \\t :heavy_check_mark:
+PMD<''' + pmdLink + '''|[*PMD Report*]>\\n \\t :heavy_check_mark:
+Checkstyle <''' + checkstyleLink + '''|[*Checkstyle Report*]>\\n \\t :heavy_check_mark:
+Sonarqube <''' + sonarLink + '''|[*Sonarqube Report*]>"
 \t\t\t}
 \t\t},
 \t\t{
@@ -616,14 +616,34 @@ Sonarqube <'''+sonarLink+'''|[*Sonarqube Report*]>"
 }
 
 def autoReleaseFailedMSGBuilder(channel) {
+    def branch = ""
+    def envTemp = ""
+    if (TYPE == "DEV_RELEASE") {
+        branch = "Develop"
+        envTemp = "Develop"
+    } else if (TYPE == "QA_RELEASE") {
+        branch = "Release"
+        envTemp = "QA"
+    } else if (TYPE == "PROD_RELEASE") {
+        branch = "Master"
+        envTemp = "Production"
+    } else if (TYPE == "HOTFIX_QA_RELEASE") {
+        branch = "Hotfix"
+        envTemp = "QA"
+    }
+
     return '''
  {
+{ "channel":"''' + channel + '''",
 \t"blocks": [
 \t\t{
 \t\t\t"type": "section",
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
-\t\t\t\t"text": ":x: *Build Failed* <goog.com|[*jenkins pipeline*]>:x:\\n \\t :fire:*Develop* branch released to *Develop* environment*:fire:\\n \\t Initiated by *SYSTEM* , Approved by *MarK*\\n \\t Git commit [*MarK*] , Author [*xxx*]\\n \\t Git message [*MarK*]"
+\t\t\t\t"text": ":x: *Build Failed* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>:x:\\n 
+\\t :fire:*''' + branch + ''''* branch released to *''' + envTemp + '''* environment*:fire:\\n \\t
+ Initiated by *SYSTEM* , Approved by [*''' + approvedBy + '''*]\\n \\t Git commit [*''' + COMMIT_HASH + '''*] , Author [*''' + COMMIT_AUTHOR + '''*]\\n \\t 
+Git message[*''' + COMMIT_MSG + '''*]"
 \t\t\t}
 \t\t},
 \t\t{
