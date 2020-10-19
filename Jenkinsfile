@@ -141,7 +141,7 @@ pipeline {
                 script {
                     BUILD_USER = currentBuild.getBuildCauses()[0].shortDescription
                     SLACK_USER = env.user_name
-                    gitPRLink=env.
+                    gitPRLink=env.CHANGE_URL
                     COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse HEAD')
                     COMMIT_AUTHOR = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${COMMIT_HASH}").trim()
                     COMMIT_MSG = sh(returnStdout: true, script: "git log --format=%B -n 1  ${COMMIT_HASH}").trim()
@@ -311,10 +311,11 @@ pipeline {
                                     try {
                                         sh "./gradlew checkstyleMain checkstyleTest"
                                     } catch (exception) {
-                                        checkstyleLink=
+                                        checkstyleLink=BUILD_URL+"Checkstyle_20Report"
                                         errorReport(TYPE)
                                         throw exception
                                     } finally {
+                                        checkstyleLink=BUILD_URL+"Checkstyle_20Report"
                                         publishHTML target: [
                                                 allowMissing         : false,
                                                 alwaysLinkToLastBuild: false,
@@ -334,9 +335,11 @@ pipeline {
                                     try {
                                         sh "./gradlew pmdmain pmdtest"
                                     } catch (exception) {
+                                        pmdLink=BUILD_URL+"PMD_20Report"
                                         errorReport(TYPE)
-                                        throw exception
+//                                        throw exception
                                     } finally {
+                                        pmdLink=BUILD_URL+"PMD_20Report"
                                         publishHTML target: [
                                                 allowMissing         : false,
                                                 alwaysLinkToLastBuild: false,
@@ -372,6 +375,9 @@ pipeline {
                                 }
                             }
                             post {
+                                always{
+                                    sonarLink="http://localhost:9000/dashboard?id=${env.JOB_BASE_NAME}/${env.BUILD_NUMBER}"
+                                }
                                 unstable {
                                     errorReport(TYPE)
                                 }
@@ -389,6 +395,7 @@ pipeline {
                                     try {
                                         timeout(time: 1, unit: "HOURS") {
                                             getApproval(TYPE)
+                                            successReport(TYPE)
                                             approvedBy = input id: 'reqApproval', message: "$SLACK_USER requested  $slackUserRequestedReleaseType ",
                                                     ok: 'Approve?',
 //                                                submitter: 'user1,user2,group1',
@@ -560,12 +567,12 @@ def getBuildStatusSuccess() {
 }
 def getHeader() {
     if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-        return ',{"type": "section","text": {"type": "mrkdwn","text": "Action *'+slackUserRequestedReleaseType+'*"}},' +
+        return ',{"type": "section","text": {"type": "mrkdwn","text": "Action: *'+slackUserRequestedReleaseType+'*"}},' +
                 '{"type": "section","text": {"type": "mrkdwn","text": "Requested by *'+SLACK_USER+'*"}}'
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
         return ',{"type": "section","text": {"type": "mrkdwn","text": "*PR Request* by *'+COMMIT_AUTHOR+'*"}}' +
                 ',{"type": "section","text": {"type": "mrkdwn","text": "*Commit Message*  *'+COMMIT_MSG+'*"}}'+
-                ',{"type": "section","text": {"type": "mrkdwn","text": "*GitHub* <'+env.RUN_DISPLAY_URL+'|link>"}}'
+                ',{"type": "section","text": {"type": "mrkdwn","text": "*GitHub* <'+gitPRLink+'|link>"}}'
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
         return ',{"type": "section","text": {"type": "mrkdwn","text": "Commits merged to  *'+autoTriggeredGitBranch+' branch*"}}'
     }
