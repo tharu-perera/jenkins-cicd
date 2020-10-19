@@ -89,7 +89,6 @@ pipeline {
                         // hotfix staging release request
                         slackUserRequestedReleaseType = "STAGING release from HOTFIX"
                         TYPE = "HOTFIX_STAGING_RELEASE_REQ"
-
                         /* ---------------- automatic release requests [ get the approval ,checkout and release ]--------------------*/
                     } else if (env.JOB_BASE_NAME == "develop") {
                         // start dev release. no need approval .
