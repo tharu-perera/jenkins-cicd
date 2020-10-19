@@ -280,7 +280,7 @@ pipeline {
                                     finally {
                                         summary = junit testResults: '**/build/test-results/test/*.xml'
                                         testsummary=summary.getProperties()
-                                        testRpeortLink=env.BUILD_URL+"Junit_20Report"
+                                        testRpeortLink=env.RUN_TESTS_DISPLAY_URL
                                         echo "test >>> ${summary.getProperties()}"
                                         step([$class          : 'JacocoPublisher',
                                               execPattern     : '**/build/jacoco/*.exec',
