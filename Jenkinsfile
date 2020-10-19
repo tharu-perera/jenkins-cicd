@@ -31,7 +31,14 @@ approvedBy = ""
 slackUserRequestedReleaseType = ""
 autoTriggeredGitBranch = ""
 slackUserCreatedBranch = ""
-summary = ""
+testsummary = ""
+sonarsummary = ""
+sonarLink=""
+pmdLink=""
+checkstyleLink=""
+buildURL=""
+testRpeortLink=""
+coverageRpeortLink=""
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 
@@ -207,7 +214,6 @@ pipeline {
                                 step([$class: 'WsCleanup'])
                                 checkout scm
                                 script {
-                                    def errorDesc = ""
                                     try {
                                         if (TYPE == "QA_RELEASE_REQ") {
                                             sh 'git checkout origin/release'
@@ -352,7 +358,7 @@ pipeline {
                         }
 
 
-                        stage('On request release approval') {
+                        stage('Release Request[Manual]') {
                             when {
                                 expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
                             }
@@ -378,7 +384,7 @@ pipeline {
                             }
                         }
 
-                        stage('commit merged auto release approval') {
+                        stage('Release Request[Auto]') {
                             when {
                                 expression { TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" }
                             }
