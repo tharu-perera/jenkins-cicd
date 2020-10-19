@@ -490,30 +490,172 @@ def notifySlack(body) {
 
 def getApproval(type) {
     def channel = "release-approval"
-    def msg = "need approval for release"
-    withCredentials([string(credentialsId: 'slack-token', variable: 'st')]) {
-        script {
-            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\"  : \"msg=${msg}   type= ${type} \"}'"
-        }
+    def branch = ""
+    def envTemp = ""
+    def manualReq = false
+    if (TYPE == "DEV_RELEASE_REQ") {
+        branch = "Develop"
+        envTemp = "Develop"
+        manualReq = true
+    } else if (TYPE == "QA_RELEASE_REQ") {
+        branch = "Release"
+        envTemp = "QA"
+        manualReq = true
+    } else if (TYPE == "STAGE_RELEASE_REQ") {
+        branch = "release"
+        envTemp = "staging"
+        manualReq = true
+    } else if (TYPE == "PROD_RELEASE_REQ") {
+        branch = "master"
+        envTemp = "Production"
+        manualReq = true
+    } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
+        branch = "Hotfix"
+        envTemp = "QA"
+        manualReq = true
+    } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+        branch = "Hotfix"
+        envTemp = "Staging"
+        manualReq = true
+    } else if (TYPE == "DEV_RELEASE") {
+        branch = "Develop"
+        envTemp = "Develop"
+    } else if (TYPE == "QA_RELEASE") {
+        branch = "Release"
+        envTemp = "QA"
+    } else if (TYPE == "PROD_RELEASE") {
+        branch = "Master"
+        envTemp = "Production"
+    } else if (TYPE == "HOTFIX_QA_RELEASE") {
+        branch = "Hotfix"
+        envTemp = "QA"
     }
+
+    if (manualReq) {
+        def body = '''
+ { "channel":"''' + channel + '''",
+\t"blocks": [
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": ":white_check_mark: *Approval is pending * <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\n 
+:fire:*''' + branch + '''* branch will be released to *''' + envTemp + '''* environment*:fire:\n
+Initiated by *''' + SLACK_USER + '''* \n 
+Git commit [*''' + COMMIT_HASH + '''*] \n
+Author [*''' + COMMIT_AUTHOR + '''*]\n
+Git message [*''' + COMMIT_MSG + '''*]"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": "
+\tReports \n  
+\t :heavy_check_mark:Test Summary ''' + testsummary + '''<''' + testRpeortLink + '''|[*Junit Report*]>\n 
+\t :heavy_check_mark:Jacoco Coverage <''' + coverageRpeortLink + '''|[*Jacoco Report*]>\n 
+\t :heavy_check_mark:PMD<''' + pmdLink + '''|[*PMD Report*]>\n 
+\t :heavy_check_mark:Checkstyle <''' + checkstyleLink + '''|[*Checkstyle Report*]>\n
+\t :heavy_check_mark:Sonarqube <''' + sonarLink + '''|[*Sonarqube Report*]>"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "divider"
+\t\t}
+\t]
+}
+ '''
+        notifySlack(body)
+    } else {
+        def body = '''
+ { "channel":"''' + channel + '''",
+\t"blocks": [
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": ":white_check_mark: *Approval is pending * <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\n 
+:fire:*''' + branch + '''* branch will be released to *''' + envTemp + '''* environment*:fire:\n
+Initiated by *''' + System + '''*\n 
+Git commit [*''' + COMMIT_HASH + '''*] \n
+Author [*''' + COMMIT_AUTHOR + '''*]\n
+Git message [*''' + COMMIT_MSG + '''*]"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": "
+\tReports \n  
+\t :heavy_check_mark:Test Summary ''' + testsummary + '''<''' + testRpeortLink + '''|[*Junit Report*]>\n 
+\t :heavy_check_mark:Jacoco Coverage <''' + coverageRpeortLink + '''|[*Jacoco Report*]>\n 
+\t :heavy_check_mark:PMD<''' + pmdLink + '''|[*PMD Report*]>\n 
+\t :heavy_check_mark:Checkstyle <''' + checkstyleLink + '''|[*Checkstyle Report*]>\n
+\t :heavy_check_mark:Sonarqube <''' + sonarLink + '''|[*Sonarqube Report*]>"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "divider"
+\t\t}
+\t]
+}
+ '''
+        notifySlack(body)
+    }
+
+
 }
 
 def notifyApproval(type) {
     def channel = "general"
-    def msg = "approved for release ${approvedBy}"
+    def body='''
+{
+ { "channel":"''' + channel + '''",
+\t"blocks": [
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": ":white_check_mark: *Release Was Approved* <'''+ env.RUN_DISPLAY_URL+'''|[*jenkins pipeline*]>:x: \\nApproved by *'''+approvedBy+'''*\\nGit commit [*'''+COMMIT_HASH+'''*]\\nAuthor [*'''+COMMIT_AUTHOR+'''*]\\nGit message [*'''+COMMIT_MSG+'''*]"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "divider"
+\t\t}
+\t]
+}
+'''
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
-            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=${msg}   type= ${type} \"}'"
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '$body'"
         }
     }
 }
 
 def notifyReject(type, user) {
     def channel = "general"
-    def msg = "rejected release $user"
+    def body='''
+{
+ { "channel":"''' + channel + '''",
+\t"blocks": [
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": ":white_check_mark: *Release Was Rejected* <'''+ env.RUN_DISPLAY_URL+'''|[*jenkins pipeline*]>:x: \\n Rejected by *'''+user+'''*\\nGit commit [*'''+COMMIT_HASH+'''*]\\nAuthor [*'''+COMMIT_AUTHOR+'''*]\\nGit message [*'''+COMMIT_MSG+'''*]"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "divider"
+\t\t}
+\t]
+}
+'''
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
-            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"${channel}\", \"text\" :  \"msg=${msg}   type= ${type} \"}'"
+            sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '$body'"
         }
     }
 }
@@ -614,10 +756,10 @@ def manualReleaseSuccessMSGBuilder(channel) {
     } else if (TYPE == "PROD_RELEASE_REQ") {
         branch = "master"
         envTemp = "Production"
-    }else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
+    } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
         branch = "Hotfix"
         envTemp = "QA"
-    }else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+    } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
         branch = "Hotfix"
         envTemp = "Staging"
     }
@@ -632,7 +774,7 @@ def manualReleaseSuccessMSGBuilder(channel) {
 \t\t\t\t"type": "mrkdwn",
 \t\t\t\t"text": ":white_check_mark: *Release Successful* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\n 
 :fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment*:fire:\n
-Initiated by *'''+SLACK_USER+'''* , Approved by *''' + approvedBy + '''*\n 
+Initiated by *''' + SLACK_USER + '''* , Approved by *''' + approvedBy + '''*\n 
 Git commit [*''' + COMMIT_HASH + '''*] \n
 Author [*''' + COMMIT_AUTHOR + '''*]\n
 Git message [*''' + COMMIT_MSG + '''*]"
@@ -674,10 +816,10 @@ def manualReleaseFailedMSGBuilder(channel) {
     } else if (TYPE == "PROD_RELEASE_REQ") {
         branch = "master"
         envTemp = "Production"
-    }else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
+    } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
         branch = "Hotfix"
         envTemp = "QA"
-    }else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+    } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
         branch = "Hotfix"
         envTemp = "Staging"
     }
@@ -691,7 +833,7 @@ def manualReleaseFailedMSGBuilder(channel) {
 \t\t\t\t"type": "mrkdwn",
 \t\t\t\t"text": ":x: *Release Failed* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>:x:\n 
 \t :fire:*''' + branch + '''* branch released to *''' + envTemp + '''* environment :fire:\n 
-Initiated by *'''+SLACK_USER+'''* \n
+Initiated by *''' + SLACK_USER + '''* \n
 Approved by [*''' + approvedBy + '''*]\n
 Git commit [*''' + COMMIT_HASH + '''*] \n
 Author [*''' + COMMIT_AUTHOR + '''*]\n  
