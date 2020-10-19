@@ -553,14 +553,15 @@ def errorLayoutSlack(channel) {
     return ' {"channel":"' + channel + '","blocks": [ ' + getHeader() + getDetailWithLink("Build Link", env.RUN_DISPLAY_URL) + getDetail("Test Summary " + testsummary) + ' ] }'
 }
 
+
 def getHeader() {
     return '{"type": "section","text": {"type": "mrkdwn","text": "*This rele*[Requested by <fakeLink.toUser.com|Mark>"}}'
 }
 
-def getDetail(msg) {
+def getDetailWithLink(msg,link) {
     return ',{"type": "section","text": {"type": "mrkdwn","text": "' + msg + ' <' + link + '|Report>"}}'
 }
 
-def getDetailWithLink(msg) {
+def getDetail(msg) {
     return ',{"type": "section","text": {"type": "mrkdwn","text": "' + msg + '"}}'
 }
