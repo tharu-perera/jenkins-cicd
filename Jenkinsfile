@@ -164,7 +164,7 @@ pipeline {
         }
 
         stage(" ") {
-            parallel {
+
                 stage('Branch Creation') {
                     when {
                         expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
@@ -458,7 +458,7 @@ pipeline {
                 }
 
             }
-        }
+
 
         stage("send build status") {
             steps {
