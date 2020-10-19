@@ -31,6 +31,7 @@ approvedBy = ""
 slackUserRequestedReleaseType = ""
 autoTriggeredGitBranch = ""
 slackUserCreatedBranch = ""
+summary = ""
 
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
@@ -117,9 +118,14 @@ pipeline {
                         // create hotfix branch with tag. check whether still have one
                         slackUserCreatedBranch = "hotfix"
                         TYPE = "CREATE_HOTFIX_BR"
-
                     } else {
                         echo "<<<could not find the change type>>>"
+                        withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
+                            script {
+                                sh "curl --location --request POST '$st'  --header 'Content-Type: application/json' --data-raw '{ \"channel\": \"error\", \"text\": \"Jenkins file error\"}'"
+                            }
+                        }
+                        throw RuntimeException()
                     }
 
                     echo "Build trigger type ==  $TYPE"
@@ -155,40 +161,40 @@ pipeline {
 
         stage(" ") {
             parallel {
-//                stage('Branch Creation') {
-//                    when {
-//                        expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
-//                    }
-//                    stages {
-//                        stage('checking and create branch') {
-//
-//                            steps {
-//                                script {
-//                                    def br = ""
-//                                    if (TYPE == "CREATE_RELEASE_BR") {
-//                                        br = sh(returnStdout: true, script: './test.sh release').trim()
-//                                        if (br == '1') {
-//                                            branchCreationError()
-//                                            throw exception
-//                                        } else {
-//                                            sh 'git checkout -b release origin/develop'
-//                                            sh 'git push origin release'
-//                                        }
-//                                    } else {
-//                                        br = sh(returnStdout: true, script: './test.sh hotfix').trim()
-//                                        if (br == '1') {
-//                                            branchCreationError()
-//                                            throw exception
-//                                        } else {
-//                                            sh 'git checkout -b hotfix origin/master'
-//                                            sh 'git push origin hotfix'
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
+                stage('Branch Creation') {
+                    when {
+                        expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
+                    }
+                    stages {
+                        stage('checking and create branch') {
+
+                            steps {
+                                script {
+                                    def br = ""
+                                    if (TYPE == "CREATE_RELEASE_BR") {
+                                        br = sh(returnStdout: true, script: './test.sh release').trim()
+                                        if (br == '1') {
+                                            branchCreationError()
+                                            throw exception
+                                        } else {
+                                            sh 'git checkout -b release origin/develop'
+                                            sh 'git push origin release'
+                                        }
+                                    } else {
+                                        br = sh(returnStdout: true, script: './test.sh hotfix').trim()
+                                        if (br == '1') {
+                                            branchCreationError()
+                                            throw exception
+                                        } else {
+                                            sh 'git checkout -b hotfix origin/master'
+                                            sh 'git push origin hotfix'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 stage("non branch") {
                     when {
@@ -196,184 +202,184 @@ pipeline {
                     }
                     stages {
 
-//                        stage('checkout code when on request releases[Slack]') {
-//                            when {
-//                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
-//                            }
-//                            steps {
-//                                step([$class: 'WsCleanup'])
-//                                checkout scm
-//                                script {
-//                                    def errorDesc = ""
-//                                    try {
-//                                        if (TYPE == "QA_RELEASE_REQ") {
-//                                            sh 'git checkout origin/release'
-//                                        } else if (TYPE == "STAGE_RELEASE_REQ") {
-//                                            sh 'git checkout origin/release'
-//                                        } else if (TYPE == "DEV_RELEASE_REQ") {
-//                                            sh 'git checkout origin/develop'
-//                                        } else if (TYPE == "PROD_RELEASE_REQ") {
-//                                            sh 'git checkout origin/master'
-//                                        } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
-//                                            sh 'git checkout origin/hotfix'
-//                                        } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-//                                            sh 'git checkout origin/hotfix'
-//                                        }
-//                                    } catch (exception) {
-//                                        errorReport(TYPE)
-//                                        throw exception
-//                                    }
-//                                }
-//                            }
-//                        }
+                        stage('checkout code when on request releases[Slack]') {
+                            when {
+                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                            }
+                            steps {
+                                step([$class: 'WsCleanup'])
+                                checkout scm
+                                script {
+                                    def errorDesc = ""
+                                    try {
+                                        if (TYPE == "QA_RELEASE_REQ") {
+                                            sh 'git checkout origin/release'
+                                        } else if (TYPE == "STAGE_RELEASE_REQ") {
+                                            sh 'git checkout origin/release'
+                                        } else if (TYPE == "DEV_RELEASE_REQ") {
+                                            sh 'git checkout origin/develop'
+                                        } else if (TYPE == "PROD_RELEASE_REQ") {
+                                            sh 'git checkout origin/master'
+                                        } else if (TYPE == "HOTFIX_QA_RELEASE_REQ") {
+                                            sh 'git checkout origin/hotfix'
+                                        } else if (TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
+                                            sh 'git checkout origin/hotfix'
+                                        }
+                                    } catch (exception) {
+                                        errorReport(TYPE)
+                                        throw exception
+                                    }
+                                }
+                            }
+                        }
+
+                        stage('build ') {
+                            steps {
+                                script {
+                                    try {
+                                        sh "./gradlew clean build -x test -x check"
+                                    } catch (exception) {
+                                        errorReport(TYPE)
+                                        throw exception
+                                    }
+                                }
+                            }
+                        }
 //
-//                        stage('build ') {
-//                            steps {
-//                                script {
-//                                    try {
-//                                        sh "./gradlew clean build -x test -x check"
-//                                    } catch (exception) {
-//                                        errorReport(TYPE, "Build", exception)
-//                                        throw exception
-//                                    }
-//                                }
-//                            }
-//                        }
+                        stage('Junit & Jacoco') {
+                            steps('running junit') {
+                                script {
+                                    try {
+                                        sh 'chmod +x gradlew'
+                                        sh './gradlew test jacocoTestReport --no-daemon'
+                                        // if in case tests fail then subsequent stages
+                                        // will not run .but post block in this stage will run
+                                        step([$class          : 'JacocoPublisher',
+                                              execPattern     : '**/build/jacoco/*.exec',
+                                              classPattern    : '**/build/classes',
+                                              sourcePattern   : 'src/main/java',
+                                              exclusionPattern: 'src/test*'
+                                        ])
+                                        publishHTML target: [
+                                                allowMissing         : false,
+                                                alwaysLinkToLastBuild: false,
+                                                keepAll              : true,
+                                                reportDir            : "build/reports/tests/test",
+                                                reportFiles          : 'index.html',
+                                                reportName           : 'Junit Report'
+                                        ]
+                                    }
+                                    catch (exception) {
+                                        echo "$exception"
+                                        errorReport(TYPE)
+                                        throw exception
+                                    }
+                                    finally {
+                                        summary = junit testResults: '**/build/test-results/test/*.xml'
+                                        echo "test >>> ${summary.getProperties()}"
+                                    }
+                                }
+                            }
+                        }
+
+                        stage('Checkstyle') {
+                            steps {
+                                script {
+                                    try {
+                                        sh "./gradlew checkstyleMain checkstyleTest"
+                                    } catch (exception) {
+                                        errorReport(TYPE)
+                                        throw exception
+                                    } finally {
+                                        publishHTML target: [
+                                                allowMissing         : false,
+                                                alwaysLinkToLastBuild: false,
+                                                keepAll              : true,
+                                                reportDir            : "build/reports/checkstyle",
+                                                reportFiles          : '**/*',
+                                                reportName           : 'Checkstyle Report'
+                                        ]
+                                    }
+                                }
+                            }
+                        }
 //
-//                        stage('Junit & Jacoco') {
-//                            steps('running junit') {
-//                                script {
-//                                    try {
-//                                        sh 'chmod +x gradlew'
-//                                        sh './gradlew test jacocoTestReport --no-daemon'
-//                                        // if in case tests fail then subsequent stages
-//                                        // will not run .but post block in this stage will run
-//                                        step([$class          : 'JacocoPublisher',
-//                                              execPattern     : '**/build/jacoco/*.exec',
-//                                              classPattern    : '**/build/classes',
-//                                              sourcePattern   : 'src/main/java',
-//                                              exclusionPattern: 'src/test*'
-//                                        ])
-//                                        publishHTML target: [
-//                                                allowMissing         : false,
-//                                                alwaysLinkToLastBuild: false,
-//                                                keepAll              : true,
-//                                                reportDir            : "build/reports/tests/test",
-//                                                reportFiles          : 'index.html',
-//                                                reportName           : 'Junit Report'
-//                                        ]
-//                                    }
-//                                    catch (exception) {
-//                                        echo "$exception"
-//                                        errorReport(TYPE, "Junit", exception)
-//                                        throw exception
-//                                    }
-//                                    finally {
-//                                        summary = junit testResults: '**/build/test-results/test/*.xml'
-//                                        echo "test >>> ${summary.getProperties()}"
-//                                    }
-//                                }
-//                            }
-//                        }
-//
-//                        stage('Checkstyle') {
-//                            steps {
-//                                script {
-//                                    try {
-//                                        sh "./gradlew checkstyleMain checkstyleTest"
-//                                    } catch (exception) {
-//                                        errorReport(TYPE, "Checkstyle", exception)
-//                                        throw exception
-//                                    } finally {
-//                                        publishHTML target: [
-//                                                allowMissing         : false,
-//                                                alwaysLinkToLastBuild: false,
-//                                                keepAll              : true,
-//                                                reportDir            : "build/reports/checkstyle",
-//                                                reportFiles          : '**/*',
-//                                                reportName           : 'Checkstyle Report'
-//                                        ]
-//                                    }
-//                                }
-//                            }
-//                        }
-//
-//                        stage('PMD') {
-//                            steps {
-//                                script {
-//                                    try {
-//                                        sh "./gradlew pmdmain pmdtest"
-//                                    } catch (exception) {
-////                                        errorReportToSlack(TYPE, "PMD", exception)
-////                                        throw exception
-//                                    } finally {
-//                                        publishHTML target: [
-//                                                allowMissing         : false,
-//                                                alwaysLinkToLastBuild: false,
-//                                                keepAll              : true,
-//                                                reportDir            : "build/reports/pmd",
-//                                                reportFiles          : 'main.html,test.html',
-//                                                reportName           : 'PMD Report'
-//                                        ]
-//                                    }
-//                                }
-//                            }
-//                        }
+                        stage('PMD') {
+                            steps {
+                                script {
+                                    try {
+                                        sh "./gradlew pmdmain pmdtest"
+                                    } catch (exception) {
+                                        errorReportToSlack(TYPE)
+                                        throw exception
+                                    } finally {
+                                        publishHTML target: [
+                                                allowMissing         : false,
+                                                alwaysLinkToLastBuild: false,
+                                                keepAll              : true,
+                                                reportDir            : "build/reports/pmd",
+                                                reportFiles          : 'main.html,test.html',
+                                                reportName           : 'PMD Report'
+                                        ]
+                                    }
+                                }
+                            }
+                        }
 //
 //
-//                        stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
-//                            //one method usingg jenkins global configuration
-//                            steps {
-//                                script {
-////                    def scannerHome = tool 'SonarScanner 4.0';
-////                    withSonarQubeEnv('mysona') { // If you have configured more than one global server connection, you can specify its name
-////                        sh "${scannerHome}/bin/sonar-scanner"
-////                    }
-//                                    //other one is using gradle build
-//                                    withSonarQubeEnv() {
-//                                        // Will pick the global server connection you have configured
-//                                        sh "./gradlew sonarqube -Dsonar.projectName=${TYPE}"
-//                                    }
-//                                    timeout(time: 1, unit: 'HOURS') {
-//                                        // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-//                                        // true = set pipeline to UNSTABLE, false = don't
-//                                        waitForQualityGate abortPipeline: true
-//                                    }
-//                                }
-//                            }
-//                            post {
-//                                unstable {
-//                                    errorReport(TYPE, "SQ", "eroor")
-//                                }
-//                            }
-//                        }
+                        stage('SQ analysis') { //there are 2 ways to configure sonar in jenkins
+                            //one method usingg jenkins global configuration
+                            steps {
+                                script {
+//                    def scannerHome = tool 'SonarScanner 4.0';
+//                    withSonarQubeEnv('mysona') { // If you have configured more than one global server connection, you can specify its name
+//                        sh "${scannerHome}/bin/sonar-scanner"
+//                    }
+                                    //other one is using gradle build
+                                    withSonarQubeEnv() {
+                                        // Will pick the global server connection you have configured
+                                        sh "./gradlew sonarqube -Dsonar.projectName=${TYPE}"
+                                    }
+                                    timeout(time: 1, unit: 'HOURS') {
+                                        // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                                        // true = set pipeline to UNSTABLE, false = don't
+                                        waitForQualityGate abortPipeline: true
+                                    }
+                                }
+                            }
+                            post {
+                                unstable {
+                                    errorReport(TYPE)
+                                }
+                            }
+                        }
 
 
-//                        stage('On request release approval') {
-//                            when {
-//                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
-//                            }
-//                            steps {
-//
-//                                script {
-//                                    try {
-//                                        timeout(time: 1, unit: "HOURS") {
-//                                            getApproval(TYPE)
-//                                            approvedBy = input id: 'reqApproval', message: "$SLACK_USER requested  $slackUserRequestedReleaseType ",
-//                                                    ok: 'Approve?',
-////                                                submitter: 'user1,user2,group1',
-//                                                    submitterParameter: 'APPROVER'
-//
-//                                            notifyApproval(TYPE)
-//                                        }
-//                                    } catch (exception) {
-//                                        def user123 = exception.getCauses()[0].getUser().toString()
-//                                        notifyReject(TYPE, "${user123}")
-//                                        throw exception
-//                                    }
-//                                }
-//                            }
-//                        }
+                        stage('On request release approval') {
+                            when {
+                                expression { TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ" }
+                            }
+                            steps {
+
+                                script {
+                                    try {
+                                        timeout(time: 1, unit: "HOURS") {
+                                            getApproval(TYPE)
+                                            approvedBy = input id: 'reqApproval', message: "$SLACK_USER requested  $slackUserRequestedReleaseType ",
+                                                    ok: 'Approve?',
+//                                                submitter: 'user1,user2,group1',
+                                                    submitterParameter: 'APPROVER'
+
+                                            notifyApproval(TYPE)
+                                        }
+                                    } catch (exception) {
+                                        def user123 = exception.getCauses()[0].getUser().toString()
+                                        notifyReject(TYPE, "${user123}")
+                                        throw exception
+                                    }
+                                }
+                            }
+                        }
 
                         stage('commit merged auto release approval') {
                             when {
@@ -402,12 +408,11 @@ pipeline {
 
                         }
 
-
                         stage('deployment') {
                             when {
                                 expression {
                                     TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE" ||
-                                    TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" ||
+                                            TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" ||
                                             TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ"
                                 }
                             }
