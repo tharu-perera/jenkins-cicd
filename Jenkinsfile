@@ -475,7 +475,7 @@ def successReport(TYPE) {
     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
         branchCreationSuccessful()
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-        notifySlack(successLayoutSlack('general'))
+        notifySlack(manualReleaseSuccessMSGBuilder('general'))
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
         notifySlack(pullReqSuccessMSGBuilder("pull-request"))
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
@@ -487,7 +487,7 @@ def errorReport(TYPE) {
     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
         branchCreationError()
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
-        notifySlack(errorLayoutSlack("admin"))
+        notifySlack(manualReleaseFailedMSGBuilder("admin"))
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
         notifySlack(pullReqFailedMSGBuilder("pull-request"))
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
@@ -564,31 +564,55 @@ def pullReqFailedMSGBuilder(channel){
 
  '''
 }
-def autoReleaseFailedMSGBuilder(channel){
+def manualReleaseSuccessMSGBuilder(channel){
+    return '''
+
+ '''
+}
+def manualReleaseFailedMSGBuilder(channel){
     return '''
 
  '''
 }
 def autoReleaseSuccessMSGBuilder(channel){
+
     return '''
-{
+ { "channel":"'''+channel+'''"
 \t"blocks": [
 \t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": ":white_check_mark: *Release Successful* <goog.com|[*jenkins pipeline*]>\\n \\t :fire:*Develop* branch released to *Develop* environment*:fire:\\n \\t Initiated by *SYSTEM* , Approved by *MarK*\\n \\t Git commit [*MarK*] , Author [*xxx*]\\n \\t Git message [*MarK*]"
+\t\t\t}
+\t\t},
+\t\t{
+\t\t\t"type": "section",
+\t\t\t"text": {
+\t\t\t\t"type": "mrkdwn",
+\t\t\t\t"text": "\\t\\t Reports \\n \\t :heavy_check_mark:Test Summary [past:32,faile:23]<goog.com|[*Junit Report*]>\\n \\t :heavy_check_mark:Jacoco Coverage <goog.com|[*Jacoco Report*]>\\n \\t :heavy_check_mark:PMD<goog.com|[*PMD Report*]>\\n \\t :heavy_check_mark:Checkstyle <goog.com|[*Checkstyle Report*]>\\n \\t :heavy_check_mark:Sonarqube <goog.com|[*Sonarqube Report*]>"
+\t\t\t}
+\t\t},
+\t\t{
 \t\t\t"type": "divider"
-\t\t},
+\t\t}
+\t]
+}
+ '''
+}
+def autoReleaseFailedMSGBuilder(channel){
+    return '''
+ {
+\t"blocks": [
 \t\t{
 \t\t\t"type": "section",
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
-\t\t\t\t"text": " Requested by *<fakeLink.toUser.com|Mark>*"
+\t\t\t\t"text": ":x: *Build Failed* <goog.com|[*jenkins pipeline*]>:x:\\n \\t :fire:*Develop* branch released to *Develop* environment*:fire:\\n \\t Initiated by *SYSTEM* , Approved by *MarK*\\n \\t Git commit [*MarK*] , Author [*xxx*]\\n \\t Git message [*MarK*]"
 \t\t\t}
 \t\t},
 \t\t{
-\t\t\t"type": "section",
-\t\t\t"text": {
-\t\t\t\t"type": "mrkdwn",
-\t\t\t\t"text": ":ghost: *Build Failed*, and ~this is crossed out~, and <https://google.com|this is a link>"
-\t\t\t}
+\t\t\t"type": "divider"
 \t\t}
 \t]
 }
@@ -623,16 +647,4 @@ def getHeader() {
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
         return '{"type": "section","text": {"type": "mrkdwn","text": "Commits merged to  *' + autoTriggeredGitBranch + ' branch*"}}'
     }
-}
-
-def getDetailWithLink(msg, link) {
-    return '{"type": "section","text": {"type": "mrkdwn","text": "' + msg + ' <' + link + '|Report>"}}'
-}
-
-def getDetail(msg) {
-    return '{"type": "section","text": {"type": "mrkdwn","text": "' + msg + '"}}'
-}
-
-def getDivider() {
-    return ' {  "type": "divider" }'
 }
