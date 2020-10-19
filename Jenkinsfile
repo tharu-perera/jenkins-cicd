@@ -64,7 +64,6 @@ pipeline {
                     } else if (env.JOB_BASE_NAME.startsWith('PR') && env.CHANGE_TARGET.startsWith('master') && env.CHANGE_BRANCH.startsWith('hotfix')) {
                         // hotfix prod release PR
                         TYPE = "HOTFIX_PROD_PR"
-
                         /* ---------------- release requests [ get the approval ,checkout and release ] --------------------*/
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'qa') {
                         // qa release request
@@ -108,7 +107,6 @@ pipeline {
                         //  qa  release request. need approval
                         autoTriggeredGitBranch = "hotfix"
                         TYPE = "HOTFIX_QA_RELEASE"
-
                         /* ---------------- branches create requests [ check , create and inform general]--------------------*/
                     } else if (env.JOB_BASE_NAME == 'onrequest-release' && env.par1 == 'create-release') {
                         // create release branch with tag
