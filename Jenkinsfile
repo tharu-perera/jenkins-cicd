@@ -542,6 +542,10 @@ def branchCreationSuccessful() {
 }
 
 def errorLayoutSlack(channel){
+   echo "$testsummary"
+    echo "$testRpeortLink"
+    echo "$coverageRpeortLink"
+
 return " { \"channel\":\"$channel\",\n" +
         "\t\"blocks\": [ ${getHeader()} ] }"
 }
