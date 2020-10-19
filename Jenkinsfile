@@ -274,6 +274,10 @@ pipeline {
                                     }
                                     catch (exception) {
                                         echo "$exception"
+                                        summary = junit testResults: '**/build/test-results/test/*.xml'
+                                        testsummary=summary.getProperties()
+                                        testRpeortLink=env.RUN_TESTS_DISPLAY_URL
+                                        coverageRpeortLink=BUILD_URL+"jacoco"
                                         errorReport(TYPE)
                                         throw exception
                                     }
@@ -542,7 +546,7 @@ def branchCreationSuccessful() {
 }
 
 def errorLayoutSlack(channel){
-   echo "$testsummary"
+    echo "$testsummary"
     echo "$testRpeortLink"
     echo "$coverageRpeortLink"
 
@@ -551,7 +555,5 @@ return " { \"channel\":\"$channel\",\n" +
 }
 
 def getHeader(){
-
     return  '{"type": "section","text": {"type": "mrkdwn","text": "*This rele*[Requested by <fakeLink.toUser.com|Mark>]"}}'
-
 }
