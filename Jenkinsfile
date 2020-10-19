@@ -550,11 +550,7 @@ def errorLayoutSlack(channel) {
     echo "$coverageRpeortLink"
     echo "uild url ${env.RUN_DISPLAY_URL}"
 
-    return ' {"channel":"' + channel + '","blocks": [ ' +
-            getHeader()
-    +getDetailWithLink("Build Link", env.RUN_DISPLAY_URL)
-    +getDetail("Test Summary "+testsummary)
-    +' ] }'
+    return ' {"channel":"' + channel + '","blocks": [ ' + getHeader() + getDetailWithLink("Build Link", env.RUN_DISPLAY_URL) + getDetail("Test Summary " + testsummary) + ' ] }'
 }
 
 def getHeader() {
