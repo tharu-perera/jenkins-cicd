@@ -577,7 +577,7 @@ def manualReleaseFailedMSGBuilder(channel){
 def autoReleaseSuccessMSGBuilder(channel){
 
     return '''
- { "channel":"'''+channel+'''"
+ { "channel":"'''+channel+'''",
 \t"blocks": [
 \t\t{
 \t\t\t"type": "section",
