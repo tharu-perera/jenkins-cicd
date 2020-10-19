@@ -279,6 +279,8 @@ pipeline {
                                     }
                                     finally {
                                         summary = junit testResults: '**/build/test-results/test/*.xml'
+                                        testsummary=summary.getProperties()
+                                        testRpeortLink=env.BUILD_URL+"Junit_20Report"
                                         echo "test >>> ${summary.getProperties()}"
                                     }
                                 }
@@ -313,7 +315,7 @@ pipeline {
                                     try {
                                         sh "./gradlew pmdmain pmdtest"
                                     } catch (exception) {
-                                        errorReportToSlack(TYPE)
+                                        errorReport(TYPE)
                                         throw exception
                                     } finally {
                                         publishHTML target: [
