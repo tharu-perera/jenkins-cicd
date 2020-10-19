@@ -550,7 +550,7 @@ def errorLayoutSlack(channel) {
     echo "$coverageRpeortLink"
     echo "uild url ${env.JOB_DISPLAY_URL}"
 
-    return ' {"channel":"$channel",blocks": [ '+${getHeader()}+getDetailWithLink("Build Link",env.JOB_DISPLAY_URL)+' ] }'
+    return ' {"channel":"'+channel+'",blocks": [ ' + getHeader() + getDetailWithLink("Build Link", env.JOB_DISPLAY_URL) + ' ] }'
 }
 
 def getHeader() {
@@ -558,5 +558,5 @@ def getHeader() {
 }
 
 def getDetailWithLink(msg, link) {
-    return ',{"type": "section","text": {"type": "mrkdwn","text": "'+msg+' <'+link+'|Report>]"}}'
+    return ',{"type": "section","text": {"type": "mrkdwn","text": "' + msg + ' <' + link + '|Report>]"}}'
 }
