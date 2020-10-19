@@ -33,12 +33,12 @@ autoTriggeredGitBranch = ""
 slackUserCreatedBranch = ""
 testsummary = ""
 sonarsummary = ""
-sonarLink=""
-pmdLink=""
-checkstyleLink=""
-buildURL=""
-testRpeortLink=""
-coverageRpeortLink=""
+sonarLink = ""
+pmdLink = ""
+checkstyleLink = ""
+buildURL = ""
+testRpeortLink = ""
+coverageRpeortLink = ""
 
 //TODO chnageset  ,  changelog, try catch bloc , send test summary, sonar summary ,
 
@@ -275,18 +275,17 @@ pipeline {
                                     catch (exception) {
                                         echo "$exception"
                                         summary = junit testResults: '**/build/test-results/test/*.xml'
-                                        testsummary=summary.getProperties()
-                                        testRpeortLink=env.RUN_TESTS_DISPLAY_URL
-                                        coverageRpeortLink=BUILD_URL+"jacoco"
+                                        testsummary = summary.getProperties()
+                                        testRpeortLink = env.RUN_TESTS_DISPLAY_URL
+                                        coverageRpeortLink = BUILD_URL + "jacoco"
                                         errorReport(TYPE)
                                         throw exception
                                     }
                                     finally {
                                         summary = junit testResults: '**/build/test-results/test/*.xml'
-                                        testsummary=summary.getProperties()
-                                        testRpeortLink=env.RUN_TESTS_DISPLAY_URL
-                                        coverageRpeortLink=BUILD_URL+"jacoco"
-                                        echo "test >>> ${summary.getProperties()}"
+                                        testsummary = summary.getProperties()
+                                        testRpeortLink = env.RUN_TESTS_DISPLAY_URL
+                                        coverageRpeortLink = BUILD_URL + "jacoco"
                                         step([$class          : 'JacocoPublisher',
                                               execPattern     : '**/build/jacoco/*.exec',
                                               classPattern    : '**/build/classes',
@@ -474,15 +473,15 @@ def successReport(TYPE) {
 }
 
 def errorReport(TYPE) {
-     if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
-         notifySlack("admin")
+    if (TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR") {
+        notifySlack("admin")
     } else if (TYPE == "QA_RELEASE_REQ" || TYPE == "STAGE_RELEASE_REQ" || TYPE == "DEV_RELEASE_REQ" || TYPE == "PROD_RELEASE_REQ" || TYPE == "HOTFIX_QA_RELEASE_REQ" || TYPE == "HOTFIX_STAGING_RELEASE_REQ") {
         errorLayoutSlack("admin")
-         notifySlack( errorLayoutSlack("admin"))
+        notifySlack(errorLayoutSlack("admin"))
     } else if (TYPE == "DEV_PR" || TYPE == "RELEASE_PR" || TYPE == "HOTFIX_PR" || TYPE == "PROD_PR" || TYPE == "HOTFIX_PROD_PR") {
-         notifySlack("pull-request")
+        notifySlack("pull-request")
     } else if (TYPE == "DEV_RELEASE" || TYPE == "QA_RELEASE" || TYPE == "PROD_RELEASE" || TYPE == "HOTFIX_QA_RELEASE") {
-         notifySlack("error")
+        notifySlack("error")
     }
 }
 
@@ -545,15 +544,19 @@ def branchCreationSuccessful() {
     }
 }
 
-def errorLayoutSlack(channel){
+def errorLayoutSlack(channel) {
     echo "$testsummary"
     echo "$testRpeortLink"
     echo "$coverageRpeortLink"
+    echo "uild url ${env.JOB_DISPLAY_URL}"
 
-return " { \"channel\":\"$channel\",\n" +
-        "\t\"blocks\": [ ${getHeader()} ] }"
+    return ' {"channel":"$channel",blocks": [ '+${getHeader()}+getDetailWithLink("Build Link",env.JOB_DISPLAY_URL)+' ] }'
 }
 
-def getHeader(){
-    return  '{"type": "section","text": {"type": "mrkdwn","text": "*This rele*[Requested by <fakeLink.toUser.com|Mark>]"}}'
+def getHeader() {
+    return '{"type": "section","text": {"type": "mrkdwn","text": "*This rele*[Requested by <fakeLink.toUser.com|Mark>]"}}'
+}
+
+def getDetailWithLink(msg, link) {
+    return ',{"type": "section","text": {"type": "mrkdwn","text": "'+msg+' <'+link+'|Report>]"}}'
 }
