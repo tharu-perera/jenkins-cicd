@@ -164,7 +164,6 @@ pipeline {
         }
 
 
-
                 stage('Branch Creation') {
                     when {
                         expression { TYPE == "CREATE_RELEASE_BR" || TYPE == "CREATE_HOTFIX_BR" }
@@ -399,6 +398,7 @@ pipeline {
                                     try {
                                         timeout(time: 1, unit: "HOURS") {
                                             getApproval(TYPE)
+//                                            successReport(TYPE)
                                             approvedBy = input id: 'reqApproval', message: "$SLACK_USER requested  $slackUserRequestedReleaseType ",
                                                     ok: 'Approve?',
 //                                                submitter: 'user1,user2,group1',
@@ -456,8 +456,6 @@ pipeline {
                         }
                     }
                 }
-
-
 
 
         stage("send build status") {
