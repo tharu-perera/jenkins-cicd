@@ -637,7 +637,6 @@ def notifyApproval(type) {
 def notifyReject(type, user) {
     def channel = "general"
     def body='''
-{
  { "channel":"''' + channel + '''",
 \t"blocks": [
 \t\t{
@@ -651,7 +650,6 @@ def notifyReject(type, user) {
 \t\t\t"type": "divider"
 \t\t}
 \t]
-}
 }
 '''
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
