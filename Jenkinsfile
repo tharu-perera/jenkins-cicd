@@ -652,6 +652,7 @@ def notifyReject(type, user) {
 \t\t}
 \t]
 }
+}
 '''
     withCredentials([string(credentialsId: 'slack-token', variable: 'st'), string(credentialsId: 'jen', variable: 'jenn')]) {
         script {
