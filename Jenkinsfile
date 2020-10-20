@@ -492,6 +492,7 @@ def getApproval(TYPE) {
     def branch = ""
     def envTemp = ""
     def manualReq = false
+    def body=""
     if (TYPE == "DEV_RELEASE_REQ") {
         branch = "Develop"
         envTemp = "Develop"
@@ -531,7 +532,7 @@ def getApproval(TYPE) {
     }
 
     if (manualReq) {
-        def body = '''
+          body = '''
  { "channel":"''' + channel + '''",
 \t"blocks": [
 \t\t{
@@ -567,7 +568,7 @@ Git message [*''' + COMMIT_MSG + '''*]"
  '''
 
     } else {
-        def body = '''
+         body = '''
  { "channel":"''' + channel + '''",
 \t"blocks": [
 \t\t{
