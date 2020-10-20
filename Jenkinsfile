@@ -426,7 +426,6 @@ pipeline {
                             }
                         }
                     }
-
                 }
 
                 stage('deployment') {
