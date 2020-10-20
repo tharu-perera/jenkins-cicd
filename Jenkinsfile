@@ -385,7 +385,6 @@ pipeline {
                             try {
                                 timeout(time: 1, unit: "HOURS") {
                                     getApproval(TYPE)
-//                                            successReport(TYPE)
                                     approvedBy = input id: 'reqApproval', message: "$SLACK_USER requested  $slackUserRequestedReleaseType ",
                                             ok: 'Approve?',
 //                                                submitter: 'user1,user2,group1',
