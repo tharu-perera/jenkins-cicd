@@ -644,7 +644,7 @@ def notifyReject(type, user) {
 \t\t\t"type": "section",
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
-\t\t\t\t"text": ":white_check_mark: *Release Was Rejected* <'''+ env.RUN_DISPLAY_URL+'''|[*jenkins pipeline*]>:x: \\n Rejected by *'''+user+'''*\\nGit commit [*'''+COMMIT_HASH+'''*]\\nAuthor [*'''+COMMIT_AUTHOR+'''*]\\nGit message [*'''+COMMIT_MSG+'''*]"
+\t\t\t\t"text":":white_check_mark: *Release Was Rejected* <'''+ env.RUN_DISPLAY_URL+'''|[*jenkins pipeline*]>:x:\n Rejected by *'''+user+'''*\nGit commit [*'''+COMMIT_HASH+'''*]\nAuthor [*'''+COMMIT_AUTHOR+'''*]\nGit message [*'''+COMMIT_MSG+'''*]"
 \t\t\t}
 \t\t},
 \t\t{
