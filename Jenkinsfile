@@ -438,7 +438,7 @@ pipeline {
                         }
                     }
                     steps {
-                        echo 'deployment for PR merge commits and release requests'
+                        echo 'deployment for PR merge commits and release requests>>>'
                     }
                 }
             }
