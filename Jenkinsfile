@@ -5,6 +5,7 @@ enum Type {
     DEV_PR,
     RELEASE_PR,
     HOTFIX_PR,
+        wdwwd,
     PROD_PR,
     HOTFIX_PROD_PR,
     QA_RELEASE_REQ,
