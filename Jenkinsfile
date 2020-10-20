@@ -420,8 +420,8 @@ pipeline {
                                     notifyApproval(TYPE)
                                 }
                             } catch (exception) {
-//                                def user123 = exception.getCauses()[0].getUser().toString()
-//                                notifyReject(TYPE, "${user123}")
+                                def user123 = exception.getCauses()[0].getUser().toString()
+                                notifyReject(TYPE, "${user123}")
                                 throw exception
                             }
                         }
