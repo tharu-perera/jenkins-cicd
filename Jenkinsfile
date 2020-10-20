@@ -488,7 +488,7 @@ def notifySlack(body) {
     }
 }
 
-def getApproval(type) {
+def getApproval(TYPE) {
     def channel = "release-approval"
     def branch = ""
     def envTemp = ""
@@ -566,7 +566,7 @@ Git message [*''' + COMMIT_MSG + '''*]"
 \t]
 }
  '''
-        notifySlack(body)
+
     } else {
         def body = '''
  { "channel":"''' + channel + '''",
@@ -602,9 +602,9 @@ Git message [*''' + COMMIT_MSG + '''*]"
 \t]
 }
  '''
-        notifySlack(body)
-    }
 
+    }
+    notifySlack(body)
 
 }
 
@@ -691,8 +691,9 @@ def pullReqSuccessMSGBuilder(channel) {
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
 \t\t\t\t"text": ":white_check_mark: *PR Build Successful* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>\n 
-\\t:fire:Git commit [*''' + COMMIT_HASH + '''*]\\n 
-\\t:fire:Author [*''' + COMMIT_AUTHOR + '''*]\\n  
+\t:fire:<''' + GIT_PR_LINK + ''' |Pull Request> \n 
+\t:fire:Git commit [*''' + COMMIT_HASH + '''*]\n 
+\t:fire:Author [*''' + COMMIT_AUTHOR + '''*]\\n  
 \\t:fire:Git message[*''' + COMMIT_MSG + '''*]"
 \t\t\t}
 \t\t},
@@ -727,6 +728,7 @@ def pullReqFailedMSGBuilder(channel) {
 \t\t\t"text": {
 \t\t\t\t"type": "mrkdwn",
 \t\t\t\t"text": ":x: *Pull Request Failed* <''' + env.RUN_DISPLAY_URL + '''|[*jenkins pipeline*]>:x:\n 
+\t:fire:<''' +GIT_PR_LINK+ ''' |Pull Request> \n 
 \t:fire:Git commit [*''' + COMMIT_HASH + '''*]\n 
 \t:fire:Author [*''' + COMMIT_AUTHOR + '''*]\n  
 \t:fire:Git message[*''' + COMMIT_MSG + '''*]"
