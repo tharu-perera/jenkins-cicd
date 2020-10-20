@@ -1,10 +1,10 @@
-#!groovy
+#!groovyd
 def COLOR_MAP = ['SUCCESS': 'good', 'FAILURE': 'danger',]
 
 enum Type {
     DEV_PR,
     RELEASE_PR,
-    HOTFIX_PR,
+    HOTFIX_PR,wdwdqwd
     PROD_PR,
     HOTFIX_PROD_PR,
     QA_RELEASE_REQ,
